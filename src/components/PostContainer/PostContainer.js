@@ -40,15 +40,19 @@ export default function PostContainer() {
               <PostPlaceholder />
               <PostPlaceholder />
             </>
+          ) : posts.length > 0 ? (
+            posts?.map((post, index) => <PostImage post={post} key={index} />)
           ) : (
-            posts?.map((post, index) => <PostImage post={post} key={index}/>)
+            <div className="text-2xl font-semibold text-center text-black !mt-16">
+              No posts
+            </div>
           )}
         </div>
 
         {/* right sidebar */}
-        <div className="w-full lg:max-w-[380px] md:max-w-[575px] mx-auto">
+        <div className="w-full hidden lg:block lg:max-w-[380px] md:max-w-[575px] mx-auto">
           <PeopleKnow />
-          <SwiperPhotos />
+          {/* <SwiperPhotos /> */}
         </div>
       </div>
     </>

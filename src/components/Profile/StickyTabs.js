@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IoCameraOutline, IoPlayOutline, IoPricetagsOutline } from "react-icons/io5";
 
-export default function   StickyTabs() {
+export default function StickyTabs() {
   return (
     <>
       <div className=''>

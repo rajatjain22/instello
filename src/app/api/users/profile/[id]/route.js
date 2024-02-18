@@ -28,9 +28,9 @@ export async function GET(request, { params }) {
     const user = await Users.findOne({ _id: userId })
       .select("-password -createdAt -updatedAt -__v -lastLoginAt")
       .populate([
-        { path: "followers" },
-        { path: "following" },
-        { path: "posts", model: Posts },
+        { path: "followers", options: { sort: { createdAt: -1 } } },
+        { path: "following", options: { sort: { createdAt: -1 } } },
+        { path: "posts", model: Posts, options: { sort: { createdAt: -1 } } },
       ]);
 
     return NextResponse.json({

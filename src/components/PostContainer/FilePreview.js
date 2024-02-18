@@ -1,4 +1,4 @@
-import { PostContext } from "@/app/context/Post";
+import { PostContext } from "@/app/_context/Post";
 import React, { useContext } from "react";
 import { IoClose } from "react-icons/io5";
 

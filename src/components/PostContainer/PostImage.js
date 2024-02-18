@@ -1,6 +1,10 @@
+'use client'
+
+import { UserContext } from "@/app/_context/User";
 import { formatTimestamp } from "@/helpers/all";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext } from "react";
 import {
   IoHeart,
   IoChatbubbleEllipses,
@@ -11,6 +15,7 @@ import {
 } from "react-icons/io5";
 
 export default function PostImage({ post }) {
+  const {userDetails} = useContext(UserContext);
   return (
     <div className="bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2">
       <div className="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
@@ -41,17 +46,26 @@ export default function PostImage({ post }) {
           </button>
         </div>
       </div>
-      <div className="relative w-full h-96 px-4">
-        <div className="relative w-full h-full">
-          <Image
-            className="rounded-3xl object-cover"
-            src={post?.post[0]}
-            alt="Picture of the author"
-            fill={true}
-            loading="lazy"
-          />
+
+      {post?.post.length > 0 ? (
+        <div className="relative w-full h-96 px-4">
+          <div className="relative w-full h-full">
+            <Image
+              className="rounded-3xl object-cover"
+              src={post?.post[0]}
+              alt="Picture of the author"
+              fill={true}
+              loading="lazy"
+            />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="sm:px-4 p-2.5 pt-0">
+          <p className="font-medium">
+            {post.text}
+          </p>
+        </div>
+      )}
 
       {/* <!-- post icons --> */}
       <div className="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
@@ -82,14 +96,16 @@ export default function PostImage({ post }) {
       </div>
 
       {/* <!-- post caption --> */}
-      <div className="sm:px-4 p-2.5 flex items-center gap-4">
-        <p className="font-normal">
-          <span className="font-bold">{post?.user?.fullName}</span>{" "}
-          <span>{post?.text}</span>
-        </p>
-      </div>
+      {post?.post.length > 0 && (
+        <div className="sm:px-4 p-2.5 flex items-center gap-4">
+          <p className="font-normal">
+            <span className="font-bold">{post?.user?.fullName}</span>{" "}
+            <span>{post?.text}</span>
+          </p>
+        </div>
+      )}
 
-      <div className="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative dark:border-slate-700/40">
+      {/* <div className="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative dark:border-slate-700/40">
         <div className="flex items-start gap-3 relative">
           <div className="relative w-6 h-6 mt-1">
             <Image
@@ -138,13 +154,13 @@ export default function PostImage({ post }) {
           <IoChevronDownOutline />
           More Comment
         </button>
-      </div>
+      </div> */}
 
       <div className="sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1 dark:border-slate-700/40">
         <div className="relative w-6 h-6 mt-1">
           <Image
             className="rounded-full"
-            src="/people-know/avatar-2.jpg"
+            src={userDetails.avatar}
             alt="Picture of the author"
             fill={true}
             loading="lazy"

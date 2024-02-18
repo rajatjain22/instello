@@ -18,7 +18,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useContext, useEffect } from "react";
-import { UserContext } from "@/app/context/User";
+import { UserContext } from "@/app/_context/User";
 
 function MainComp({ handleToggle }) {
   const { userDetails } = useContext(UserContext);
@@ -159,7 +159,7 @@ function MainComp({ handleToggle }) {
               <Link
                 key={index}
                 href={item.path}
-                className="relative text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
+                className="relative text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
                 onClick={(e) =>
                   item.onclick && item?.onclick(item.label.toLowerCase())
                 }
@@ -178,14 +178,14 @@ function MainComp({ handleToggle }) {
           })}
         </div>
         <div className="w-full h-full flex flex-col justify-end">
-          <button className="text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg">
+          <button className="text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg">
             <SiThreads className="text-2xl" />
             <span className="p-2 hidden lg:block">Threads</span>
           </button>
 
           <button
             onClick={handleLogout}
-            className="text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
+            className="text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
           >
             <IoReorderThreeOutline className="text-2xl" />
             <span className="p-2 hidden lg:block">Logout</span>

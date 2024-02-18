@@ -14,15 +14,16 @@ import ShortList from "./ShortList";
 import HightlightList from "./HightlightList";
 import { MdOutlineVerified } from "react-icons/md";
 import { useContext, useEffect, useState } from "react";
-import { UserContext } from "@/app/context/User";
+import { UserContext } from "@/app/_context/User";
 import toast from "react-hot-toast";
-import { ImageLoading2, ImageLoading3 } from "../Loaders/Profile/ImageLoading";
+import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
 
 export default function Profile({ userId }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const [isFollowed, setIsFollowed] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profileloading, setProfileloading] = useState(false);
+  const [followBtnLoading, setFollowBtnLoading] = useState(false);
 
   useEffect(() => {
     if (!userId) return;
@@ -49,6 +50,7 @@ export default function Profile({ userId }) {
   }, [userDetails]);
 
   const handleFollow = (val) => {
+    setFollowBtnLoading(true);
     const requestData = {
       method: "POST",
       headers: {
@@ -93,7 +95,10 @@ export default function Profile({ userId }) {
         }
         toast.success(val);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => console.log(err.message))
+      .finally(() => {
+        setFollowBtnLoading(false);
+      });
   };
 
   if (!profile) {
@@ -104,12 +109,6 @@ export default function Profile({ userId }) {
     setProfileloading(true);
     const file = e.target.files[0];
     if (file) {
-      // const { name, value, type, files } = e.target;
-      // let avatar = "";
-      // if (type === "file") {
-      //   avatar = await convertBase64(files[0]);
-      // }
-
       const formData = new FormData();
       formData.append("avatar", file);
 
@@ -136,12 +135,19 @@ export default function Profile({ userId }) {
     <>
       <div className="py-6 relative">
         <div className="flex md:gap-16 gap-4 max-md:flex-col">
-          <div className="relative md:p-1 rounded-full h-full max-md:w-16 bg-gradient-to-tr from-pink-400 to-pink-600 shadow-md hover:scale-110 duration-500">
-            <label for="file" className="cursor-pointer">
+          <div
+            className={`relative md:p-1 rounded-full h-full max-md:w-16 bg-gradient-to-tr from-pink-400 to-pink-600 shadow-md ${
+              userId === userDetails._id ? "hover:scale-110 duration-500" : ""
+            }`}
+          >
+            <label
+              for="file"
+              className={`${userId === userDetails._id && "cursor-pointer"}`}
+            >
               <div className="relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900">
                 {profileloading ? (
                   <div className="text-sm md:text-2xl text-white">
-                    Loading...
+                    <ImageLoading4 className="w-20 h-20" />
                   </div>
                 ) : (
                   <Image
@@ -154,21 +160,26 @@ export default function Profile({ userId }) {
                 )}
               </div>
             </label>
-            <button
-              type="button"
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden"
-            >
-              <IoCamera className="text-2xl" />
-            </button>
+            {userId === userDetails._id && (
+              <>
+                <button
+                  type="button"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden"
+                >
+                  <IoCamera className="text-2xl" />
+                </button>
 
-            <input
-              id="file"
-              type="file"
-              name="file"
-              className="hidden"
-              onChange={handleChangeImage}
-              accept="image/*"
-            />
+                <input
+                  id="file"
+                  type="file"
+                  name="file"
+                  className="hidden"
+                  onChange={handleChangeImage}
+                  accept="image/*"
+                  disabled={profileloading}
+                />
+              </>
+            )}
           </div>
           <div className="max-w-2x flex-1">
             <h3 className="md:text-xl text-base font-semibold text-black dark:text-white">
@@ -181,12 +192,10 @@ export default function Profile({ userId }) {
             </p>
 
             <p className="text-sm mt-2 md:font-normal font-light">
-              I love beauty and emotion. 🥰 I’m passionate about photography and
-              learning. 📚 I explore genres and styles. 🌈 I think photography
-              is storytelling. 📖 I hope you like and feel my photos. 😊
+              {profile?.bio}
             </p>
 
-            <p className="mt-2 space-x-2 text-gray-500 text-sm">
+            {/* <p className="mt-2 space-x-2 text-gray-500 text-sm">
               <Link href="#" className="inline-block">
                 Travel
               </Link>
@@ -198,26 +207,26 @@ export default function Profile({ userId }) {
               <Link href="#" className="inline-block">
                 Technolgy
               </Link>
-            </p>
+            </p> */}
 
             <div className="flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4">
-              <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36">
+              <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36 text-center">
                 <div>
                   <p>Posts</p>
                   <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
                     {profile?.posts?.length}
                   </h3>
                 </div>
-                <Link href={`/profile/${profile._id}/following`}>
-                  <p>Following</p>
-                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
-                    {profile.following.length}
-                  </h3>
-                </Link>
                 <Link href={`/profile/${profile._id}/followers`}>
                   <p>Followers</p>
                   <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
                     {profile.followers.length}
+                  </h3>
+                </Link>
+                <Link href={`/profile/${profile._id}/following`}>
+                  <p>Following</p>
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+                    {profile.following.length}
                   </h3>
                 </Link>
               </div>
@@ -231,7 +240,15 @@ export default function Profile({ userId }) {
                   </button>
                 ) : (
                   <>
-                    {isFollowed ? (
+                    {followBtnLoading ? (
+                      <button
+                        type="button"
+                        className="button bg-pink-100 text-pink-600 border border-pink-200 cursor-not-allowed"
+                        disabled
+                      >
+                        <ImageLoading4 className="w-20" />
+                      </button>
+                    ) : isFollowed ? (
                       <button
                         type="button"
                         className="button bg-pink-100 text-pink-600 border border-pink-200"
@@ -274,7 +291,7 @@ export default function Profile({ userId }) {
 
       <div className="mt-10">
         {/* <!-- sticky tabs --> */}
-        <StickyTabs />
+        {/* <StickyTabs /> */}
         {/* <HightlightList /> */}
 
         <PostList posts={profile?.posts} />

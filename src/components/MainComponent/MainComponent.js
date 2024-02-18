@@ -5,14 +5,13 @@ import SideNav from "../SideNavBar/SideNavBar";
 import SearchModel from "../Search/SearchModel";
 import NotificationModel from "../Search/NotificationModel";
 import { usePathname } from "next/navigation";
-import { UserContext } from "@/app/context/User";
+import { UserContext } from "@/app/_context/User";
 
 export default function MainComponent({ children }) {
   const { userDetails } = useContext(UserContext);
   const pathname = usePathname();
   const isPublicPath = pathname === "/login" || pathname === "/register";
 
-  // Toggle 1
   const [toggle, setToggle] = useState({
     search: false,
     notifications: false,
@@ -26,6 +25,14 @@ export default function MainComponent({ children }) {
     }));
   };
 
+  const onClose = () => {
+    setToggle((prevToggle) => ({
+      ...prevToggle,
+      search: false,
+      notifications: false,
+    }));
+  };
+
   if (!userDetails && !isPublicPath) {
     return <div>Loading...</div>;
   }
@@ -35,8 +42,12 @@ export default function MainComponent({ children }) {
         {!isPublicPath ? <SideNav handleToggle={handleToggle} /> : ""}
         <div className="w-full bg-body-color h-screen overflow-y-scroll relative">
           <div className="main__inner">{children}</div>
-          {toggle.search && <SearchModel setToggle={setToggle} />}
-          {toggle.notifications && <NotificationModel setToggle={setToggle}/>}
+          {toggle.search && (
+            <SearchModel onClose={onClose} setToggle={setToggle} />
+          )}
+          {toggle.notifications && (
+            <NotificationModel onClose={onClose} setToggle={setToggle} />
+          )}
         </div>
       </main>
     </>

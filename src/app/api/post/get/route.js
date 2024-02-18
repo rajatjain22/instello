@@ -15,7 +15,7 @@ export async function GET(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const followingIds = [...currentUser.following];
+    const followingIds = [...currentUser.following, currentUser._id];
 
     const allData = await Posts.find({ user: { $in: followingIds } })
       .select("-__v")

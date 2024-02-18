@@ -1,9 +1,9 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MainComponent from "@/components/MainComponent/MainComponent";
-import { UserContextProvider } from "./context/User";
+import { UserContextProvider } from "./_context/User";
 import { Toaster } from "react-hot-toast";
-import { PostContextProvider } from "./context/Post";
+import { PostContextProvider } from "./_context/Post";
 import Test from "@/components/checking/test";
 
 const inter = Inter({ subsets: ["latin"] });
