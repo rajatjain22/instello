@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --w-side: 290px;
+  --w-side-md: 240px;
+  --w-side-small: 73px;
+  --color-bgbody: 246 249 251;
+  --color-primary: 219 39 119;
+  --color-primary-soft: 252 231 243;
+  --color-secondery: 241 245 249;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Inter", system-ui, sans-serif !important;
+}
+
+.bg-primary {
+  --tw-bg-opacity: 1;
+  background-color: rgb(var(--color-primary) / var(--tw-bg-opacity));
+}
+
+.bg-secondery {
+  --tw-bg-opacity: 1;
+  background-color: rgb(var(--color-secondery) / var(--tw-bg-opacity));
+}
+
+.bg-body-color {
+  --tw-bg-opacity: 1;
+  background-color: rgb(var(--color-bgbody) / var(--tw-bg-opacity));
+  font-weight: 400;
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+.button {
+  border-radius: 0.375rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+}
+
+.main__inner {
+  margin-left: auto;
+  margin-right: auto;
+  /* max-width: 1024px; */
+  max-width: 935px;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+/* Custom Product Swiper */
+
+/* .custom-swiper {
+  --tw-bg-opacity: 1;
+  background-color: rgb(30 41 59 / var(--tw-bg-opacity));
+} */
+.swiper,
+.swiper-wrapper {
+  position: unset !important;
+}
+
+.swiper-button-prev,
+.swiper-rtl .swiper-button-next {
+  left: 6px !important;
+}
+.swiper-button-next,
+.swiper-rtl .swiper-button-prev {
+  right: 6px !important;
+}
+.swiper-button-prev,
+.swiper-button-next {
+  top: 148px !important;
+}
+
+.swiper-button-prev::after,
+.swiper-button-next::after {
+  color: rgb(51 65 85 / var(--tw-bg-opacity));
+  --tw-bg-opacity: 1;
+  background-color: white;
+  width: 1.75rem !important;
+  height: 1.75rem;
+  border-radius: 9999px;
+
+  font-size: 13px !important;
+  font-weight: bolder !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.button__ico {
+  display: grid;
+  height: 1.75rem;
+  width: 1.75rem;
+  place-items: center;
+  border-radius: 9999px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.page__heading a {
+  margin-bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  --tw-text-opacity: 1;
+  color: rgb(59 130 246 / var(--tw-text-opacity));
+}
+.page__heading h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
