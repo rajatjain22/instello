@@ -26,12 +26,11 @@ export async function GET(request, { params }) {
     }
 
     const user = await Users.findOne({ _id: userId })
-      .select("-password -createdAt -updatedAt -__v -lastLoginAt")
-      .populate([
-        { path: "followers", options: { sort: { createdAt: -1 } } },
-        { path: "following", options: { sort: { createdAt: -1 } } },
-        { path: "posts", model: Posts, options: { sort: { createdAt: -1 } } },
-      ]);
+      .select("-password -updatedAt -lastLoginAt -__v")
+      .populate({
+        path: "posts",
+        options: { sort: { createdAt: -1 } },
+      });
 
     return NextResponse.json({
       message: "User Found",

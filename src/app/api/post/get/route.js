@@ -18,7 +18,6 @@ export async function GET(request) {
     const followingIds = [...currentUser.following, currentUser._id];
 
     const allData = await Posts.find({ user: { $in: followingIds } })
-      .select("-__v")
       .sort('-createdAt')
       .populate({
         path: "user",

@@ -6,6 +6,7 @@ import SearchModel from "../Search/SearchModel";
 import NotificationModel from "../Search/NotificationModel";
 import { usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
+import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
 
 export default function MainComponent({ children }) {
   const { userDetails } = useContext(UserContext);
@@ -34,14 +35,18 @@ export default function MainComponent({ children }) {
   };
 
   if (!userDetails && !isPublicPath) {
-    return <div>Loading...</div>;
+    return (
+      <div className='w-full h-screen flex justify-center items-center'>
+        <InitialLoader />
+      </div>
+    );
   }
   return (
     <>
-      <main className="flex min-h-screen">
+      <main className='flex min-h-screen'>
         {!isPublicPath ? <SideNav handleToggle={handleToggle} /> : ""}
-        <div className="w-full bg-body-color h-screen overflow-y-scroll relative">
-          <div className="main__inner">{children}</div>
+        <div className='w-full bg-body-color h-screen overflow-y-scroll relative'>
+          <div className='main__inner'>{children}</div>
           {toggle.search && (
             <SearchModel onClose={onClose} setToggle={setToggle} />
           )}

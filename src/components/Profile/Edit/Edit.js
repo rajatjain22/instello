@@ -1,5 +1,6 @@
 'use client'
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IoChevronBackOutline } from "react-icons/io5";
@@ -41,17 +42,19 @@ export default function ProfileSetting({ userId }) {
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm dark:border-slate-700 dark:bg-dark2">
         <div className="flex md:gap-8 gap-4 items-center md:p-10 p-6">
           <div className="relative md:w-20 md:h-20 w-12 h-12 shrink-0">
-            <label for="file" className="cursor-pointer">
-              <img
+            <label htmlFor="file" className="cursor-pointer">
+              <Image
                 id="img"
                 src={editData.avatar}
-                className="object-cover w-full h-full rounded-full"
-                alt=""
+                className="object-cover rounded-full"
+                alt="profile"
+                fill={true}
+                loading="lazy"
               />
               <input type="file" id="file" className="hidden" />
             </label>
             <label
-              for="file"
+              htmlFor="file"
               className="md:p-1 p-0.5 rounded-full bg-slate-600 md:border-4 border-white absolute -bottom-2 -right-2 cursor-pointer dark:border-slate-700"
             >
               <input id="file" type="file" className="hidden" />

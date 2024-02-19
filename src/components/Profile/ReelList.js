@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function ReelList() {
     
 
@@ -9,10 +11,12 @@ export default function ReelList() {
               <div className='lg:hover:scale-105 hover:shadow-lg hover:z-10 duration-500 delay-100'>
                 <a href='#'>
                   <div className='relative w-full lg:h-[270px] aspect-[2.5/4] overflow-hidden rounded-lg shrink-0'>
-                    <img
+                    <Image
                       className='object-cover w-full h-full'
                       src='/people-know/avatar-2.jpg'
-                      alt=''
+                      alt='reel'
+                      fill={true}
+                      loading="lazy"
                     />
 
                     <div className='w-full bottom-0 absolute left-0 bg-gradient-to-t from-black/60 pt-20'>

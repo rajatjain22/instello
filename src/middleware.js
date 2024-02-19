@@ -14,7 +14,7 @@ export async function middleware(request) {
 
         if (!isAuth) {
             Response.json({ success: false, message: "authentication failed" }, { status: 401 });
-            return NextResponse.redirect(new URL("/", request.nextUrl));
+            return NextResponse.redirect(new URL("/login", request.nextUrl));
         }
 
         const requestHeaders = new Headers(request.headers);

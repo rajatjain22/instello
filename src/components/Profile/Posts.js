@@ -1,12 +1,15 @@
+"use client";
+
+import { UserContext } from "@/app/_context/User";
 import { formatTimestamp } from "@/helpers/all";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext } from "react";
 import {
   IoHeart,
   IoChatbubbleEllipses,
   IoPaperPlaneOutline,
   IoShareOutline,
-  IoChevronDownOutline,
   IoEllipsisHorizontal,
 } from "react-icons/io5";
 
@@ -17,7 +20,7 @@ export default function PostImage({ post }) {
         <Link href={`/profile/${post.user._id}`} className='relative w-9 h-9'>
           <Image
             className='rounded-3xl'
-            src={post?.user?.avatar}
+            // src={post?.user?.avatar}
             alt='Picture of the author'
             fill={true}
             loading='lazy'
@@ -27,7 +30,7 @@ export default function PostImage({ post }) {
         <div className='flex-1'>
           <h4 className='text-black dark:text-white'>{post?.user?.fullName}</h4>
           <div className='text-xs text-gray-500 dark:text-white/80'>
-            {formatTimestamp(post?.createdAt)}
+            {/* {formatTimestamp(post?.createdAt)} */}
           </div>
         </div>
         <div className='-mr-1'>
@@ -47,7 +50,7 @@ export default function PostImage({ post }) {
           <div className='relative w-full h-full'>
             <Image
               className='rounded-3xl object-cover'
-              src={post?.post[0]}
+            //   src={post?.post[0]}
               alt='Picture of the author'
               fill={true}
               loading='lazy'
@@ -56,7 +59,7 @@ export default function PostImage({ post }) {
         </div>
       ) : (
         <div className='sm:px-4 p-2.5 pt-0'>
-          <p className='font-medium'>{post.text}</p>
+          {/* <p className='font-medium'>{post.text}</p> */}
         </div>
       )}
 
@@ -89,72 +92,19 @@ export default function PostImage({ post }) {
       </div>
 
       {/* <!-- post caption --> */}
-      {post?.post.length > 0 && post?.text.trim().length > 0 && (
+      {/* {post?.post.length > 0 && post?.text.trim().length > 0 && (
         <div className='sm:px-4 p-2.5 flex items-center gap-4'>
           <p className='font-normal'>
             <span className='font-bold'>{post?.user?.fullName}</span>{" "}
             <span>{post?.text}</span>
           </p>
         </div>
-      )}
-
-      {/* Comment */}
-      {/* <div className="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative dark:border-slate-700/40">
-        <div className="flex items-start gap-3 relative">
-          <div className="relative w-6 h-6 mt-1">
-            <Image
-              className="rounded-full"
-              src="/people-know/avatar-2.jpg"
-              alt="Picture of the author"
-              fill={true}
-              loading="lazy"
-            />
-          </div>
-          <div className="flex-1">
-            <a
-              href="profile.html"
-              className="text-black font-medium inline-block dark:text-white"
-            >
-              Steeve
-            </a>
-            <p className="mt-0.5">What a beautiful photo! I love it. 😍 </p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3 relative">
-          <div className="relative w-6 h-6 mt-1">
-            <Image
-              className="rounded-full"
-              src="/people-know/avatar-2.jpg"
-              alt="Picture of the author"
-              fill={true}
-              loading="lazy"
-            />
-          </div>
-          <div className="flex-1">
-            <a
-              href="profile.html"
-              className="text-black font-medium inline-block dark:text-white"
-            >
-              Rajat Jain
-            </a>
-            <p className="mt-0.5"> You captured the moment.😎 </p>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="flex items-center gap-1.5 text-gray-500 hover:text-blue-500 mt-2"
-        >
-          <IoChevronDownOutline />
-          More Comment
-        </button>
-      </div> */}
-
-      {/* <div className='sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1 dark:border-slate-700/40'>
+      )} */}
+      <div className='sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1 dark:border-slate-700/40'>
         <div className='relative w-6 h-6 mt-1'>
           <Image
             className='rounded-full'
-            src={userDetails.avatar}
+            // src={userDetails.avatar}
             alt='Picture of the author'
             fill={true}
             loading='lazy'
@@ -175,7 +125,7 @@ export default function PostImage({ post }) {
         >
           Replay
         </button>
-      </div> */}
+      </div>
     </div>
   );
 }

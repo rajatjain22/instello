@@ -41,8 +41,8 @@ export default function Login() {
       const resJson = await response.json();
       if (!response.ok) throw new Error(resJson.error);
       setUserDetails(resJson.user);
-      toast.success("Login Successfull");
       router.push("/");
+      toast.success("Login Successfull");
     } catch (error) {
       console.log("Login Failed", error.message);
       toast.error("Login Failed");
@@ -73,7 +73,6 @@ export default function Login() {
             className="bg-transparen !w-full !p-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none"
             value={formData.email}
             onChange={handleChange}
-            autoComplete={true}
           />
           <input
             id="password"

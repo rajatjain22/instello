@@ -14,19 +14,19 @@ export default function NotificationModel({ onClose }) {
   return (
     <div ref={modalRef}>
       <NavModel>
-        <div class="flex items-center justify-between px-5 py-4 sm:mt-3 mt-12">
-          <h3 class="md:text-xl text-lg font-medium mt-3 text-black dark:text-white">
+        <div className="flex items-center justify-between px-5 py-4 sm:mt-3 mt-12">
+          <h3 className="md:text-xl text-lg font-medium mt-3 text-black dark:text-white">
             Notification
           </h3>
 
-          <div class="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-6 h-6"
+              className="w-6 h-6"
             >
               <path
                 stroke-linecap="round"
@@ -45,7 +45,7 @@ export default function NotificationModel({ onClose }) {
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              class="w-6 h-6"
+              className="w-6 h-6"
             >
               <path
                 stroke-linecap="round"
@@ -57,117 +57,125 @@ export default function NotificationModel({ onClose }) {
         </div>
 
         {/* <!-- contents list --> */}
-        <div class="px-2 -mt-2 text-sm font-normal">
-          <div class="px-5 py-3 -mx-2">
-            <h4 class="font-semibold">New</h4>
+        <div className="px-2 -mt-2 text-sm font-normal">
+          <div className="px-5 py-3 -mx-2">
+            <h4 className="font-semibold">New</h4>
           </div>
 
           <a
             href="#"
-            class="relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
+            className="relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
           >
-            <div class="relative w-12 h-12 shrink-0">
+            <div className="relative w-12 h-12 shrink-0">
               {" "}
-              <img
+              <Image
                 src="assets/images/avatars/avatar-2.jpg"
-                alt=""
-                class="object-cover w-full h-full rounded-full"
+                alt="profile"
+                className="object-cover rounded-full"
+                fill={true}
+                loading="lazy"
               />
             </div>
-            <div class="flex-1 ">
+            <div className="flex-1 ">
               <p>
                 {" "}
-                <b class="font-bold mr-1"> John Michael</b> who you might know,
+                <b className="font-bold mr-1"> John Michael</b> who you might know,
                 is on Instello.
               </p>
-              <div class="text-xs text-gray-500 mt-1.5 dark:text-white/80">
+              <div className="text-xs text-gray-500 mt-1.5 dark:text-white/80">
                 {" "}
                 2 hours ago{" "}
               </div>
             </div>
-            <button type="button" class="button text-white bg-primary">
+            <button type="button" className="button text-white bg-primary">
               fallow
             </button>
           </a>
           <a
             href="#"
-            class="relative flex items-center gap-3 p-2 duration-200 rounded-xl pr-10 hover:bg-secondery bg-teal-500/5"
+            className="relative flex items-center gap-3 p-2 duration-200 rounded-xl pr-10 hover:bg-secondery bg-teal-500/5"
           >
-            <div class="relative w-12 h-12 shrink-0">
+            <div className="relative w-12 h-12 shrink-0">
               {" "}
-              <img
+              <Image
                 src="assets/images/avatars/avatar-3.jpg"
-                alt=""
-                class="object-cover w-full h-full rounded-full"
+                alt="profile"
+                className="object-cover rounded-full"
+                fill={true}
+                loading="lazy"
               />
             </div>
-            <div class="flex-1 ">
+            <div className="flex-1 ">
               <p>
                 {" "}
-                <b class="font-bold mr-1"> Alexa Gray</b> started following you.
+                <b className="font-bold mr-1"> Alexa Gray</b> started following you.
                 Welcome him to your profile. 👋{" "}
               </p>
-              <div class="text-xs text-gray-500 mt-1.5 dark:text-white/80">
+              <div className="text-xs text-gray-500 mt-1.5 dark:text-white/80">
                 {" "}
                 4 hours ago{" "}
               </div>
-              <div class="w-2.5 h-2.5 bg-teal-600 rounded-full absolute right-3 top-5"></div>
+              <div className="w-2.5 h-2.5 bg-teal-600 rounded-full absolute right-3 top-5"></div>
             </div>
           </a>
 
-          <div class="border-t px-5 py-3 -mx-2 mt-4 dark:border-slate-700/40">
-            <h4 class="font-semibold">This Week</h4>
+          <div className="border-t px-5 py-3 -mx-2 mt-4 dark:border-slate-700/40">
+            <h4 className="font-semibold">This Week</h4>
           </div>
 
           <a
             href="#"
-            class="relative flex items-center gap-3 p-2 duration-200 rounded-xl pr-10 hover:bg-secondery bg-teal-500/5"
+            className="relative flex items-center gap-3 p-2 duration-200 rounded-xl pr-10 hover:bg-secondery bg-teal-500/5"
           >
-            <div class="relative w-12 h-12 shrink-0">
+            <div className="relative w-12 h-12 shrink-0">
               {" "}
-              <img
+              <Image
                 src="assets/images/avatars/avatar-3.jpg"
-                alt=""
-                class="object-cover w-full h-full rounded-full"
+                alt="profile"
+                className="object-cover rounded-full"
+                fill={true}
+                loading="lazy"
               />
             </div>
-            <div class="flex-1 ">
+            <div className="flex-1 ">
               <p>
                 {" "}
-                <b class="font-bold mr-1"> Sarah Gray</b> sent you a message. He
+                <b className="font-bold mr-1"> Sarah Gray</b> sent you a message. He
                 wants to chat with you. 💖{" "}
               </p>
-              <div class="text-xs text-gray-500 mt-1.5 dark:text-white/80">
+              <div className="text-xs text-gray-500 mt-1.5 dark:text-white/80">
                 {" "}
                 4 hours ago{" "}
               </div>
-              <div class="w-2.5 h-2.5 bg-teal-600 rounded-full absolute right-3 top-5"></div>
+              <div className="w-2.5 h-2.5 bg-teal-600 rounded-full absolute right-3 top-5"></div>
             </div>
           </a>
           <a
             href="#"
-            class="relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
+            className="relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
           >
-            <div class="relative w-12 h-12 shrink-0">
+            <div className="relative w-12 h-12 shrink-0">
               {" "}
-              <img
+              <Image
                 src="assets/images/avatars/avatar-4.jpg"
-                alt=""
-                class="object-cover w-full h-full rounded-full"
+                alt="profile"
+                className="object-cover rounded-full"
+                fill={true}
+                loading="lazy"
               />
             </div>
-            <div class="flex-1 ">
+            <div className="flex-1 ">
               <p>
                 {" "}
-                <b class="font-bold mr-1"> James Lewis</b> Start following you
+                <b className="font-bold mr-1"> James Lewis</b> Start following you
                 on instello{" "}
               </p>
-              <div class="text-xs text-gray-500 mt-1.5 dark:text-white/80">
+              <div className="text-xs text-gray-500 mt-1.5 dark:text-white/80">
                 {" "}
                 8 hours ago{" "}
               </div>
             </div>
-            <button type="button" class="button bg-primary-soft text-primary">
+            <button type="button" className="button bg-primary-soft text-primary">
               fallowing
             </button>
           </a>
