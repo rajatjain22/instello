@@ -12,7 +12,6 @@ export default function AddPost({ setPosts }) {
   const [filesRef, setFileRef] = useState([]);
   const inputRef = useRef(null);
 
-  console.log(userDetails)
   function auto_grow(element) {
     element.target.style.height = "5px";
     element.target.style.height = element.target.scrollHeight + "px";
@@ -41,6 +40,7 @@ export default function AddPost({ setPosts }) {
 
         const resData = await response.json();
         const newPost = {...resData.data, user:userDetails}
+
         setPosts((prevPosts) => [newPost, ...prevPosts]);
         setUserDetails((presVal)=>({...presVal, posts:[resData.data, ...presVal.posts]}))
         setFileRef([]);

@@ -27,10 +27,14 @@ export async function GET(request, { params }) {
 
     const user = await Users.findOne({ _id: userId })
       .select("-password -updatedAt -lastLoginAt -__v")
-      .populate({
-        path: "posts",
-        options: { sort: { createdAt: -1 } },
-      });
+      .populate([
+        { path: "following" },
+        { path: "followers" },
+        {
+          path: "posts",
+          options: { sort: { createdAt: -1 } },
+        },
+      ]);
 
     return NextResponse.json({
       message: "User Found",
@@ -45,8 +49,12 @@ export async function GET(request, { params }) {
 export async function PUT(request, { params }) {
   try {
     const userId = params.id;
-    const form = await request.formData();
+    const form = await request?.formData();
     const avatar = form.get("avatar");
+    const username = form.get("username");
+    const fullName = form.get("fullName");
+    const email = form.get("email");
+    const bio = form.get("bio");
 
     const user = await Users.findById(userId).select(
       "-password -createdAt -__v -lastLoginAt"
@@ -74,6 +82,15 @@ export async function PUT(request, { params }) {
       });
       user.avatar = avatarResult;
     }
+
+    if (username && fullName && email) {
+      user.username = username;
+      user.fullName = fullName;
+      user.email = email;
+      user.bio = bio;
+    }
+
+    console.log(user);
 
     user.updatedAt = Date.now();
     await user.save();

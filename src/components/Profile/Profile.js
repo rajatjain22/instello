@@ -17,6 +17,7 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/app/_context/User";
 import toast from "react-hot-toast";
 import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
+import PostImage from "../PostContainer/PostImage";
 
 export default function Profile({ userId }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
@@ -42,8 +43,8 @@ export default function Profile({ userId }) {
           (e) => e._id === userDetails?._id
         );
         setIsFollowed(isCurrentUserFollowing);
+        console.log(res.data);
         setProfile(res.data);
-        console.log("use effect object");
       })
       .catch((error) => {
         console.error("Error fetching user profile:", error);
@@ -150,32 +151,31 @@ export default function Profile({ userId }) {
     }
   };
 
-  console.log(profile)
   return (
     <>
-      <div className='py-6 relative'>
-        <div className='flex md:gap-16 gap-4 max-md:flex-col'>
+      <div className="py-6 relative">
+        <div className="flex md:gap-16 gap-4 max-md:flex-col">
           <div
             className={`relative md:p-1 rounded-full h-full max-md:w-16 bg-gradient-to-tr from-pink-400 to-pink-600 shadow-md ${
               userId === userDetails._id ? "hover:scale-110 duration-500" : ""
             }`}
           >
             <label
-              htmlFor='file'
+              htmlFor="file"
               className={`${userId === userDetails._id && "cursor-pointer"}`}
             >
-              <div className='relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900'>
+              <div className="relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900">
                 {profileloading ? (
-                  <div className='text-sm md:text-2xl text-white'>
-                    <ImageLoading4 className='w-20 h-20' />
+                  <div className="text-sm md:text-2xl text-white">
+                    <ImageLoading4 className="w-20 h-20" />
                   </div>
                 ) : (
                   <Image
-                    className='shrink-0 bg-fuchsia-100 rounded-2xl'
+                    className="shrink-0 bg-fuchsia-100 rounded-2xl"
                     src={profile.avatar}
-                    alt='Picture of the author'
+                    alt="Picture of the author"
                     fill={true}
-                    loading='lazy'
+                    loading="lazy"
                   />
                 )}
               </div>
@@ -183,35 +183,35 @@ export default function Profile({ userId }) {
             {userId === userDetails._id && (
               <>
                 <button
-                  type='button'
-                  className='absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden'
+                  type="button"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden"
                 >
-                  <IoCamera className='text-2xl' />
+                  <IoCamera className="text-2xl" />
                 </button>
 
                 <input
-                  id='file'
-                  type='file'
-                  name='file'
-                  className='hidden'
+                  id="file"
+                  type="file"
+                  name="file"
+                  className="hidden"
                   onChange={handleChangeImage}
-                  accept='image/*'
+                  accept="image/*"
                   disabled={profileloading}
                 />
               </>
             )}
           </div>
-          <div className='max-w-2x flex-1'>
-            <h3 className='md:text-xl text-base font-semibold text-black dark:text-white'>
+          <div className="max-w-2x flex-1">
+            <h3 className="md:text-xl text-base font-semibold text-black dark:text-white">
               {profile.fullName}
               {profile.isVerified ? <MdOutlineVerified /> : ""}
             </h3>
 
-            <p className='sm:text-sm text-blue-600 mt-1 font-normal text-xs'>
+            <p className="sm:text-sm text-blue-600 mt-1 font-normal text-xs">
               @{profile.username}
             </p>
 
-            <p className='text-sm mt-2 md:font-normal font-light'>
+            <p className="text-sm mt-2 md:font-normal font-light">
               {profile?.bio}
             </p>
 
@@ -229,65 +229,66 @@ export default function Profile({ userId }) {
               </Link>
             </p> */}
 
-            <div className='flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4'>
-              <div className='flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36 text-center'>
+            <div className="flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4">
+              <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36 text-center">
                 <div>
                   <p>Posts</p>
-                  <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
                     {profile?.posts?.length}
                   </h3>
                 </div>
                 <Link href={`/profile/${profile._id}/followers`}>
                   <p>Followers</p>
-                  <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
                     {profile.followers.length}
                   </h3>
                 </Link>
                 <Link href={`/profile/${profile._id}/following`}>
                   <p>Following</p>
-                  <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
                     {profile.following.length}
                   </h3>
                 </Link>
               </div>
-              <div className='flex items-center gap-3 text-sm'>
+              <div className="flex items-center gap-3 text-sm">
                 {userDetails?._id === userId ? (
-                  <button
-                    type='button'
-                    className='button bg-pink-100 text-pink-600 border border-pink-200'
+                  <Link
+                    href={`/profile/${userDetails._id}/edit`}
+                    type="button"
+                    className="button bg-pink-100 text-pink-600 border border-pink-200"
                   >
                     Edit
-                  </button>
+                  </Link>
                 ) : (
                   <>
                     {followBtnLoading ? (
                       <button
-                        type='button'
-                        className='button bg-pink-100 text-pink-600 border border-pink-200 cursor-not-allowed'
+                        type="button"
+                        className="button bg-pink-100 text-pink-600 border border-pink-200 cursor-not-allowed"
                         disabled
                       >
-                        <ImageLoading4 className='w-20' />
+                        <ImageLoading4 className="w-20" />
                       </button>
                     ) : isFollowed ? (
                       <button
-                        type='button'
-                        className='button bg-pink-100 text-pink-600 border border-pink-200'
+                        type="button"
+                        className="button bg-pink-100 text-pink-600 border border-pink-200"
                         onClick={() => handleFollow("unfollow")}
                       >
                         Unfollow
                       </button>
                     ) : (
                       <button
-                        type='button'
-                        className='button text-gray-600 bg-slate-200'
+                        type="button"
+                        className="button text-gray-600 bg-slate-200"
                         onClick={() => handleFollow("follow")}
                       >
                         Follow
                       </button>
                     )}
                     <button
-                      type='submit'
-                      className='button bg-pink-600 text-white'
+                      type="submit"
+                      className="button bg-pink-600 text-white"
                     >
                       Message
                     </button>
@@ -295,10 +296,10 @@ export default function Profile({ userId }) {
                 )}
                 <div>
                   <button
-                    type='submit'
-                    className='rounded-lg bg-slate-200/60 flex px-2 py-1.5 dark:bg-dark2'
-                    aria-haspopup='true'
-                    aria-expanded='false'
+                    type="submit"
+                    className="rounded-lg bg-slate-200/60 flex px-2 py-1.5 dark:bg-dark2"
+                    aria-haspopup="true"
+                    aria-expanded="false"
                   >
                     <IoEllipsisHorizontal />
                   </button>
@@ -309,11 +310,11 @@ export default function Profile({ userId }) {
         </div>
       </div>
 
-      <div className='mt-10'>
+      <div className="mt-10">
         {/* <!-- sticky tabs --> */}
         {/* <StickyTabs /> */}
         {/* <HightlightList /> */}
-
+        {/* <PostImage /> */}
         <PostList posts={profile?.posts} />
         {/* <ReelList /> */}
         {/* <ShortList /> */}
