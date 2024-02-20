@@ -19,11 +19,12 @@ export default function MainComponent({ children }) {
   });
 
   const handleToggle = (key) => {
-      setToggle((prevToggle) => ({
-        ...prevToggle,
-        [key]: !prevToggle[key],
-        [key === "search" ? "notifications" : "search"]: false,
-      }));
+    console.log(key);
+    setToggle((prevToggle) => ({
+      ...prevToggle,
+      [key]: !prevToggle[key],
+      [key === "search" ? "notifications" : "search"]: false,
+    }));
   };
 
   const onClose = () => {
@@ -36,23 +37,23 @@ export default function MainComponent({ children }) {
 
   if (!userDetails && !isPublicPath) {
     return (
-      <div className='w-full h-screen flex justify-center items-center'>
+      <div className="w-full h-screen flex justify-center items-center">
         <InitialLoader />
       </div>
     );
   }
   return (
     <>
-      <main className='flex min-h-screen'>
+      <main className="flex min-h-screen">
         {!isPublicPath ? <SideNavBar handleToggle={handleToggle} /> : ""}
+        <div className="w-full bg-body-color h-screen overflow-y-scroll relative">
+          <div className="main__inner">{children}</div>
           {toggle.search && (
             <SearchModel onClose={onClose} setToggle={setToggle} />
           )}
           {toggle.notifications && (
             <NotificationModel onClose={onClose} setToggle={setToggle} />
           )}
-        <div className='w-full bg-body-color h-screen overflow-y-scroll relative'>
-          <div className='main__inner'>{children}</div>
         </div>
       </main>
     </>

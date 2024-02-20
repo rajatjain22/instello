@@ -44,7 +44,7 @@ const ImageSlider = ({ filesRef, setFileRef, isFeed }) => {
         <div className="relative text-zinc-50 font-generalSans">
             <div
                 ref={slidesContainerRef}
-                className="slides overflow-scroll smooth-scroll w-full whitespace-nowrap touch-pan-x before:shrink-0 after:shrink-0  snap-mandatory flex snap-x"
+                className="no-scrollbar slides overflow-scroll smooth-scroll w-full whitespace-nowrap touch-pan-x before:shrink-0 after:shrink-0  snap-mandatory flex snap-x"
             >
                 {filesRef.length > 0
                     ? filesRef.map((file, idx) => (

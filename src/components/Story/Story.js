@@ -9,7 +9,7 @@ function Story() {
         Stories
       </h3>
 
-      <div className='relative overflow-x-scroll'>
+      <div className='no-scrollbar relative overflow-x-scroll'>
         <div className='py-5 container'>
           <ul className='w-[calc(100%+14px)] flex'>
             <li className='md:pr-3 '>

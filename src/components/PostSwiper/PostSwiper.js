@@ -25,7 +25,7 @@ export default function PostSwiper({ posts }) {
               {isImage && (
                 <div className='relative w-full h-full' key={i}>
                   <Image
-                    className='object-cover'
+                    className='object-contain'
                     src={post}
                     alt='Picture of the author'
                     fill={true}

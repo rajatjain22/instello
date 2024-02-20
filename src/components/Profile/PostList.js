@@ -27,7 +27,7 @@ export default function PostList({ posts }) {
           {/* </div> */}
 
           {/* <!-- Post list --> */}
-          <div className='grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-3 mt-6'>
+          <div className='grid grid-cols-3 gap-3 mt-6'>
             {posts.map((post, index) => {
               const isImage = /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(post.post[0]);
               const isVideo = /\.(mp4|webm|ogv|mpg|mpeg)$/.test(post.post[0]);
@@ -35,7 +35,7 @@ export default function PostList({ posts }) {
                 post?.post.length > 0 && (
                   <div
                     key={`post${index}`}
-                    className='lg:hover:scale-105 hover:shadow-lg hover:z-10 duration-500 delay-100'
+                    className='cursor-pointer lg:hover:scale-105 hover:shadow-lg hover:z-10 duration-500 delay-100'
                   >
                     <div className='relative w-full lg:h-60 h-full aspect-[3/3]'>
                       {isImage && (

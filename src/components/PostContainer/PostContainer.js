@@ -18,7 +18,6 @@ export default function PostContainer() {
       .then((res) => {
         if (res?.message) {
           setPosts(res.data);
-          console.log(res.data);
         } else {
           console.log(res.error);
         }
