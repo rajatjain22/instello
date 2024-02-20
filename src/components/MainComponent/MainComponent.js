@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useContext, useState } from "react";
-import SideNav from "../SideNavBar/SideNavBar";
+import SideNavBar from "../SideNavBar/SideNavBar";
 import SearchModel from "../Search/SearchModel";
 import NotificationModel from "../Search/NotificationModel";
 import { usePathname } from "next/navigation";
@@ -19,11 +19,11 @@ export default function MainComponent({ children }) {
   });
 
   const handleToggle = (key) => {
-    setToggle((prevToggle) => ({
-      ...prevToggle,
-      [key]: !prevToggle[key],
-      [key === "search" ? "notifications" : "search"]: false,
-    }));
+      setToggle((prevToggle) => ({
+        ...prevToggle,
+        [key]: !prevToggle[key],
+        [key === "search" ? "notifications" : "search"]: false,
+      }));
   };
 
   const onClose = () => {
@@ -44,15 +44,15 @@ export default function MainComponent({ children }) {
   return (
     <>
       <main className='flex min-h-screen'>
-        {!isPublicPath ? <SideNav handleToggle={handleToggle} /> : ""}
-        <div className='w-full bg-body-color h-screen overflow-y-scroll relative'>
-          <div className='main__inner'>{children}</div>
+        {!isPublicPath ? <SideNavBar handleToggle={handleToggle} /> : ""}
           {toggle.search && (
             <SearchModel onClose={onClose} setToggle={setToggle} />
           )}
           {toggle.notifications && (
             <NotificationModel onClose={onClose} setToggle={setToggle} />
           )}
+        <div className='w-full bg-body-color h-screen overflow-y-scroll relative'>
+          <div className='main__inner'>{children}</div>
         </div>
       </main>
     </>

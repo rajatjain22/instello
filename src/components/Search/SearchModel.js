@@ -6,6 +6,7 @@ import NavModel from "./NavModel";
 import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
 import useOnClickOutside from "@/app/_hooks/useClickOutside";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function NewSearchModel({ onClose }) {
   const modalRef = useRef(null);
@@ -15,25 +16,50 @@ export default function NewSearchModel({ onClose }) {
   const [search, setsearch] = useState({
     searchValue: "",
     searchUsers: [],
-    searchLoading: true,
+    searchLoading: false,
   });
 
-  useEffect(() => {
-    fetch("/api/users/all")
-      .then((res) => res.json())
-      .then((res) => {
-        if (res?.message) {
-          setsearch((presVal) => ({ ...presVal, searchUsers: res.data }));
-        } else {
-          throw new Error(res?.error);
-        }
-      })
-      .catch((err) => console.log(err.message))
-      .finally(() => {
-        setsearch((presVal) => ({ ...presVal, searchLoading: false }));
-      });
-  }, []);
+  // useEffect(() => {
+  //   fetch("/api/users/all")
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       if (res?.message) {
+  //         setsearch((presVal) => ({ ...presVal, searchUsers: res.data }));
+  //       } else {
+  //         throw new Error(res?.error);
+  //       }
+  //     })
+  //     .catch((err) => console.log(err.message))
+  //     .finally(() => {
+  //       setsearch((presVal) => ({ ...presVal, searchLoading: false }));
+  //     });
+  // }, []);
 
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!search.searchValue) {
+      toast.error("Please enter value!");
+      return false;
+    }
+    try {
+      setsearch((presVal) => ({ ...presVal, searchLoading: true }));
+      const request = {
+        method: "POST",
+        body: JSON.stringify({ search: search.searchValue }),
+      };
+      const response = await fetch("/api/users/search", request);
+      const resJson = await response.json();
+      if (response.ok) {
+        setsearch((presVal) => ({ ...presVal, searchUsers: resJson.users }));
+      } else {
+        console.log(resJson.error);
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setsearch((presVal) => ({ ...presVal, searchLoading: false }));
+    }
+  };
   return (
     <div ref={modalRef}>
       <NavModel>
@@ -43,22 +69,25 @@ export default function NewSearchModel({ onClose }) {
             Search
           </h3>
 
-          <div className='relative -mx-1'>
-            <IoSearch className='absolute top-2.5 left-2 text-xl' />
+          <form onSubmit={handleSearch}>
+            <div className='relative -mx-1'>
+              <IoSearch className='absolute top-2.5 left-2 text-xl' />
 
-            <input
-              type='text'
-              placeholder='Search'
-              className='bg-transparen w-full !pl-10 !py-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none'
-              value={search.searchValue}
-              onChange={(e) =>
-                setsearch((presVal) => ({
-                  ...presVal,
-                  searchValue: e.target.value,
-                }))
-              }
-            />
-          </div>
+              <input
+                type='text'
+                placeholder='Search'
+                className='bg-transparen w-full !pl-10 !py-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none'
+                value={search.searchValue}
+                onChange={(e) =>
+                  setsearch((presVal) => ({
+                    ...presVal,
+                    searchValue: e.target.value,
+                  }))
+                }
+              />
+              <button type='submit' hidden></button>
+            </div>
+          </form>
         </div>
 
         {/* <!-- contents list --> */}
@@ -76,7 +105,7 @@ export default function NewSearchModel({ onClose }) {
               <UserPlaceholder />
               <UserPlaceholder />
             </>
-          ) : search.searchUsers.length > 0 ? (
+          ) : search?.searchUsers?.length > 0 ? (
             search.searchUsers.map((user, index) => (
               <div
                 // href={`/profile/${user._id}`}

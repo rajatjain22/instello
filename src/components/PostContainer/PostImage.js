@@ -9,15 +9,16 @@ import {
   IoChevronDownOutline,
   IoEllipsisHorizontal,
 } from "react-icons/io5";
+import PostSwiper from "../PostSwiper/PostSwiper";
 
-export default function PostImage({ post }) {
+export default function PostImage({ user, post }) {
   return (
     <div className='bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2'>
       <div className='flex gap-3 sm:p-4 p-2.5 text-sm font-medium'>
-        <Link href={`/profile/${post.user._id}`} className='relative w-9 h-9'>
+        <Link href={`/profile/${user._id}`} className='relative w-9 h-9'>
           <Image
             className='rounded-3xl'
-            src={post?.user?.avatar}
+            src={user?.avatar}
             alt='Picture of the author'
             fill={true}
             loading='lazy'
@@ -25,7 +26,7 @@ export default function PostImage({ post }) {
         </Link>
 
         <div className='flex-1'>
-          <h4 className='text-black dark:text-white'>{post?.user?.fullName}</h4>
+          <h4 className='text-black dark:text-white'>{user?.fullName}</h4>
           <div className='text-xs text-gray-500 dark:text-white/80'>
             {formatTimestamp(post?.createdAt)}
           </div>
@@ -42,17 +43,9 @@ export default function PostImage({ post }) {
         </div>
       </div>
 
-      {post?.post.length > 0 ? (
+      {post.post?.length > 0 ? (
         <div className='relative w-full h-96 px-4'>
-          <div className='relative w-full h-full'>
-            <Image
-              className='rounded-3xl object-cover'
-              src={post?.post[0]}
-              alt='Picture of the author'
-              fill={true}
-              loading='lazy'
-            />
-          </div>
+          <PostSwiper posts={post.post} />
         </div>
       ) : (
         <div className='sm:px-4 p-2.5 pt-0'>
@@ -89,10 +82,10 @@ export default function PostImage({ post }) {
       </div>
 
       {/* <!-- post caption --> */}
-      {post?.post.length > 0 && post?.text.trim().length > 0 && (
+      {post?.length > 0 && post?.text?.trim()?.length > 0 && (
         <div className='sm:px-4 p-2.5 flex items-center gap-4'>
           <p className='font-normal'>
-            <span className='font-bold'>{post?.user?.fullName}</span>{" "}
+            <span className='font-bold'>{user?.fullName}</span>{" "}
             <span>{post?.text}</span>
           </p>
         </div>

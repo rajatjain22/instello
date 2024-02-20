@@ -21,7 +21,7 @@ function Story() {
               <div className='md:w-20 md:h-20 w-12 h-12 relative md:border-4 border-2 shadow border-white rounded-full overflow-hidden dark:border-slate-700'>
                 <Image
                   className=''
-                  src='/people-know/avatar-4.jpg'
+                  src='/people-know/avatar-2.jpg'
                   alt='Picture of the author'
                   fill={true}
                   loading='lazy'

@@ -87,7 +87,7 @@ export async function PUT(request, { params }) {
       user.username = username;
       user.fullName = fullName;
       user.email = email;
-      user.bio = bio;
+      user.bio = bio ? bio : "";
     }
 
     console.log(user);

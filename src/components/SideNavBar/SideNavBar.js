@@ -20,7 +20,7 @@ import toast from "react-hot-toast";
 import { useContext, useEffect } from "react";
 import { UserContext } from "@/app/_context/User";
 
-function MainComp({ handleToggle }) {
+function SideNavBar({ handleToggle }) {
   const { userDetails } = useContext(UserContext);
   const router = useRouter();
 
@@ -198,4 +198,4 @@ function MainComp({ handleToggle }) {
   );
 }
 
-export default MainComp;
+export default SideNavBar;
