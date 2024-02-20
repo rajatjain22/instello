@@ -32,8 +32,8 @@ export default function PostContainer() {
 
   return (
     <>
-      <div className="flex max-lg:flex-col xl:gap-10 md:gap-3 md:mt-10">
-        <div className="w-full md:max-w-[575px] mx-auto flex-1 xl:space-y-6 space-y-3">
+      <div className='flex max-lg:flex-col xl:gap-10 md:gap-3 md:mt-10'>
+        <div className='w-full md:max-w-[475px] mx-auto flex-1 xl:space-y-6 space-y-3'>
           <AddPost setPosts={setPosts} />
           {postLoading ? (
             <>
@@ -41,16 +41,18 @@ export default function PostContainer() {
               <PostPlaceholder />
             </>
           ) : posts.length > 0 ? (
-            posts?.map((post, index) => <PostImage post={post} key={index} />)
+            posts?.map((post, index) => (
+              <PostImage user={post?.user} post={post} key={index} />
+            ))
           ) : (
-            <div className="text-2xl font-semibold text-center text-black !mt-16">
+            <div className='text-2xl font-semibold text-center text-black !mt-16'>
               No posts
             </div>
           )}
         </div>
 
         {/* right sidebar */}
-        <div className="w-full hidden lg:block lg:max-w-[380px] md:max-w-[575px] mx-auto">
+        <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto'>
           <PeopleKnow />
           {/* <SwiperPhotos /> */}
         </div>

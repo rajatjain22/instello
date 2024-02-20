@@ -1,10 +1,8 @@
-'use client'
+"use client";
 
-import { UserContext } from "@/app/_context/User";
 import { formatTimestamp } from "@/helpers/all";
 import Image from "next/image";
 import Link from "next/link";
-import { useContext } from "react";
 import {
   IoHeart,
   IoChatbubbleEllipses,
@@ -13,16 +11,54 @@ import {
   IoChevronDownOutline,
   IoEllipsisHorizontal,
 } from "react-icons/io5";
+import PostSwiper from "../PostSwiper/PostSwiper";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "@/app/_context/User";
 
-export default function PostImage({ post }) {
+export default function PostImage({ user, post }) {
   const {userDetails} = useContext(UserContext);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+
+  useEffect(() => {
+    setIsLiked(post.likes.includes(userDetails._id));
+    setLikesCount(post.likes.length);
+  }, [post]);
+
+  const handleLike = async (val) => {
+    try {
+      console.log("isLiked click", val);
+      const request = {
+        method: "PUT",
+        body: JSON.stringify({
+          postId: post._id,
+          action: val === true ? "like" : "unlike",
+        }),
+      };
+      const response = await fetch("/api/post/likeToggle", request);
+      const resData = await response.json();
+      if (response.ok) {
+        if (val) {
+          setLikesCount(likesCount + 1);
+        } else {
+          setLikesCount(likesCount - 1);
+        }
+        setIsLiked(val);
+      } else {
+        console.log("Error: ", response.error);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2">
       <div className="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-        <Link href={`/profile/${post.user._id}`} className="relative w-9 h-9">
+        <Link href={`/profile/${user._id}`} className="relative w-9 h-9">
           <Image
             className="rounded-3xl"
-            src={post?.user?.avatar}
+            src={user?.avatar}
             alt="Picture of the author"
             fill={true}
             loading="lazy"
@@ -30,7 +66,7 @@ export default function PostImage({ post }) {
         </Link>
 
         <div className="flex-1">
-          <h4 className="text-black dark:text-white">{post?.user?.fullName}</h4>
+          <h4 className="text-black dark:text-white">{user?.fullName}</h4>
           <div className="text-xs text-gray-500 dark:text-white/80">
             {formatTimestamp(post?.createdAt)}
           </div>
@@ -47,23 +83,13 @@ export default function PostImage({ post }) {
         </div>
       </div>
 
-      {post?.post.length > 0 ? (
-        <div className="relative w-full h-96 px-4">
-          <div className="relative w-full h-full">
-            <Image
-              className="rounded-3xl object-cover"
-              src={post?.post[0]}
-              alt="Picture of the author"
-              fill={true}
-              loading="lazy"
-            />
-          </div>
+      {post.post?.length > 0 ? (
+        <div className="relative w-full h-[22rem] px-4">
+          <PostSwiper posts={post.post} />
         </div>
       ) : (
         <div className="sm:px-4 p-2.5 pt-0">
-          <p className="font-medium">
-            {post.text}
-          </p>
+          <p className="font-medium whitespace-pre-line">{post.text}</p>
         </div>
       )}
 
@@ -72,11 +98,14 @@ export default function PostImage({ post }) {
         <div className="flex items-center gap-2.5">
           <button
             type="button"
-            className="button__ico text-red-500 bg-red-100 dark:bg-slate-700"
+            className={`button__ico ${
+              isLiked ? "text-red-500 bg-red-100 dark:bg-slate-700" : ""
+            }`}
+            onClick={() => handleLike(!isLiked)}
           >
             <IoHeart className="text-lg" />
           </button>
-          <a href="#">1,380</a>
+          <a href="#">{likesCount}</a>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -96,15 +125,16 @@ export default function PostImage({ post }) {
       </div>
 
       {/* <!-- post caption --> */}
-      {post?.post.length > 0 && (
+      {post?.length > 0 && post?.text?.trim()?.length > 0 && (
         <div className="sm:px-4 p-2.5 flex items-center gap-4">
           <p className="font-normal">
-            <span className="font-bold">{post?.user?.fullName}</span>{" "}
-            <span>{post?.text}</span>
+            <span className="font-bold">{user?.fullName}</span>{" "}
+            <span className="whitespace-pre-line">{post?.text}</span>
           </p>
         </div>
       )}
 
+      {/* Comment */}
       {/* <div className="sm:p-4 p-2.5 border-t border-gray-100 font-normal space-y-3 relative dark:border-slate-700/40">
         <div className="flex items-start gap-3 relative">
           <div className="relative w-6 h-6 mt-1">
@@ -156,34 +186,32 @@ export default function PostImage({ post }) {
         </button>
       </div> */}
 
-      <div className="sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1 dark:border-slate-700/40">
-        <div className="relative w-6 h-6 mt-1">
+      {/* <div className='sm:px-4 sm:py-3 p-2.5 border-t border-gray-100 flex items-center gap-1 dark:border-slate-700/40'>
+        <div className='relative w-6 h-6 mt-1'>
           <Image
-            className="rounded-full"
+            className='rounded-full'
             src={userDetails.avatar}
-            alt="Picture of the author"
+            alt='Picture of the author'
             fill={true}
-            loading="lazy"
+            loading='lazy'
           />
         </div>
 
-        <div className="flex-1 relative overflow-hidden h-10">
+        <div className='flex-1 relative overflow-hidden h-10'>
           <textarea
-            placeholder="Add Comment...."
-            rows="1"
-            className="w-full resize-none !bg-transparent px-4 py-2 focus:!border-transparent focus:!ring-transparent focus:outline-none"
-            aria-haspopup="true"
-            aria-expanded="false"
-          ></textarea>
+            placeholder='Add Comment....'
+            rows='1'
+            className='w-full resize-none !bg-transparent px-4 py-2 focus:!border-transparent focus:!ring-transparent focus:outline-none'
+          />
         </div>
 
         <button
-          type="submit"
-          className="text-sm rounded-full py-1.5 px-3.5 bg-secondery"
+          type='submit'
+          className='text-sm rounded-full py-1.5 px-3.5 bg-secondery'
         >
           Replay
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

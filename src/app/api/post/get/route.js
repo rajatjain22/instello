@@ -15,11 +15,10 @@ export async function GET(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const followingIds = [...currentUser.following, currentUser._id];
+    const followingIds = [...currentUser.following];
 
     const allData = await Posts.find({ user: { $in: followingIds } })
-      .select("-__v")
-      .sort('-createdAt')
+      .sort("-createdAt")
       .populate({
         path: "user",
         select: "-__v -password -updatedAt -lastLoginAt",

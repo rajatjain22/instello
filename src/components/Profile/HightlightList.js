@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { IoChevronBack } from "react-icons/io5";
 
 export default function HightlightList() {
@@ -50,10 +51,12 @@ export default function HightlightList() {
                 >
                   <div className=' lg:hover:scale-105 hover:shadow-lg hover:z-10 duration-500 delay-100'>
                     <div className='w-full lg:h-64 aspect-[2.5/4] realtive'>
-                      <img
+                      <Image
                         src='/people-know/avatar-2.jpg'
-                        className='rounded-lg w-full h-full object-cover inset-0'
-                        alt=''
+                        className='rounded-lg object-cover inset-0'
+                        alt='hightlight'
+                        fill={true}
+                        loading='lazy'
                       />
                     </div>
                   </div>

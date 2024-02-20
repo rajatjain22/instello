@@ -51,15 +51,15 @@ export default function Register() {
     <div className="flex flex-col h-screen justify-center items-center">
       <div className="max-w-sm mx-auto md:px-10 p-4 w-full">
         <div>
-          <div className="relative w-auto h-16 flex justify-center mb-12">
-            <Image
+        <div className="relative w-6 h-16 bg-fuchsia-100 px-3 rounded-2xl p-2.5 my-5 mx-auto">
+          {/* <Image
               className="shrink-0 bg-fuchsia-100 px-3 rounded-2xl p-2.5"
-              src=""
+              src="/"
               alt="Picture of the author"
               fill={true}
               loading="lazy"
-            />
-          </div>
+            /> */}
+        </div>
 
           <form method="POST" className="space-y-3" onSubmit={formSubmit}>
             <input

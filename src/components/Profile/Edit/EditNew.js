@@ -1,4 +1,5 @@
 import ModelBox from "@/components/ModelBox/ModelBox";
+import Image from "next/image";
 
 export default function EditNew({ isOpen, setIsOpen, profile }) {
   return (
@@ -14,18 +15,20 @@ export default function EditNew({ isOpen, setIsOpen, profile }) {
           </div>
         <div className="sm:flex sm:items-start">
         <div className="relative md:w-20 md:h-20 w-12 h-12 shrink-0">
-            <label for="file" className="cursor-pointer">
-              <img
+            <label htmlFor="file" className="cursor-pointer">
+              <Image
                 id="img"
                 src={profile?.avatar ?? ''}
-                className="object-cover w-full h-full rounded-full"
-                alt=""
+                className="object-cover rounded-full"
+                alt="profile"
+                fill={true}
+                loading="lazy"
               />
               <input type="file" id="file" className="hidden" />
             </label>
 
             <label
-              for="file"
+              htmlFor="file"
               className="md:p-1 p-0.5 rounded-full bg-slate-600 md:border-4 border-white absolute -bottom-2 -right-2 cursor-pointer dark:border-slate-700"
             >
               <svg

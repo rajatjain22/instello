@@ -62,11 +62,14 @@ body {
   --tw-bg-opacity: 1;
   background-color: rgb(30 41 59 / var(--tw-bg-opacity));
 } */
-.swiper,
+/* .swiper,
 .swiper-wrapper {
   position: unset !important;
-}
+} */
 
+.mySwiper, .mySwiper .swiper-wrapper {
+  z-index: unset !important;
+}
 .swiper-button-prev,
 .swiper-rtl .swiper-button-next {
   left: 6px !important;
@@ -75,10 +78,10 @@ body {
 .swiper-rtl .swiper-button-prev {
   right: 6px !important;
 }
-.swiper-button-prev,
+/* .swiper-button-prev,
 .swiper-button-next {
   top: 148px !important;
-}
+} */
 
 .swiper-button-prev::after,
 .swiper-button-next::after {

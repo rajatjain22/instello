@@ -14,20 +14,18 @@ export default function AddPost({ setPosts }) {
 
   function auto_grow(element) {
     element.target.style.height = "10px";
-    element.target.style.height = element.target.scrollHeight + "px";
+    element.target.style.height = (element.target.scrollHeight + 10) + "px";
   }
 
+  
   const handlePost = async () => {
     if (filesRef.length > 0 || postText.trim().length > 0) {
       setLoading(true);
       const formData = new FormData();
 
-      // Append files to formData
       filesRef.forEach((file) => {
         formData.append("files", file);
       });
-
-      // Append postText to formData
       formData.append("postText", postText);
 
       const requestData = {
@@ -42,29 +40,17 @@ export default function AddPost({ setPosts }) {
         }
 
         const resData = await response.json();
+        const newPost = { ...resData.data, user: userDetails };
 
-        // Check if the user ID in the response matches the userDetails ID
-        if (resData.data.user === userDetails._id) {
-          // Update userDetails and posts state with the new post
-          setUserDetails((prevUserDetails) => ({
-            ...prevUserDetails,
-            posts: [resData.data, ...prevUserDetails.posts],
-          }));
-          if(userDetails._id === resData.data.user){
-            const newPost = {...resData.data, user:userDetails}
-            setPosts((prevPosts) => [newPost, ...prevPosts]);
+        setPosts((prevPosts) => [newPost, ...prevPosts]);
+        setUserDetails((presVal) => ({
+          ...presVal,
+          posts: [resData.data, ...presVal.posts],
+        }));
+        setFileRef([]);
+        setPostText("");
 
-          }
-
-          // Clear filesRef and postText
-          setFileRef([]);
-          setPostText("");
-
-          // Show success message
-          toast.success("Post Added Successfully");
-        } else {
-          throw new Error("User ID mismatch in the response");
-        }
+        toast.success("Post Added Successfully");
       } catch (error) {
         console.log(error.message);
         toast.error("Failed to add post");
@@ -114,6 +100,7 @@ export default function AddPost({ setPosts }) {
               id="uploadImage"
               className="hidden"
             />
+
             <div
               className="p-2 bg-sky-100 hover:bg-opacity-80 transition-all rounded-lg cursor-pointer"
               onClick={() => inputRef.current.click()}

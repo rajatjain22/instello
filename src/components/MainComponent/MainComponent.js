@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useContext, useState } from "react";
-import SideNav from "../SideNavBar/SideNavBar";
+import SideNavBar from "../SideNavBar/SideNavBar";
 import SearchModel from "../Search/SearchModel";
 import NotificationModel from "../Search/NotificationModel";
 import { usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
+import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
 
 export default function MainComponent({ children }) {
   const { userDetails } = useContext(UserContext);
@@ -18,6 +19,7 @@ export default function MainComponent({ children }) {
   });
 
   const handleToggle = (key) => {
+    console.log(key);
     setToggle((prevToggle) => ({
       ...prevToggle,
       [key]: !prevToggle[key],
@@ -34,12 +36,16 @@ export default function MainComponent({ children }) {
   };
 
   if (!userDetails && !isPublicPath) {
-    return <div>Loading...</div>;
+    return (
+      <div className="w-full h-screen flex justify-center items-center">
+        <InitialLoader />
+      </div>
+    );
   }
   return (
     <>
       <main className="flex min-h-screen">
-        {!isPublicPath ? <SideNav handleToggle={handleToggle} /> : ""}
+        {!isPublicPath ? <SideNavBar handleToggle={handleToggle} /> : ""}
         <div className="w-full bg-body-color h-screen overflow-y-scroll relative">
           <div className="main__inner">{children}</div>
           {toggle.search && (

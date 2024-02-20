@@ -20,12 +20,8 @@ export async function POST(request) {
         }
       );
     }
-    const user = await Users.findOne({ email }).populate([
-      { path: "followers" },
-      { path: "following" },
-      { path: "posts", model: Posts },
-    ]);
-    
+    const user = await Users.findOne({ email }).populate("posts");
+
     if (!user) {
       return NextResponse.json(
         { error: "User not exist" },
@@ -47,7 +43,8 @@ export async function POST(request) {
 
     const tokenData = {
       id: user._id,
-      name: user.name,
+      username: user.username,
+      fullName:user.fullName,
       email: user.email,
     };
 
@@ -58,13 +55,14 @@ export async function POST(request) {
     const expirationTimeInSeconds = expirationTimeInHours * 60 * 60;
 
     const userCopy = { ...user.toObject() }; // Convert Mongoose document to plain object
-    delete userCopy.password;
+    // delete userCopy.password;
 
-    // Set cookie
     const response = NextResponse.json({
       message: "Logged in successfully!",
       user: userCopy,
     });
+
+    // Set cookie
     response.cookies.set("token", token, {
       httpOnly: true,
       maxAge: expirationTimeInSeconds,
