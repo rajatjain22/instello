@@ -22,29 +22,38 @@ export async function POST(request) {
         }
       );
     }
+    if (action === "confirm") {
+      await Users.findByIdAndUpdate(followerId, {
+        $addToSet: { followers: followeeId },
+        $pull: { followRequest: followeeId },
+      }).exec();
 
-    if (action === "follow") {
-      updateQuery = { $addToSet: { following: followeeId } };
-    } else if (action === "unfollow") {
-      updateQuery = { $pull: { following: followeeId } };
+      await Users.findByIdAndUpdate(followeeId, {
+        $addToSet: { following: followerId },
+      }).exec();
+    } else {
+      if (action === "follow") {
+        updateQuery = { $addToSet: { following: followeeId } };
+      } else if (action === "unfollow") {
+        updateQuery = { $pull: { following: followeeId } };
+      }
+
+      // Update the follower's 'following' array
+      await Users.findByIdAndUpdate(followerId, updateQuery).exec();
+
+      let followeeUpdateQuery = {};
+      if (action === "follow") {
+        followeeUpdateQuery = { $addToSet: { followers: followerId } };
+      } else if (action === "unfollow") {
+        followeeUpdateQuery = { $pull: { followers: followerId } };
+      } else if (action === "request") {
+        followeeUpdateQuery = { $addToSet: { followRequest: followerId } };
+      } else if (action === "unrequest") {
+        followeeUpdateQuery = { $pull: { followRequest: followerId } };
+      }
+
+      await Users.findByIdAndUpdate(followeeId, followeeUpdateQuery).exec();
     }
-
-    // Update the follower's 'following' array
-    await Users.findByIdAndUpdate(followerId, updateQuery).exec();
-
-    let followeeUpdateQuery = {};
-    if (action === "follow") {
-      followeeUpdateQuery = { $addToSet: { followers: followerId } };
-    } else if (action === "unfollow") {
-      followeeUpdateQuery = { $pull: { followers: followerId } };
-    } else if (action === "request") {
-      followeeUpdateQuery = { $addToSet: { followRequest: followeeId } };
-    } else if (action === "unrequest") {
-      followeeUpdateQuery = { $pull: { followRequest: followeeId } };
-    }
-
-    await Users.findByIdAndUpdate(followeeId, followeeUpdateQuery).exec();
-
     return NextResponse.json({ message: "followed" }, { status: 200 });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

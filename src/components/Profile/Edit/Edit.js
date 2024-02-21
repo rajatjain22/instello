@@ -198,7 +198,7 @@ export default function ProfileSetting({ userId }) {
                     className="w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
                     rows="5"
                     name="bio"
-                    value={editData.bio}
+                    value={editData?.bio ?? ""}
                     onChange={handleChangeInput}
                     placeholder="Enter your Bio"
                   ></textarea>
@@ -234,6 +234,7 @@ export default function ProfileSetting({ userId }) {
               <div className="flex-1 max-md:mt-4">
                 <select
                   name="isPrivate"
+                  value={editData.isPrivate}
                   className="!border-0 !rounded-md lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
                   onChange={handleChangeInput}
                 >

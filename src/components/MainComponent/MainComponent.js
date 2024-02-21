@@ -2,8 +2,8 @@
 
 import React, { useContext, useState } from "react";
 import SideNavBar from "../SideNavBar/SideNavBar";
-import SearchModel from "../Search/SearchModel";
-import NotificationModel from "../Search/NotificationModel";
+import SearchModel from "../NavModel/SearchModel";
+import NotificationModel from "../NavModel/NotificationModel";
 import { usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
 import InitialLoader from "../Loaders/InitialLoading/InitialLoader";

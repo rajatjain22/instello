@@ -57,7 +57,6 @@ export async function PUT(request, { params }) {
     const bio = form.get("bio");
     const isPrivate = form.get("isPrivate");
 
-
     const user = await Users.findById(userId).select(
       "-password -createdAt -__v -lastLoginAt"
     );
@@ -90,7 +89,7 @@ export async function PUT(request, { params }) {
       user.fullName = fullName;
       user.email = email;
       user.bio = bio ? bio : "";
-      user.isPrivate = isPrivate
+      user.isPrivate = isPrivate;
     }
 
     user.updatedAt = Date.now();
