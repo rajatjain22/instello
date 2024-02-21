@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
   posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "posts" }],
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
-  followRequset: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
+  followRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
   createdAt: { type: Date, require: true, default: new Date() },
   updatedAt: { type: Date, require: true, default: new Date() },
   lastLoginAt: { type: Date, require: true, default: new Date() },

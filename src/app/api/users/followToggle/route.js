@@ -12,6 +12,8 @@ export async function POST(request) {
     const followerId = userId;
     let updateQuery = "";
 
+    console.log(action);
+
     if (!followeeId || !action || !userId) {
       return NextResponse.json(
         { error: "Please fill all required fields" },
@@ -25,17 +27,21 @@ export async function POST(request) {
       updateQuery = { $addToSet: { following: followeeId } };
     } else if (action === "unfollow") {
       updateQuery = { $pull: { following: followeeId } };
-    } else {
-      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     // Update the follower's 'following' array
     await Users.findByIdAndUpdate(followerId, updateQuery).exec();
 
-    const followeeUpdateQuery =
-      action === "follow"
-        ? { $addToSet: { followers: followerId } }
-        : { $pull: { followers: followerId } };
+    let followeeUpdateQuery = {};
+    if (action === "follow") {
+      followeeUpdateQuery = { $addToSet: { followers: followerId } };
+    } else if (action === "unfollow") {
+      followeeUpdateQuery = { $pull: { followers: followerId } };
+    } else if (action === "request") {
+      followeeUpdateQuery = { $addToSet: { followRequest: followeeId } };
+    } else if (action === "unrequest") {
+      followeeUpdateQuery = { $pull: { followRequest: followeeId } };
+    }
 
     await Users.findByIdAndUpdate(followeeId, followeeUpdateQuery).exec();
 
