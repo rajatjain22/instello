@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SideNavBar from "../SideNavBar/SideNavBar";
 import SearchModel from "../NavModel/SearchModel";
 import NotificationModel from "../NavModel/NotificationModel";
@@ -9,14 +9,14 @@ import { UserContext } from "@/app/_context/User";
 import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
 
 export default function MainComponent({ children }) {
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
   const pathname = usePathname();
   const isPublicPath = pathname === "/login" || pathname === "/register";
 
   const [toggle, setToggle] = useState({
     search: false,
     notifications: false,
-  });
+  }); 
 
   const handleToggle = (key) => {
     console.log(key);

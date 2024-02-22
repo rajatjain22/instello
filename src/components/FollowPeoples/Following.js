@@ -31,13 +31,13 @@ export default function Following() {
       }
     };
 
-    if (userDetails && userDetails._id === id) {
-      setAllData(userDetails);
-      setShowType(type);
-    } else {
+    // if (userDetails && userDetails._id === id) {
+    //   setAllData(userDetails);
+    //   setShowType(type);
+    // } else {
       fetchData();
-    }
-  }, [id, type, userDetails]);
+    // }
+  }, []);
 
   const handleFollow = (followerId, val) => {
     const dd = allData.followers.findIndex((e) => e._id === followerId);

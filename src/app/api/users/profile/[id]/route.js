@@ -35,7 +35,6 @@ export async function GET(request, { params }) {
           options: { sort: { createdAt: -1 } },
         },
       ]);
-
     return NextResponse.json({
       message: "User Found",
       data: user,

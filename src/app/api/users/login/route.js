@@ -20,8 +20,15 @@ export async function POST(request) {
         }
       );
     }
-    const user = await Users.findOne({ email }).populate("posts");
-
+    const user = await Users.findOne({ email }).populate([
+      { path: "following" },
+      { path: "followers" },
+      {
+        path: "posts",
+        options: { sort: { createdAt: -1 } },
+      },
+    ]);
+    
     if (!user) {
       return NextResponse.json(
         { error: "User not exist" },
@@ -44,7 +51,7 @@ export async function POST(request) {
     const tokenData = {
       id: user._id,
       username: user.username,
-      fullName:user.fullName,
+      fullName: user.fullName,
       email: user.email,
     };
 

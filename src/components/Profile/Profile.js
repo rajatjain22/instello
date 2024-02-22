@@ -34,6 +34,7 @@ export default function Profile({ userId }) {
   useEffect(() => {
     if (!userId && !userDetails) return;
     if (userId === userDetails?._id) {
+      console.log("userDetails ===> ", userDetails)
       return setProfile(userDetails);
     }
     fetch(`/api/users/profile/${userId}`)
@@ -44,6 +45,7 @@ export default function Profile({ userId }) {
         return res.json();
       })
       .then((res) => {
+
         console.log(res.data.followRequest);
         const isUserRequest = !!res.data.followRequest.includes(
           userDetails?._id
