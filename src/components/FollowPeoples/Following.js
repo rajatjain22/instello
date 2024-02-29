@@ -7,12 +7,16 @@ import { useParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import FollowCard from "./FollowCard";
+import { FollowPeoplePlaceholder } from "../Placeholders/FollowPeoplePlaceholder";
 
 export default function Following() {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const { id, type } = useParams();
   const [showType, setShowType] = useState("");
   const [allData, setAllData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [loadingStates, setLoadingStates] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,25 +30,22 @@ export default function Following() {
         setAllData(data.data);
       } catch (error) {
         console.error(error.message);
-        // Handle error (e.g., show a toast message)
-        toast.error("Failed to fetch user profile");
+      } finally {
+        setLoading(false);
       }
     };
-
-    // if (userDetails && userDetails._id === id) {
-    //   setAllData(userDetails);
-    //   setShowType(type);
-    // } else {
-      fetchData();
-    // }
-  }, []);
+    fetchData();
+  }, [id, type]);
 
   const handleFollow = (followerId, val) => {
+    setLoadingStates((prevLoadingStates) => ({
+      ...prevLoadingStates,
+      [followerId]: true,
+    }));
+
     const dd = allData.followers.findIndex((e) => e._id === followerId);
 
-    const followAction =
-      allData.followers[dd].isPrivate && val === "follow" ? "request" : val;
-    console.log("followAction ===> ", followAction);
+    const followAction = val;
     const requestData = {
       method: "POST",
       headers: {
@@ -60,67 +61,50 @@ export default function Following() {
         return res.json();
       })
       .then((res) => {
-        if (followAction === "request") {
-          // Update followRequest array
-          const updatedFollowers = [...allData.followers];
-          updatedFollowers[dd].followRequest.push(userDetails._id);
-          console.log("updatedFollowers", updatedFollowers);
-          setAllData((prevState) => ({
+        // Handle follow/unfollow
+        const data = val === "follow" ? true : false;
+        if (data && allData) {
+          setUserDetails((prevState) => ({
             ...prevState,
-            followers: updatedFollowers,
+            following: [...prevState.following, allData.followers[dd]],
           }));
-        } else if (followAction === "unrequest") {
-          // Remove from followRequest array
-          const updatedFollowers = [...allData.followers];
-          const unRequest = updatedFollowers[dd].followRequest.filter(
-            (follower) => follower !== userDetails._id
-          );
-          console.log(unRequest);
-          updatedFollowers[dd].followRequest = unRequest;
           setAllData((prevState) => ({
             ...prevState,
-            followers: updatedFollowers,
+            following: [...prevState.following, allData.followers[dd]],
           }));
         } else {
-          // Handle follow/unfollow
-          const data = val === "follow" ? true : false;
-          if (data && allData) {
-            setUserDetails((prevState) => ({
-              ...prevState,
-              following: [...prevState.following, allData.followers[dd]],
-            }));
-            setAllData((prevState) => ({
-              ...prevState,
-              following: [...prevState.following, allData.followers[dd]],
-            }));
-          } else {
-            setUserDetails((prevState) => ({
-              ...prevState,
-              following: prevState.following.filter(
-                (follower) => follower._id !== followerId
-              ),
-            }));
-            setAllData((prevState) => ({
-              ...prevState,
-              following: prevState.following.filter(
-                (follower) => follower._id !== followerId
-              ),
-            }));
-          }
+          setUserDetails((prevState) => ({
+            ...prevState,
+            following: prevState.following.filter(
+              (follower) => follower._id !== followerId
+            ),
+          }));
+          setAllData((prevState) => ({
+            ...prevState,
+            following: prevState.following.filter(
+              (follower) => follower._id !== followerId
+            ),
+          }));
         }
+
         toast.success(val);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => console.log(err.message))
+      .finally(() => {
+        setLoadingStates((prevLoadingStates) => ({
+          ...prevLoadingStates,
+          [followerId]: false,
+        }));
+      });
   };
 
-  console.log(allData);
   return (
     <>
-      <nav className="border-b dark:border-slate-700">
-        <ul className="flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80">
-          <li className="">
+      <nav className='border-b dark:border-slate-700'>
+        <ul className='flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80'>
+          <li className=''>
             <Link
-              href="#"
+              href='#'
               className={`inline-block py-5 border-b-2 ${
                 showType === "followers"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -131,9 +115,9 @@ export default function Following() {
               followers {allData?.followers?.length}
             </Link>
           </li>
-          <li className="">
+          <li className=''>
             <Link
-              href="#"
+              href='#'
               className={`inline-block py-5 border-b-2 ${
                 showType === "following"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -154,20 +138,25 @@ export default function Following() {
           </li> */}
         </ul>
       </nav>
-      {allData?.[showType]?.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
+      {loading ? (
+        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
+          <FollowPeoplePlaceholder />
+          <FollowPeoplePlaceholder />
+        </div>
+      ) : allData?.[showType]?.length > 0 ? (
+        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
           {allData[showType].map((follow, index) => (
             <FollowCard
               key={index}
               allData={allData}
               follow={follow}
               handleFollow={handleFollow}
-              userDetails={userDetails}
+              loadingStates={loadingStates[follow._id]}
             />
           ))}
         </div>
       ) : (
-        <div className="text-2xl font-semibold text-center text-black mt-16">{`No ${showType}`}</div>
+        <div className='text-2xl font-semibold text-center text-black mt-16'>{`No ${showType}`}</div>
       )}
 
       {/* <div className="flex justify-center my-10">

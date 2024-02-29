@@ -1,20 +1,28 @@
 "use client";
 
+import { UserContext } from "@/app/_context/User";
+import FollowButton from "@/components/FollowButton/FollowButton";
 import { UserPlaceholderWithButton } from "@/components/Placeholders/UserPlaceholder";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IoSyncSharp } from "react-icons/io5";
 
 export default function PeopleKnow() {
+  const { userDetails, setUserDetails } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState([]);
 
+  const [loadingStates, setLoadingStates] = useState({});
+
   useEffect(() => {
-    fetch("/api/users/all")
+    fetch("/api/users/suggestion")
       .then((res) => res.json())
       .then((res) => {
         if (res?.message) {
+          const suggestion = res.data.filter(
+            (e) => !!userDetails.following.find((a) => a._id !== e._id)
+          );
           setUserData(res.data);
         } else {
           throw new Error(res.message);
@@ -27,6 +35,53 @@ export default function PeopleKnow() {
         setLoading(false);
       });
   }, []);
+
+  const handleToggleFollow = (user, val) => {
+    const followAction = val ? "unfollow" : "follow";
+
+    setLoadingStates((prevLoadingStates) => ({
+      ...prevLoadingStates,
+      [user._id]: true,
+    }));
+
+    const requestData = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ followeeId: user._id, action: followAction }),
+    };
+
+    fetch("/api/users/followToggle", requestData)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Server response wasn't OK");
+        }
+        return res.json();
+      })
+      .then((res) => {
+        if (followAction === "follow") {
+          setUserDetails((presVal) => ({
+            ...presVal,
+            following: [...presVal.following, user],
+          }));
+        } else if (followAction === "unfollow") {
+          setUserDetails((presVal) => ({
+            ...presVal,
+            following: presVal.following.filter((e) => e._id !== user._id),
+          }));
+        }
+      })
+      .catch((error) => {
+        console.log(error.message);
+      })
+      .finally(() => {
+        setLoadingStates((prevLoadingStates) => ({
+          ...prevLoadingStates,
+          [user._id]: false,
+        }));
+      });
+  };
 
   return (
     <div className='bg-white rounded-xl shadow-sm p-5 px-6 border1 dark:bg-dark2'>
@@ -45,35 +100,43 @@ export default function PeopleKnow() {
             <UserPlaceholderWithButton />
           </>
         ) : (
-          userData.map((user, index) => (
-            <div className='flex items-center gap-3 justify-between' key={index}>
-              <Link href={`/profile/${user._id}`} className="flex gap-2">
-                <div className='w-10 h-10 relative'>
-                  <Image
-                    className='bg-gray-200 rounded-full w-10 h-10'
-                    src={user.avatar}
-                    alt='Picture of the author'
-                    fill={true}
-                    loading='lazy'
-                  />
-                </div>
+          userData.map((user, index) => {
+            const checkFollow = userDetails.following.find(
+              (e) => e._id === user._id
+            );
 
-                <div className='flex-1'>
-                  <h4 className='font-semibold text-sm text-black dark:text-white'>
-                    {user.fullName}
-                  </h4>
-
-                  <div className='mt-0.5'> Suggested For You </div>
-                </div>
-              </Link>
-              {/* <button
-                type='button'
-                className='text-sm rounded-full py-1.5 px-4 font-semibold bg-secondery'
+            return (
+              <div
+                className='flex items-center gap-3 justify-between'
+                key={index}
               >
-                Follow
-              </button> */}
-            </div>
-          ))
+                <Link href={`/profile/${user._id}`} className='flex gap-2'>
+                  <div className='w-10 h-10 relative'>
+                    <Image
+                      className='bg-gray-200 rounded-full w-10 h-10'
+                      src={user.avatar}
+                      alt='Picture of the author'
+                      fill={true}
+                      loading='lazy'
+                    />
+                  </div>
+
+                  <div className='flex-1'>
+                    <h4 className='font-semibold text-sm text-black dark:text-white'>
+                      {user.fullName}
+                    </h4>
+
+                    <div className='mt-0.5'> Suggested For You </div>
+                  </div>
+                </Link>
+                <FollowButton
+                  isFollowing={!!checkFollow}
+                  isLoading={loadingStates[user._id]}
+                  onToggleFollow={() => handleToggleFollow(user, checkFollow)}
+                />
+              </div>
+            );
+          })
         )}
       </div>
     </div>

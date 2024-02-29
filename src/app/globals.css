@@ -70,12 +70,12 @@ body {
 .mySwiper, .mySwiper .swiper-wrapper {
   z-index: unset !important;
 }
-.swiper-button-prev,
-.swiper-rtl .swiper-button-next {
+.mySwiper .swiper-button-prev,
+.mySwiper .swiper-rtl .swiper-button-next {
   left: 6px !important;
 }
-.swiper-button-next,
-.swiper-rtl .swiper-button-prev {
+.mySwiper .swiper-button-next,
+.mySwiper .swiper-rtl .swiper-button-prev {
   right: 6px !important;
 }
 /* .swiper-button-prev,
@@ -83,8 +83,8 @@ body {
   top: 148px !important;
 } */
 
-.swiper-button-prev::after,
-.swiper-button-next::after {
+.mySwiper .swiper-button-prev::after,
+.mySwiper .swiper-button-next::after {
   color: rgb(51 65 85 / var(--tw-bg-opacity));
   --tw-bg-opacity: 1;
   background-color: white;

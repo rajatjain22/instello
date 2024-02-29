@@ -52,7 +52,8 @@ export default function PostContainer() {
         </div>
 
         {/* right sidebar */}
-        <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto'>
+        <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto gap-5'>
+          {/* <PeopleKnow /> */}
           <PeopleKnow />
           {/* <SwiperPhotos /> */}
         </div>

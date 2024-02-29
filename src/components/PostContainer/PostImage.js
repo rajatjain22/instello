@@ -16,18 +16,21 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/app/_context/User";
 
 export default function PostImage({ user, post }) {
-  const {userDetails} = useContext(UserContext);
+  const { userDetails } = useContext(UserContext);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
 
   useEffect(() => {
     setIsLiked(post.likes.includes(userDetails._id));
     setLikesCount(post.likes.length);
-  }, [post]);
+  }, [userDetails, post]);
 
   const handleLike = async (val) => {
     try {
-      console.log("isLiked click", val);
+      setLikesCount(() => {
+        return val ? likesCount + 1 : setLikesCount(likesCount - 1);
+      });
+      setIsLiked(val);
       const request = {
         method: "PUT",
         body: JSON.stringify({
@@ -38,12 +41,6 @@ export default function PostImage({ user, post }) {
       const response = await fetch("/api/post/likeToggle", request);
       const resData = await response.json();
       if (response.ok) {
-        if (val) {
-          setLikesCount(likesCount + 1);
-        } else {
-          setLikesCount(likesCount - 1);
-        }
-        setIsLiked(val);
       } else {
         console.log("Error: ", response.error);
       }
@@ -53,30 +50,30 @@ export default function PostImage({ user, post }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2">
-      <div className="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-        <Link href={`/profile/${user._id}`} className="relative w-9 h-9">
+    <div className='bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2'>
+      <div className='flex gap-3 sm:p-4 p-2.5 text-sm font-medium'>
+        <Link href={`/profile/${user._id}`} className='relative w-9 h-9'>
           <Image
-            className="rounded-3xl"
+            className='rounded-3xl'
             src={user?.avatar}
-            alt="Picture of the author"
+            alt='Picture of the author'
             fill={true}
-            loading="lazy"
+            loading='lazy'
           />
         </Link>
 
-        <div className="flex-1">
-          <h4 className="text-black dark:text-white">{user?.fullName}</h4>
-          <div className="text-xs text-gray-500 dark:text-white/80">
+        <div className='flex-1'>
+          <h4 className='text-black dark:text-white'>{user?.fullName}</h4>
+          <div className='text-xs text-gray-500 dark:text-white/80'>
             {formatTimestamp(post?.createdAt)}
           </div>
         </div>
-        <div className="-mr-1">
+        <div className='-mr-1'>
           <button
-            type="button"
-            className="button__ico w-8 h-8"
-            aria-haspopup="true"
-            aria-expanded="false"
+            type='button'
+            className='button__ico w-8 h-8'
+            aria-haspopup='true'
+            aria-expanded='false'
           >
             <IoEllipsisHorizontal />
           </button>
@@ -84,52 +81,64 @@ export default function PostImage({ user, post }) {
       </div>
 
       {post.post?.length > 0 ? (
-        <div className="relative w-full h-[22rem] px-4">
-          <PostSwiper posts={post.post} />
+        <div className='px-4'>
+          <div className='relative w-full h-[22rem]'>
+            <PostSwiper posts={post.post} />
+          </div>
+          {post.text && (
+            <div className='pt-2 flex gap-2'>
+              <Link href={"#"} className='font-bold'>
+                {user.fullName}
+              </Link>
+              <span className='font-medium whitespace-pre-line'>
+                {post.text}
+              </span>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="sm:px-4 p-2.5 pt-0">
-          <p className="font-medium whitespace-pre-line">{post.text}</p>
+        <div className='sm:px-4 p-2.5 pt-0'>
+          <p className='font-medium whitespace-pre-line'>{post.text}</p>
         </div>
       )}
 
       {/* <!-- post icons --> */}
-      <div className="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
-        <div className="flex items-center gap-2.5">
+      <div className='sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold'>
+        <div className='flex items-center gap-2.5'>
           <button
-            type="button"
+            type='button'
             className={`button__ico ${
               isLiked ? "text-red-500 bg-red-100 dark:bg-slate-700" : ""
             }`}
             onClick={() => handleLike(!isLiked)}
           >
-            <IoHeart className="text-lg" />
+            <IoHeart className='text-lg' />
           </button>
-          <a href="#">{likesCount}</a>
+          <a href='#'>{likesCount}</a>
         </div>
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <button
-            type="button"
-            className="button__ico bg-slate-200/70 dark:bg-slate-700"
+            type='button'
+            className='button__ico bg-slate-200/70 dark:bg-slate-700'
           >
-            <IoChatbubbleEllipses className="text-lg" />
+            <IoChatbubbleEllipses className='text-lg' />
           </button>
           <span>260</span>
         </div>
-        <button type="button" className="button__ico ml-auto">
-          <IoPaperPlaneOutline className="text-lg" />
+        <button type='button' className='button__ico ml-auto'>
+          <IoPaperPlaneOutline className='text-lg' />
         </button>
-        <button type="button" className="button__ico">
-          <IoShareOutline className="text-lg" />
+        <button type='button' className='button__ico'>
+          <IoShareOutline className='text-lg' />
         </button>
       </div>
 
       {/* <!-- post caption --> */}
       {post?.length > 0 && post?.text?.trim()?.length > 0 && (
-        <div className="sm:px-4 p-2.5 flex items-center gap-4">
-          <p className="font-normal">
-            <span className="font-bold">{user?.fullName}</span>{" "}
-            <span className="whitespace-pre-line">{post?.text}</span>
+        <div className='sm:px-4 p-2.5 flex items-center gap-4'>
+          <p className='font-normal'>
+            <span className='font-bold'>{user?.fullName}</span>{" "}
+            <span className='whitespace-pre-line'>{post?.text}</span>
           </p>
         </div>
       )}

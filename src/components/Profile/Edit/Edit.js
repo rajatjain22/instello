@@ -47,7 +47,6 @@ export default function ProfileSetting({ userId }) {
 
   const handleChangeInput = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setEditdata((prevEditData) => ({ ...prevEditData, [name]: value }));
   };
 
@@ -97,11 +96,9 @@ export default function ProfileSetting({ userId }) {
     return <div>Loading...</div>;
   }
 
-  console.log(editData);
-
   return (
     <>
-      <div className="page__heading py-6">
+      <div className='page__heading py-6'>
         <Link href={"#"} onClick={() => router.back()}>
           <IoChevronBackOutline />
           Back
@@ -109,156 +106,124 @@ export default function ProfileSetting({ userId }) {
         <h1> Edit </h1>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm dark:border-slate-700 dark:bg-dark2">
-        <div className="flex md:gap-8 gap-4 items-center md:p-10 p-6">
-          <div className="relative md:w-20 md:h-20 w-12 h-12 shrink-0">
-            {/* <label htmlFor="file" className="cursor-pointer"> */}
+      <div className='bg-white border border-slate-200 rounded-xl shadow-sm dark:border-slate-700 dark:bg-dark2'>
+        <div className='flex md:gap-8 gap-4 items-center md:p-10 p-6'>
+          <div className='relative md:w-20 md:h-20 w-12 h-12 shrink-0'>
             <Image
-              id="img"
+              id='img'
               src={userDetails.avatar}
-              className="object-cover rounded-full"
-              alt="profile"
+              className='object-cover rounded-full'
+              alt='profile'
               fill={true}
-              loading="lazy"
+              loading='lazy'
             />
-            {/* <input type="file" id="file" className="hidden" /> */}
-            {/* </label> */}
-            {/* <label
-              htmlFor="file"
-              className="md:p-1 p-0.5 rounded-full bg-slate-600 md:border-4 border-white absolute -bottom-2 -right-2 cursor-pointer dark:border-slate-700"
-            >
-              <input id="file" type="file" className="hidden" />
-            </label> */}
           </div>
 
-          <div className="flex-1">
-            <h3 className="md:text-xl text-base font-semibold text-black dark:text-white">
+          <div className='flex-1'>
+            <h3 className='md:text-xl text-base font-semibold text-black dark:text-white'>
               {userDetails.fullName}
             </h3>
-            <p className="text-sm text-blue-600 mt-1 font-normal">
+            <p className='text-sm text-blue-600 mt-1 font-normal'>
               @{userDetails.username}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="mt-6 mb-20 text-sm font-medium text-gray-600 dark:text-white/80">
+      <div className='mt-6 mb-20 text-sm font-medium text-gray-600 dark:text-white/80'>
         <div
-          id="setting_tab"
-          className="bg-white border rounded-xl shadow-sm md:py-12 md:px-20 p-6 overflow-hidden dark:border-slate-700 dark:bg-dark2"
+          id='setting_tab'
+          className='bg-white border rounded-xl shadow-sm md:py-12 md:px-20 p-6 overflow-hidden dark:border-slate-700 dark:bg-dark2'
         >
           {/* <!-- tab user basic info --> */}
           <form onSubmit={handleFormSubmit}>
-            <div className="space-y-6">
-              <div className="md:flex items-center gap-10">
-                <label className="md:w-32 text-right"> Username </label>
-                <div className="flex-1 max-md:mt-4">
+            <div className='space-y-6'>
+              <div className='md:flex items-center gap-10'>
+                <label className='md:w-32 text-right'> Username </label>
+                <div className='flex-1 max-md:mt-4'>
                   <input
-                    type="text"
-                    name="username"
+                    type='text'
+                    name='username'
                     value={editData.username}
                     onChange={handleChangeInput}
-                    placeholder="Monroe"
-                    className="lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
+                    placeholder='Monroe'
+                    className='lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white'
                   />
                 </div>
               </div>
-              <div className="md:flex items-center gap-10">
-                <label className="md:w-32 text-right"> Full name </label>
-                <div className="flex-1 max-md:mt-4">
+              <div className='md:flex items-center gap-10'>
+                <label className='md:w-32 text-right'> Full name </label>
+                <div className='flex-1 max-md:mt-4'>
                   <input
-                    type="text"
-                    name="fullName"
+                    type='text'
+                    name='fullName'
                     value={editData.fullName}
                     onChange={handleChangeInput}
-                    placeholder="Monroe"
-                    className="lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
+                    placeholder='Monroe'
+                    className='lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white'
                   />
                 </div>
               </div>
 
-              <div className="md:flex items-center gap-10">
-                <label className="md:w-32 text-right"> Email </label>
-                <div className="flex-1 max-md:mt-4">
+              <div className='md:flex items-center gap-10'>
+                <label className='md:w-32 text-right'> Email </label>
+                <div className='flex-1 max-md:mt-4'>
                   <input
-                    type="text"
-                    name="email"
+                    type='text'
+                    name='email'
                     value={editData.email}
                     onChange={handleChangeInput}
-                    placeholder="info@mydomain.com"
-                    className="w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
+                    placeholder='info@mydomain.com'
+                    className='w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white'
                   />
                 </div>
               </div>
 
-              <div className="md:flex items-start gap-10">
-                <label className="md:w-32 text-right"> Bio </label>
-                <div className="flex-1 max-md:mt-4">
+              <div className='md:flex items-start gap-10'>
+                <label className='md:w-32 text-right'> Bio </label>
+                <div className='flex-1 max-md:mt-4'>
                   <textarea
-                    className="w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
-                    rows="5"
-                    name="bio"
+                    className='w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white'
+                    rows='5'
+                    name='bio'
                     value={editData?.bio ?? ""}
                     onChange={handleChangeInput}
-                    placeholder="Enter your Bio"
+                    placeholder='Enter your Bio'
                   ></textarea>
                 </div>
               </div>
-
-              {/* <div className="md:flex items-center gap-10">
-                  <label className="md:w-32 text-right"> Gender </label>
-                  <div className="flex-1 max-md:mt-4">
-                    <select className="!border-0 !rounded-md lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white">
-                      <option value="1">Male</option>
-                      <option value="2">Female</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="md:flex items-center gap-10">
-                  <label className="md:w-32 text-right"> Relationship </label>
-                  <div className="flex-1 max-md:mt-4">
-                    <select className="!border-0 !rounded-md lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white">
-                      <option value="0">None</option>
-                      <option value="1">Single</option>
-                      <option value="2">In a relationship</option>
-                      <option value="3">Married</option>
-                      <option value="4">Engaged</option>
-                    </select>
-                  </div>
-                </div> */}
             </div>
 
-            <div className="md:flex items-center gap-10">
+            {/* <div className="md:flex items-center gap-10">
               <label className="md:w-32 text-right"> Private Account </label>
               <div className="flex-1 max-md:mt-4">
                 <select
                   name="isPrivate"
                   value={editData.isPrivate}
-                  className="!border-0 !rounded-md lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
+                  className="!border-0 !rounded-md lg:w-1/2 w-full bg-slate-100 focus-visible:outline-none p-2.5 dark:text-white"
                   onChange={handleChangeInput}
                 >
                   <option value={true}>Yes</option>
                   <option value={false}>No</option>
                 </select>
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex items-center justify-end gap-4 mt-16">
+            <div className='flex items-center justify-end gap-4 mt-16'>
               {btnLoading ? (
                 <button
-                  type="button"
+                  type='button'
                   disabled
-                  className="button lg:px-10 bg-primary text-white max-md:flex-1"
+                  className='button lg:px-10 bg-primary text-white max-md:flex-1'
                 >
-                  <BtnLoading /> <span className="ripple-overlay"></span>
+                  <BtnLoading /> <span className='ripple-overlay'></span>
                 </button>
               ) : (
                 <button
-                  type="submit"
-                  className="button lg:px-10 bg-primary text-white max-md:flex-1"
+                  type='submit'
+                  className='button lg:px-10 bg-primary text-white max-md:flex-1'
                 >
-                  Save <span className="ripple-overlay"></span>
+                  Save <span className='ripple-overlay'></span>
                 </button>
               )}
             </div>

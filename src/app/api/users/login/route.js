@@ -3,7 +3,6 @@ import bcryptjs from "bcryptjs";
 import Users from "../../../../schemas/UserModel";
 import createJWT from "../../../../jwt/createJWT";
 import dbConnect from "@/dbconfig/dbconfig";
-import Posts from "@/schemas/PostModel";
 
 dbConnect();
 
@@ -20,15 +19,105 @@ export async function POST(request) {
         }
       );
     }
-    const user = await Users.findOne({ email }).populate([
-      { path: "following" },
-      { path: "followers" },
+
+    const user = await Users.aggregate([
+      { $match: { email: email } },
       {
-        path: "posts",
-        options: { sort: { createdAt: -1 } },
+        $lookup: {
+          from: "users",
+          localField: "following",
+          foreignField: "_id",
+          as: "following",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "followers",
+          foreignField: "_id",
+          as: "followers",
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "posts",
+          foreignField: "_id",
+          as: "posts",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          email:1,
+          username: 1,
+          fullName: 1,
+          avatar: 1,
+          bio: 1,
+          following: {
+            $slice: [
+              {
+                $map: {
+                  input: "$following",
+                  as: "followingUser",
+                  in: {
+                    _id: "$$followingUser._id",
+                    username: "$$followingUser.username",
+                    fullName: "$$followingUser.fullName",
+                    avatar: "$$followingUser.avatar",
+                    followingCount: { $size: "$$followingUser.following" },
+                    followersCount: { $size: "$$followingUser.followers" },
+                  },
+                },
+              },
+              10,
+            ],
+          },
+          followers: {
+            $slice: [
+              {
+                $map: {
+                  input: "$followers",
+                  as: "followersUser",
+                  in: {
+                    _id: "$$followersUser._id",
+                    username: "$$followersUser.username",
+                    fullName: "$$followersUser.fullName",
+                    avatar: "$$followersUser.avatar",
+                    followingCount: { $size: "$$followersUser.following" },
+                    followersCount: { $size: "$$followersUser.followers" },
+                  },
+                },
+              },
+              10,
+            ],
+          },
+          posts: {
+            $slice: [
+              {
+                $map: {
+                  input: "$posts",
+                  as: "postsData",
+                  in: {
+                    _id: "$$postsData._id",
+                    likes: "$$postsData.likes",
+                    comments: "$$postsData.comments",
+                    text: "$$postsData.text",
+                    post: "$$postsData.post",
+                    createdAt: "$$postsData.createdAt",
+                  },
+                },
+              },
+              10,
+            ],
+          },
+          followingCount: { $size: "$following" },
+          followersCount: { $size: "$followers" },
+          postsCount: { $size: "$posts" },
+        },
       },
     ]);
-    
+
     if (!user) {
       return NextResponse.json(
         { error: "User not exist" },
@@ -61,12 +150,13 @@ export async function POST(request) {
     const expirationTimeInHours = 10;
     const expirationTimeInSeconds = expirationTimeInHours * 60 * 60;
 
-    const userCopy = { ...user.toObject() }; // Convert Mongoose document to plain object
-    // delete userCopy.password;
+    // console.log(allData[0]);
+    // const userCopy = { ...allData[0].toObject() }; // Convert Mongoose document to plain object
 
     const response = NextResponse.json({
       message: "Logged in successfully!",
-      user: userCopy,
+      user: user[0],
+      allData,
     });
 
     // Set cookie
