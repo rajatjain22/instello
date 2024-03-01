@@ -32,7 +32,7 @@ export async function GET(request) {
       {
         $match: {
           $and: [
-            { _id: { $ne: new mongoose.Types.ObjectId(userID) } }, // Exclude the current user
+            { _id: { $ne: (userID) } }, // Exclude the current user
             { _id: { $nin: followingIds } }, // Exclude users already being followed
           ],
         },

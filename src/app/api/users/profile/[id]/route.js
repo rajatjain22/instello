@@ -20,6 +20,7 @@ export async function GET(request, { params }) {
     let userId;
     if (query == "user") {
       const data = verifyJWT(token);
+      console.log(token, data)
       userId = data?.id;
     } else {
       userId = query;
