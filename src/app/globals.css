@@ -67,7 +67,8 @@ body {
   position: unset !important;
 } */
 
-.mySwiper, .mySwiper .swiper-wrapper {
+.mySwiper,
+.mySwiper .swiper-wrapper {
   z-index: unset !important;
 }
 .mySwiper .swiper-button-prev,
@@ -78,10 +79,10 @@ body {
 .mySwiper .swiper-rtl .swiper-button-prev {
   right: 6px !important;
 }
-/* .swiper-button-prev,
-.swiper-button-next {
-  top: 148px !important;
-} */
+.mySwiper .swiper-button-prev,
+.mySwiper .swiper-button-next {
+  z-index: 0 !important;
+}
 
 .mySwiper .swiper-button-prev::after,
 .mySwiper .swiper-button-next::after {

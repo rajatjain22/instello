@@ -25,6 +25,8 @@ export async function POST(request) {
       updateQuery = { $addToSet: { following: followeeId } };
     } else if (action === "unfollow") {
       updateQuery = { $pull: { following: followeeId } };
+    } else if (action === "remove") {
+      updateQuery = { $pull: { followers: followeeId } };
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
@@ -35,7 +37,9 @@ export async function POST(request) {
     const followeeUpdateQuery =
       action === "follow"
         ? { $addToSet: { followers: followerId } }
-        : { $pull: { followers: followerId } };
+        : action === "unfollow"
+        ? { $pull: { followers: followerId } }
+        : { $pull: { following: followerId } };
 
     await Users.findByIdAndUpdate(followeeId, followeeUpdateQuery).exec();
 

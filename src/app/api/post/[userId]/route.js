@@ -6,36 +6,17 @@ import mongoose from "mongoose";
 
 dbConnect();
 
-export async function GET(request) {
+export async function GET(request, { params }) {
   try {
+    const query = params.userId;
     const loggedUserId = request.headers.get("x-user-id");
 
-    const currentUser = await Users.findById(loggedUserId).exec();
-
-    if (!currentUser) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const followingIds = [...currentUser.following];
-
-    const allData = await Posts.aggregate([
+    const userId = query === "user" ? loggedUserId : query;
+    const data = await Posts.aggregate([
       {
         $match: {
-          user: {
-            $in: followingIds.map((e) => new mongoose.Types.ObjectId(e)),
-          },
+          user: new mongoose.Types.ObjectId(userId),
         },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      {
-        $unwind: "$user",
       },
       {
         $project: {
@@ -43,7 +24,6 @@ export async function GET(request) {
           text: 1,
           createdAt: 1,
           post: 1,
-          user: { _id: 1, username: 1, fullName: 1, avatar: 1 },
           hasLiked: {
             $cond: {
               if: {
@@ -68,7 +48,7 @@ export async function GET(request) {
 
     return NextResponse.json({
       message: "Successfully!",
-      data: allData,
+      data,
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

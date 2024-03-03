@@ -18,24 +18,29 @@ export default function Following() {
 
   const [loadingStates, setLoadingStates] = useState({});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch(`/api/users/profile/${id}`);
-        if (!res.ok) {
-          throw new Error("Failed to fetch user profile");
-        }
-        const data = await res.json();
-        setShowType(type);
-        setAllData(data.data);
-      } catch (error) {
-        console.error(error.message);
-      } finally {
-        setLoading(false);
+  const fetchData = async (action) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/users/profile/${id}/${action}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch user profile");
       }
-    };
-    fetchData();
-  }, [id, type]);
+      const data = await res.json();
+      setAllData(data.data);
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    setShowType(type);
+  }, [type]);
+
+  useEffect(() => {
+    fetchData(showType);
+  }, [showType]);
 
   const handleFollow = (followerId, val) => {
     setLoadingStates((prevLoadingStates) => ({
@@ -43,15 +48,12 @@ export default function Following() {
       [followerId]: true,
     }));
 
-    const dd = allData.followers.findIndex((e) => e._id === followerId);
-
-    const followAction = val;
     const requestData = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ followeeId: followerId, action: followAction }),
+      body: JSON.stringify({ followeeId: followerId, action: val }),
     };
     fetch("/api/users/followToggle", requestData)
       .then((res) => {
@@ -61,32 +63,66 @@ export default function Following() {
         return res.json();
       })
       .then((res) => {
-        // Handle follow/unfollow
-        const data = val === "follow" ? true : false;
-        if (data && allData) {
-          setUserDetails((prevState) => ({
-            ...prevState,
-            following: [...prevState.following, allData.followers[dd]],
-          }));
-          setAllData((prevState) => ({
-            ...prevState,
-            following: [...prevState.following, allData.followers[dd]],
-          }));
-        } else {
-          setUserDetails((prevState) => ({
-            ...prevState,
-            following: prevState.following.filter(
-              (follower) => follower._id !== followerId
-            ),
-          }));
-          setAllData((prevState) => ({
-            ...prevState,
-            following: prevState.following.filter(
-              (follower) => follower._id !== followerId
-            ),
-          }));
-        }
+        const followUserIndex = allData?.following?.findIndex(
+          (e) => e._id === followerId
+        );
+        if (followUserIndex) {
+          if (val === "follow") {
+            setUserDetails((prevState) => ({
+              ...prevState,
+              followingCount: prevState.followingCount + 1,
+            }));
+            setAllData((prevState) => {
+              let updatedUserData = [...prevState.following];
+              updatedUserData[followUserIndex] = {
+                ...updatedUserData[followUserIndex],
+                followed_by_viewer: true,
+              };
 
+              return {
+                ...prevState,
+                following: updatedUserData,
+                followingCount: prevState.followingCount + 1,
+              };
+            });
+          } else if (val === "unfollow") {
+            setUserDetails((prevState) => ({
+              ...prevState,
+              followingCount: prevState.followingCount - 1,
+            }));
+            setAllData((prevState) => {
+              let updatedUserData = [...prevState.following];
+              updatedUserData[followUserIndex] = {
+                ...updatedUserData[followUserIndex],
+                followed_by_viewer: false,
+              };
+
+              return {
+                ...prevState,
+                following: updatedUserData,
+                followingCount: prevState.followingCount - 1,
+              };
+            });
+          }
+        } else {
+          if (val === "remove") {
+            setUserDetails((prevState) => ({
+              ...prevState,
+              followersCount: prevState.followersCount - 1,
+            }));
+            setAllData((prevState) => {
+              let updatedUserData = prevState.followers.filter(
+                (e) => e._id !== followerId
+              );
+
+              return {
+                ...prevState,
+                followers: updatedUserData,
+                followersCount: prevState.followersCount - 1,
+              };
+            });
+          }
+        }
         toast.success(val);
       })
       .catch((err) => console.log(err.message))
@@ -100,11 +136,11 @@ export default function Following() {
 
   return (
     <>
-      <nav className='border-b dark:border-slate-700'>
-        <ul className='flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80'>
-          <li className=''>
+      <nav className="border-b dark:border-slate-700">
+        <ul className="flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80">
+          <li className="">
             <Link
-              href='#'
+              href="#"
               className={`inline-block py-5 border-b-2 ${
                 showType === "followers"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -112,12 +148,12 @@ export default function Following() {
               }`}
               onClick={() => setShowType("followers")}
             >
-              followers {allData?.followers?.length}
+              followers {allData?.followersCount}
             </Link>
           </li>
-          <li className=''>
+          <li className="">
             <Link
-              href='#'
+              href="#"
               className={`inline-block py-5 border-b-2 ${
                 showType === "following"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -125,7 +161,7 @@ export default function Following() {
               }`}
               onClick={() => setShowType("following")}
             >
-              following {allData?.following?.length}
+              following {allData?.followingCount}
             </Link>
           </li>
           {/* <li>
@@ -139,34 +175,34 @@ export default function Following() {
         </ul>
       </nav>
       {loading ? (
-        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
+        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
           <FollowPeoplePlaceholder />
           <FollowPeoplePlaceholder />
         </div>
       ) : allData?.[showType]?.length > 0 ? (
-        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
+        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
           {allData[showType].map((follow, index) => (
             <FollowCard
               key={index}
-              allData={allData}
               follow={follow}
               handleFollow={handleFollow}
               loadingStates={loadingStates[follow._id]}
+              showType={showType}
             />
           ))}
         </div>
       ) : (
-        <div className='text-2xl font-semibold text-center text-black mt-16'>{`No ${showType}`}</div>
+        <div className="text-2xl font-semibold text-center text-black mt-16">{`No ${showType}`}</div>
       )}
 
-      {/* <div className="flex justify-center my-10">
+      <div className="flex justify-center my-10">
         <button
           type="button"
           className="bg-white py-2 px-5 rounded-full shadow-md font-semibold text-sm dark:bg-dark2"
         >
           Load more...
         </button>
-      </div> */}
+      </div>
     </>
   );
 }

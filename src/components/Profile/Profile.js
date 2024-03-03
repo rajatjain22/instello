@@ -7,27 +7,20 @@ import {
   IoCameraOutline,
   IoEllipsisHorizontal,
 } from "react-icons/io5";
-import StickyTabs from "./StickyTabs";
 import PostList from "./PostList";
-import ReelList from "./ReelList";
-import ShortList from "./ShortList";
-import HightlightList from "./HightlightList";
 import { MdOutlineVerified } from "react-icons/md";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/app/_context/User";
 import toast from "react-hot-toast";
 import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
 import PostImage from "../PostContainer/PostImage";
-import IsPrivate from "./IsPrivate";
 import FollowButton from "../FollowButton/FollowButton";
 
 export default function Profile({ userId }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
-  const [isFollowed, setIsFollowed] = useState(false);
   const [profile, setProfile] = useState(null);
   const [profileloading, setProfileloading] = useState(false);
   const [followBtnLoading, setFollowBtnLoading] = useState(false);
-  const [confirmBtnLoading, setConfirmBtnLoading] = useState(false);
   const [stickyTabChange, setStickyTabChange] = useState("images-posts");
 
   useEffect(() => {
@@ -35,28 +28,35 @@ export default function Profile({ userId }) {
     if (userId === userDetails?._id) {
       return setProfile(userDetails);
     }
-    fetch(`/api/users/profile/${userId}`)
-      .then((res) => {
-        if (!res.ok) {
+
+    const fetchData = async () => {
+      try {
+        const userDataResponse = await fetch(`/api/users/profile/${userId}`);
+        if (!userDataResponse.ok) {
           throw new Error("Network response was not ok");
         }
-        return res.json();
-      })
-      .then((res) => {
-        const isCurrentUserFollowing = !!res.data.followers.find(
-          (e) => e._id === userDetails?._id
-        );
-        setIsFollowed(isCurrentUserFollowing);
+        const userData = await userDataResponse.json();
 
-        setProfile(res.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching user profile:", error);
-      });
+        if (userData.data.followed_by_viewer) {
+          const postDataResponse = await fetch(`/api/post/${userId}`);
+          if (!postDataResponse.ok) {
+            throw new Error("Network response for user's posts was not ok");
+          }
+          const postData = await postDataResponse.json();
+
+          setProfile({ ...userData.data, posts: postData.data });
+        } else {
+          setProfile({ ...userData.data, posts: [] });
+        }
+      } catch (error) {
+        console.error("Error while fetching user data:", error.message);
+      }
+    };
+
+    fetchData();
   }, [userId]);
 
   const handleFollow = (val) => {
-    const followAction = val;
     setFollowBtnLoading(true);
     const requestData = {
       method: "POST",
@@ -65,7 +65,7 @@ export default function Profile({ userId }) {
       },
       body: JSON.stringify({
         followeeId: profile._id,
-        action: followAction,
+        action: val,
       }),
     };
     fetch("/api/users/followToggle", requestData)
@@ -76,30 +76,25 @@ export default function Profile({ userId }) {
         return res.json();
       })
       .then((res) => {
-        const data = val === "follow" ? true : false;
-        setIsFollowed(data);
-
-        if (data && profile) {
+        if (val === "follow") {
           setProfile((prevState) => ({
             ...prevState,
-            followers: [...prevState.followers, userDetails._id],
+            followed_by_viewer: true,
+            followersCount: prevState.followersCount + 1,
           }));
           setUserDetails((presVal) => ({
             ...presVal,
-            following: [...presVal.following, profile],
+            followingCount: presVal.followingCount + 1,
           }));
-        } else if (!data && profile) {
-          setProfile((presVal) => ({
-            ...presVal,
-            followers: presVal.followers.filter(
-              (followerId) => followerId !== userDetails._id
-            ),
+        } else if (val === "unfollow") {
+          setProfile((prevState) => ({
+            ...prevState,
+            followed_by_viewer: false,
+            followersCount: prevState.followersCount - 1,
           }));
           setUserDetails((presVal) => ({
             ...presVal,
-            following: presVal.following.filter(
-              (followingId) => followingId._id !== profile._id
-            ),
+            followingCount: presVal.followingCount - 1,
           }));
         }
       })
@@ -113,7 +108,7 @@ export default function Profile({ userId }) {
     return <div>Loading...</div>;
   }
 
-  const handleChangeImage = async (e) => {
+  const handleUpdateProfile = async (e) => {
     const file = e.target.files[0];
     if (file) {
       // Checking if the file type is allowed or not
@@ -156,45 +151,31 @@ export default function Profile({ userId }) {
     }
   };
 
-  const followerLink =
-    profile.isPrivate &&
-    userId !== userDetails?._id &&
-    !profile.followers.find((e) => e._id === userDetails._id)
-      ? "#"
-      : `/profile/${profile._id}/followers`;
-
-  const followingLink =
-    profile.isPrivate &&
-    userId !== userDetails?._id &&
-    !profile.followers.find((e) => e._id === userDetails._id)
-      ? "#"
-      : `/profile/${profile._id}/following`;
-
   return (
     <>
-      <div className='py-6 relative'>
-        <div className='flex md:gap-16 gap-4 max-md:flex-col'>
+      <div className="py-6 relative">
+        <div className="flex md:gap-16 gap-4 max-md:flex-col">
           <div
             className={`relative md:p-1 rounded-full h-full max-md:w-16 bg-gradient-to-tr from-pink-400 to-pink-600 shadow-md ${
               userId === userDetails._id ? "hover:scale-110 duration-500" : ""
             }`}
           >
             <label
-              htmlFor='file'
+              htmlFor="file"
               className={`${userId === userDetails._id && "cursor-pointer"}`}
             >
-              <div className='relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900'>
+              <div className="relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900">
                 {profileloading ? (
-                  <div className='text-sm md:text-2xl text-white'>
-                    <ImageLoading4 className='w-20 h-20' />
+                  <div className="text-sm md:text-2xl text-white">
+                    <ImageLoading4 className="w-20 h-20" />
                   </div>
                 ) : (
                   <Image
-                    className='shrink-0 bg-fuchsia-100 rounded-2xl'
+                    className="shrink-0 bg-fuchsia-100 rounded-2xl"
                     src={profile.avatar}
-                    alt='Picture of the author'
+                    alt="Picture of the author"
                     fill={true}
-                    loading='lazy'
+                    loading="lazy"
                   />
                 )}
               </div>
@@ -202,98 +183,111 @@ export default function Profile({ userId }) {
             {userId === userDetails._id && (
               <>
                 <button
-                  type='button'
-                  className='absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden'
+                  type="button"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden"
                 >
-                  <IoCamera className='text-2xl' />
+                  <IoCamera className="text-2xl" />
                 </button>
 
                 <input
-                  id='file'
-                  type='file'
-                  name='file'
-                  className='hidden'
-                  onChange={handleChangeImage}
-                  accept='image/*'
+                  id="file"
+                  type="file"
+                  name="file"
+                  className="hidden"
+                  onChange={handleUpdateProfile}
+                  accept="image/*"
                   disabled={profileloading}
                 />
               </>
             )}
           </div>
-          <div className='max-w-2x flex-1'>
-            <h3 className='md:text-xl text-base font-semibold text-black dark:text-white'>
+          <div className="max-w-2x flex-1">
+            <h3 className="md:text-xl text-base font-semibold text-black dark:text-white">
               {profile.fullName}
               {profile.isVerified ? <MdOutlineVerified /> : ""}
             </h3>
 
-            <p className='sm:text-sm text-blue-600 mt-1 font-normal text-xs'>
+            <p className="sm:text-sm text-blue-600 mt-1 font-normal text-xs">
               @{profile.username}
             </p>
 
-            <p className='text-sm mt-2 md:font-normal font-light whitespace-pre-line'>
+            <p className="text-sm mt-2 md:font-normal font-light whitespace-pre-line">
               {profile?.bio}
             </p>
 
-            <div className='flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4'>
-              <div className='flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36 text-center'>
+            <div className="flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4">
+              <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36 text-center">
                 <div>
                   <p>Posts</p>
-                  <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
-                    {profile?.posts?.length}
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+                    {profile?.postsCount}
                   </h3>
                 </div>
 
                 <Link
-                  href={followerLink}
+                  href={`${
+                    profile.followed_by_viewer ||
+                    userDetails._id === profile._id
+                      ? `/profile/${profile._id}/followers`
+                      : "#"
+                  }`}
                   className={`${
-                    profile._id !== userDetails._id &&
-                    !isFollowed &&
-                    "cursor-context-menu"
+                    (
+                      !profile.followed_by_viewer &&
+                      userDetails._id !== profile._id
+                    ) && "cursor-default"
                   }`}
                 >
                   <p>Followers</p>
-                  <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
-                    {profile.followers.length}
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+                    {profile.followersCount}
                   </h3>
                 </Link>
                 <Link
-                  href={followingLink}
+                  href={`${
+                    profile.followed_by_viewer ||
+                    userDetails._id === profile._id
+                      ? `/profile/${profile._id}/following`
+                      : "#"
+                  }`}
                   className={`${
-                    profile._id !== userDetails._id &&
-                    !isFollowed &&
-                    "cursor-context-menu"
+                    !profile.followed_by_viewer &&
+                    userDetails._id !== profile._id &&
+                    "cursor-default"
                   }`}
                 >
                   <p>Following</p>
-                  <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
-                    {profile.following.length}
+                  <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+                    {profile.followingCount}
                   </h3>
                 </Link>
               </div>
 
-              <div className='flex items-center gap-3 text-sm'>
+              <div className="flex items-center gap-3 text-sm">
                 {userDetails?._id === userId ? (
                   <Link
                     href={`/profile/${userDetails._id}/edit`}
-                    type='button'
-                    className='button bg-pink-100 text-pink-600 border border-pink-200'
+                    type="button"
+                    className="button bg-pink-100 text-pink-600 border border-pink-200"
                   >
                     Edit
                   </Link>
                 ) : (
                   <>
                     <FollowButton
-                      isFollowing={isFollowed}
+                      isFollowing={profile.followed_by_viewer}
                       isLoading={followBtnLoading}
                       onToggleFollow={() =>
-                        handleFollow(isFollowed ? "unfollow" : "follow")
+                        handleFollow(
+                          profile.followed_by_viewer ? "unfollow" : "follow"
+                        )
                       }
                     />
 
-                    {isFollowed && (
+                    {profile.followed_by_viewer && (
                       <button
-                        type='submit'
-                        className='button bg-pink-600 text-white'
+                        type="submit"
+                        className="button bg-pink-600 text-white"
                       >
                         Message
                       </button>
@@ -302,10 +296,10 @@ export default function Profile({ userId }) {
                 )}
                 <div>
                   <button
-                    type='submit'
-                    className='rounded-lg bg-slate-200/60 flex px-2 py-1.5 dark:bg-dark2'
-                    aria-haspopup='true'
-                    aria-expanded='false'
+                    type="submit"
+                    className="rounded-lg bg-slate-200/60 flex px-2 py-1.5 dark:bg-dark2"
+                    aria-haspopup="true"
+                    aria-expanded="false"
                   >
                     <IoEllipsisHorizontal />
                   </button>
@@ -316,10 +310,10 @@ export default function Profile({ userId }) {
         </div>
       </div>
 
-      <div className='mt-10 flex flex-col gap-8 max-w-[600px] my-0 mx-auto'>
+      <div className="mt-10 flex flex-col gap-8 max-w-[600px] my-0 mx-auto">
         {/* <!-- sticky tabs --> */}
-        <nav className='text-sm text-center text-gray-500 capitalize font-semibold dark:text-white'>
-          <ul className='flex gap-2 justify-center border-t dark:border-slate-700'>
+        <nav className="text-sm text-center text-gray-500 capitalize font-semibold dark:text-white">
+          <ul className="flex gap-2 justify-center border-t dark:border-slate-700">
             <li>
               <button
                 onClick={() => setStickyTabChange("images-posts")}
@@ -328,9 +322,9 @@ export default function Profile({ userId }) {
                     ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
                     : ""
                 }`}
-                aria-expanded='true'
+                aria-expanded="true"
               >
-                <IoCameraOutline className='text-lg' />
+                <IoCameraOutline className="text-lg" />
                 Images
               </button>
             </li>
@@ -342,9 +336,9 @@ export default function Profile({ userId }) {
                     ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
                     : ""
                 }`}
-                aria-expanded='true'
+                aria-expanded="true"
               >
-                <IoCameraOutline className='text-lg' />
+                <IoCameraOutline className="text-lg" />
                 All Posts
               </button>
             </li>

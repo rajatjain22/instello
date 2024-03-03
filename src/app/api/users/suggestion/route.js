@@ -32,7 +32,7 @@ export async function GET(request) {
       {
         $match: {
           $and: [
-            { _id: { $ne: (userID) } }, // Exclude the current user
+            { _id: { $ne: new mongoose.Types.ObjectId(userID) } }, // Exclude the current user
             { _id: { $nin: followingIds } }, // Exclude users already being followed
           ],
         },
@@ -41,8 +41,8 @@ export async function GET(request) {
         $project: {
           _id: 1,
           avatar: 1,
-          followingCount: { $size: "$following" },
-          followersCount: { $size: "$followers" },
+          followed_by_viewer: { $literal: false },
+          follows_viewer: { $literal: false },
           fullName: 1,
           username: 1,
         },

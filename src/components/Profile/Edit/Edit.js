@@ -61,7 +61,7 @@ export default function ProfileSetting({ userId }) {
       const formData = new FormData();
       formData.append("username", editData.username);
       formData.append("fullName", editData.fullName);
-      formData.append("email", editData.email);
+      // formData.append("email", editData.email);
       formData.append("bio", editData.bio);
       formData.append("isPrivate", editData.isPrivate);
 
@@ -74,11 +74,11 @@ export default function ProfileSetting({ userId }) {
         toast.success("Updated!");
         setUserDetails((presVal) => ({
           ...presVal,
-          username: data.username,
-          fullName: data.fullName,
-          email: data.email,
-          bio: data.bio,
-          isPrivate: data.isPrivate,
+          username: editData.username,
+          fullName: editData.fullName,
+          email: editData.email,
+          bio: editData.bio,
+          isPrivate: editData.isPrivate,
         }));
       } else {
         toast.error("Upload failed");

@@ -5,6 +5,7 @@ export default function FollowButton({
   isFollowing,
   isLoading,
   onToggleFollow,
+  isRemove,
 }) {
   const [following, setFollowing] = useState("Follow");
 
@@ -26,18 +27,30 @@ export default function FollowButton({
   if (isLoading) {
     return (
       <button
-        type='button'
-        className='button bg-pink-100 text-pink-600 border border-pink-200 cursor-not-allowed'
+        type="button"
+        className="button bg-pink-100 text-pink-600 border border-pink-200 cursor-not-allowed"
         disabled
       >
-        <ImageLoading4 className='w-20' />
+        <ImageLoading4 className="w-20" />
+      </button>
+    );
+  }
+
+  if (isRemove) {
+    return (
+      <button
+        type="button"
+        className={`button text-gray-600 bg-slate-200`}
+        onClick={() => handleToggleFollow("remove")}
+      >
+        Remove
       </button>
     );
   }
 
   return (
     <button
-      type='button'
+      type="button"
       className={`button ${
         following === "Follow"
           ? "text-gray-600 bg-slate-200"

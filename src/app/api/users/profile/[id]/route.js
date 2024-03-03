@@ -6,6 +6,7 @@ import express from "express";
 import { NextResponse } from "next/server";
 import uploadImage from "@/cloudnary/uploadImage";
 import Posts from "@/schemas/PostModel";
+import mongoose from "mongoose";
 
 const app = express();
 app.use(fileUpload());
@@ -15,30 +16,56 @@ dbConnect();
 export async function GET(request, { params }) {
   try {
     const query = params.id;
-    const token = request.cookies.get("token")?.value || "";
+    // const token = request.cookies.get("token")?.value || "";
+    const loggedUserId = request.headers.get("x-user-id");
 
     let userId;
     if (query == "user") {
-      const data = verifyJWT(token);
-      console.log(token, data)
-      userId = data?.id;
+      // const data = verifyJWT(token);
+      // userId = data?.id;
+      userId = loggedUserId;
     } else {
       userId = query;
     }
 
-    const user = await Users.findOne({ _id: userId })
-      .select("-password -updatedAt -lastLoginAt -__v")
-      .populate([
-        { path: "following" },
-        { path: "followers" },
-        {
-          path: "posts",
-          options: { sort: { createdAt: -1 } },
+    const data = await Users.aggregate([
+      { $match: { _id: new mongoose.Types.ObjectId(userId) } },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          fullName: 1,
+          email: 1,
+          bio: 1,
+          avatar: 1,
+          followed_by_viewer: {
+            $cond: {
+              if: {
+                $in: [new mongoose.Types.ObjectId(loggedUserId), "$followers"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          follows_viewer: {
+            $cond: {
+              if: {
+                $in: [new mongoose.Types.ObjectId(loggedUserId), "$following"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          followersCount: { $size: "$followers" },
+          followingCount: { $size: "$following" },
+          postsCount: { $size: "$posts" },
         },
-      ]);
+      },
+    ]).exec();
+
     return NextResponse.json({
       message: "User Found",
-      data: user,
+      data: data[0],
     });
   } catch (error) {
     console.log(error);
@@ -84,12 +111,25 @@ export async function PUT(request, { params }) {
       user.avatar = avatarResult;
     }
 
-    if (username && fullName && email) {
+    if (username) {
+      const data = await Users.findOne({
+        _id: { $ne: user._id },
+        username: username,
+      });
+      if (data) {
+        return NextResponse.json(
+          { error: "Username already exists" },
+          { status: 409 }
+        );
+      }
       user.username = username;
-      user.fullName = fullName;
-      user.email = email;
+    }
+
+    if (bio) {
       user.bio = bio ? bio : "";
-      user.isPrivate = isPrivate;
+    }
+    if (fullName) {
+      user.fullName = fullName;
     }
 
     user.updatedAt = Date.now();
@@ -97,7 +137,7 @@ export async function PUT(request, { params }) {
 
     return NextResponse.json({
       message: "Update user",
-      data: user,
+      data: { avatar: user.avatar },
     });
   } catch (error) {
     console.log(error);
