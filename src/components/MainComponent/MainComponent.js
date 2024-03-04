@@ -16,10 +16,9 @@ export default function MainComponent({ children }) {
   const [toggle, setToggle] = useState({
     search: false,
     notifications: false,
-  }); 
+  });
 
   const handleToggle = (key) => {
-    console.log(key);
     setToggle((prevToggle) => ({
       ...prevToggle,
       [key]: !prevToggle[key],

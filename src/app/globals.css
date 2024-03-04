@@ -80,7 +80,8 @@ body {
   right: 6px !important;
 }
 .mySwiper .swiper-button-prev,
-.mySwiper .swiper-button-next {
+.mySwiper .swiper-button-next,
+.mySwiper .swiper-pagination{
   z-index: 0 !important;
 }
 

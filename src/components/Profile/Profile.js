@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
 import PostImage from "../PostContainer/PostImage";
 import FollowButton from "../FollowButton/FollowButton";
+import ProfilePlaceholder from "../Placeholders/profile/ProfilePlaceholder";
 
 export default function Profile({ userId }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
@@ -105,7 +106,7 @@ export default function Profile({ userId }) {
   };
 
   if (!profile) {
-    return <div>Loading...</div>;
+    return <div><ProfilePlaceholder /></div>;
   }
 
   const handleUpdateProfile = async (e) => {

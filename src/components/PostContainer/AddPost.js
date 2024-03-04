@@ -17,7 +17,6 @@ export default function AddPost({ setPosts }) {
     element.target.style.height = (element.target.scrollHeight + 10) + "px";
   }
 
-  
   const handlePost = async () => {
     if (filesRef.length > 0 || postText.trim().length > 0) {
       setLoading(true);

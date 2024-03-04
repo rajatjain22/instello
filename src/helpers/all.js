@@ -27,7 +27,7 @@ function formatTimestamp(timestamp) {
   // Check if the message was sent less than an hour ago
   if (timeDifference < 3600000) {
     const minutesAgo = Math.floor(timeDifference / 60000);
-    return `${minutesAgo} minute${minutesAgo !== 1 ? "s" : ""} ago`;
+    return `${minutesAgo} min ago`;
   }
 
   // Check if the message was sent today
