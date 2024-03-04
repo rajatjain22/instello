@@ -1,12 +1,13 @@
 import { useEffect, useRef } from "react";
+import { IoClose } from "react-icons/io5";
 
-export default function ModelBox({ children, isOpen, setIsOpen }) {
+export default function ModelBox({ children, isOpen, onClose }) {
   const modalRef = useRef();
 
   useEffect(() => {
     function handleClickOutside(event) {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setIsOpen(false);
+        onClose();
       }
     }
 
@@ -21,7 +22,7 @@ export default function ModelBox({ children, isOpen, setIsOpen }) {
     <div>
       {isOpen && (
         <div className="fixed inset-0 z-10 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center">
+          <div className="flex items-center justify-center min-h-screen px-4 text-center">
             <div
               className="fixed inset-0 transition-opacity"
               aria-hidden="true"
@@ -36,9 +37,15 @@ export default function ModelBox({ children, isOpen, setIsOpen }) {
             </span>
             <div
               ref={modalRef}
-              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+              className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
             >
               {children}
+              <div
+                className="absolute top-0 right-0 cursor-pointer text-2xl text-black"
+                onClick={onClose}
+              >
+                <IoClose />
+              </div>
             </div>
           </div>
         </div>

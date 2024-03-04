@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { createContext, useEffect, useState } from "react";
 
@@ -9,15 +9,25 @@ function UserContextProvider({ children }) {
 
   useEffect(() => {
     console.log("User context api start");
+
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/users/profile/user");
-        if (!response.ok) {
+        const [userDataResponse, postDataResponse] = await Promise.all([
+          fetch("/api/users/profile/user"),
+          fetch("/api/post/user"),
+        ]);
+
+        if (!userDataResponse.ok || !postDataResponse.ok) {
           throw new Error("Network response was not ok");
         }
-        const data = await response.json();
-        if (data?.message) {
-          setUserDetails(data.data);
+
+        const [userData, postData] = await Promise.all([
+          userDataResponse.json(),
+          postDataResponse.json(),
+        ]);
+
+        if (userData?.message && postData?.message) {
+          setUserDetails({ ...userData.data, posts: postData.data });
         } else {
           throw new Error("Response did not contain expected data");
         }

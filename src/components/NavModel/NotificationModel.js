@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { IoCheckmarkCircleOutline, IoSettingsOutline } from "react-icons/io5";
 import NavModel from "./NavModel";
 import { useRef } from "react";
 import useOnClickOutside from "@/app/_hooks/useClickOutside";
@@ -58,61 +56,6 @@ export default function NotificationModel({ onClose }) {
 
         {/* <!-- contents list --> */}
         <div className='px-2 -mt-2 text-sm font-normal'>
-          <div className='px-5 py-3 -mx-2'>
-            <h4 className='font-semibold'>New</h4>
-          </div>
-
-          <a
-            href='#'
-            className='relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery'
-          >
-            <div className='relative w-12 h-12 shrink-0'>
-              <Image
-                src='/people-know/avatar-2.jpg'
-                alt='profile'
-                className='object-cover rounded-full'
-                fill={true}
-                loading='lazy'
-              />
-            </div>
-            <div className='flex-1 '>
-              <p>
-                <b className='font-bold mr-1'> John Michael</b> who you might
-                know, is on Instello.
-              </p>
-              <div className='text-xs text-gray-500 mt-1.5 dark:text-white/80'>
-                2 hours ago
-              </div>
-            </div>
-            <button type='button' className='button text-white bg-primary'>
-              fallow
-            </button>
-          </a>
-          <a
-            href='#'
-            className='relative flex items-center gap-3 p-2 duration-200 rounded-xl pr-10 hover:bg-secondery bg-teal-500/5'
-          >
-            <div className='relative w-12 h-12 shrink-0'>
-              <Image
-                src='/people-know/avatar-3.jpg'
-                alt='profile'
-                className='object-cover rounded-full'
-                fill={true}
-                loading='lazy'
-              />
-            </div>
-            <div className='flex-1 '>
-              <p>
-                <b className='font-bold mr-1'> Alexa Gray</b> started following
-                you. Welcome him to your profile. 👋
-              </p>
-              <div className='text-xs text-gray-500 mt-1.5 dark:text-white/80'>
-                4 hours ago
-              </div>
-              <div className='w-2.5 h-2.5 bg-teal-600 rounded-full absolute right-3 top-5'></div>
-            </div>
-          </a>
-
           <div className='border-t px-5 py-3 -mx-2 mt-4 dark:border-slate-700/40'>
             <h4 className='font-semibold'>This Week</h4>
           </div>

@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import AddPost from "./AddPost";
 import PostImage from "./PostImage";
-import PostPlaceholder from "./PostPlaceholder";
+import PostPlaceholder from "../Placeholders/PostPlaceholder";
 import PostText from "./PostText";
 import PeopleKnow from "./Side/PeopleKnow";
 import SwiperPhotos from "./Side/SwiperPhotos";
+import EditNew from "../Profile/Edit/EditNew";
 
 export default function PostContainer() {
   const [posts, setPosts] = useState([]);
@@ -52,9 +53,8 @@ export default function PostContainer() {
         </div>
 
         {/* right sidebar */}
-        <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto'>
+        <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto gap-5'>
           <PeopleKnow />
-          {/* <SwiperPhotos /> */}
         </div>
       </div>
     </>

@@ -161,7 +161,7 @@ function SideNavBar({ handleToggle }) {
               <Link
                 key={index}
                 href={item.path}
-                className='relative text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
+                className='hover:-translate-y-1 hover:scale-110 duration-300 relative text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
                 onClick={(e) =>
                   item.onclick && item?.onclick(item.label.toLowerCase())
                 }
@@ -180,14 +180,14 @@ function SideNavBar({ handleToggle }) {
           })}
         </div>
         <div className='w-full h-full flex flex-col justify-end'>
-          <button className='text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'>
+          <button className='hover:-translate-y-1 hover:scale-110 duration-300 text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'>
             <SiThreads className='text-2xl' />
             <span className='p-2 hidden lg:block'>Threads</span>
           </button>
 
           <button
             onClick={handleLogout}
-            className='text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
+            className='hover:-translate-y-1 hover:scale-110 duration-300 text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
           >
             <IoReorderThreeOutline className='text-2xl' />
             <span className='p-2 hidden lg:block'>Logout</span>

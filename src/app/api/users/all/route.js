@@ -8,7 +8,16 @@ export async function GET(request) {
   try {
     const userID = request.headers.get("x-user-id");
 
-    const allData = await Users.find({ _id: { $ne: userID } }).select("-password -createdAt -updatedAt -__v -lastLoginAt");
+    const allData = await Users.find({ _id: { $ne: userID } })
+      .select("-password -createdAt -updatedAt -__v -lastLoginAt")
+      .populate([
+        { path: "following" },
+        { path: "followers" },
+        {
+          path: "posts",
+          options: { sort: { createdAt: -1 } },
+        },
+      ]);
 
     return NextResponse.json({
       message: "Successfully!",

@@ -52,14 +52,11 @@ const FilePreview = ({ i, file, filesRef, setFileRef, isFeed }) => {
                 )}
                 {!isFeed && (
                     <div
-                        sx={{
-                            fontSize: "30px",
-                        }}
                         onClick={() => {
                             filesRef.splice(i, 1);
                             return setFileRef([...filesRef]);
                         }}
-                        className=" absolute right-3 top-2 px-2 py-2 rounded-full bg-bg-card text-white group cursor-pointer backdrop-blur-[2px]"
+                        className="absolute right-3 top-2 px-2 py-2 rounded-full bg-bg-card text-black bg-[#f7f7f7] group cursor-pointer backdrop-blur-[2px]"
                    ><IoClose /></div>
                 )}
             </div>

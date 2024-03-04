@@ -6,31 +6,48 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import FollowCard from "./FollowCard";
+import { FollowPeoplePlaceholder } from "../Placeholders/FollowPeoplePlaceholder";
 
 export default function Following() {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const { id, type } = useParams();
   const [showType, setShowType] = useState("");
   const [allData, setAllData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [loadingStates, setLoadingStates] = useState({});
+
+  const fetchData = async (action) => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/users/profile/${id}/${action}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
+      const data = await res.json();
+      setAllData(data.data);
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    if (userDetails && userDetails._id === id) {
-      setAllData(userDetails);
-      setShowType(type);
-    } else {
-      fetch(`/api/users/profile/${id}`)
-        .then((res) => res.json())
-        .then((res) => {
-          setShowType(type);
-          setAllData(res.data);
-        })
-        .catch((error) => {
-          console.log(error.message);
-        });
-    }
-  }, []);
+    setShowType(type);
+  }, [type]);
+
+  useEffect(() => {
+    fetchData(showType);
+  }, [showType]);
 
   const handleFollow = (followerId, val) => {
+    setLoadingStates((prevLoadingStates) => ({
+      ...prevLoadingStates,
+      [followerId]: true,
+    }));
+
     const requestData = {
       method: "POST",
       headers: {
@@ -46,41 +63,84 @@ export default function Following() {
         return res.json();
       })
       .then((res) => {
-        const data = val === "follow" ? true : false;
-        if (data && allData) {
-          const dd = allData.followers.find((e) => e._id === followerId);
+        const followUserIndex = allData?.following?.findIndex(
+          (e) => e._id === followerId
+        );
+        if (followUserIndex) {
+          if (val === "follow") {
+            setUserDetails((prevState) => ({
+              ...prevState,
+              followingCount: prevState.followingCount + 1,
+            }));
+            setAllData((prevState) => {
+              let updatedUserData = [...prevState.following];
+              updatedUserData[followUserIndex] = {
+                ...updatedUserData[followUserIndex],
+                followed_by_viewer: true,
+              };
 
-          setUserDetails((presVal) => ({
-            ...presVal,
-            following: [...presVal.following, dd],
-          }));
+              return {
+                ...prevState,
+                following: updatedUserData,
+                followingCount: prevState.followingCount + 1,
+              };
+            });
+          } else if (val === "unfollow") {
+            setUserDetails((prevState) => ({
+              ...prevState,
+              followingCount: prevState.followingCount - 1,
+            }));
+            setAllData((prevState) => {
+              let updatedUserData = [...prevState.following];
+              updatedUserData[followUserIndex] = {
+                ...updatedUserData[followUserIndex],
+                followed_by_viewer: false,
+              };
 
-          setAllData((presVal) => ({
-            ...presVal,
-            following: [...presVal.following, dd],
-          }));
+              return {
+                ...prevState,
+                following: updatedUserData,
+                followingCount: prevState.followingCount - 1,
+              };
+            });
+          }
         } else {
-          setUserDetails((presVal) => ({
-            ...presVal,
-            following: presVal.following.filter((e) => e._id !== followerId),
-          }));
-          setAllData((presVal) => ({
-            ...presVal,
-            following: presVal.following.filter((e) => e._id !== followerId),
-          }));
+          if (val === "remove") {
+            setUserDetails((prevState) => ({
+              ...prevState,
+              followersCount: prevState.followersCount - 1,
+            }));
+            setAllData((prevState) => {
+              let updatedUserData = prevState.followers.filter(
+                (e) => e._id !== followerId
+              );
+
+              return {
+                ...prevState,
+                followers: updatedUserData,
+                followersCount: prevState.followersCount - 1,
+              };
+            });
+          }
         }
         toast.success(val);
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => console.log(err.message))
+      .finally(() => {
+        setLoadingStates((prevLoadingStates) => ({
+          ...prevLoadingStates,
+          [followerId]: false,
+        }));
+      });
   };
 
   return (
     <>
-      <nav className='border-b dark:border-slate-700'>
-        <ul className='flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80'>
-          <li className=''>
+      <nav className="border-b dark:border-slate-700">
+        <ul className="flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80">
+          <li className="">
             <Link
-              href='#'
+              href="#"
               className={`inline-block py-5 border-b-2 ${
                 showType === "followers"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -88,12 +148,12 @@ export default function Following() {
               }`}
               onClick={() => setShowType("followers")}
             >
-              followers {allData?.followers?.length}
+              followers {allData?.followersCount}
             </Link>
           </li>
-          <li className=''>
+          <li className="">
             <Link
-              href='#'
+              href="#"
               className={`inline-block py-5 border-b-2 ${
                 showType === "following"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -101,7 +161,7 @@ export default function Following() {
               }`}
               onClick={() => setShowType("following")}
             >
-              following {allData?.following?.length}
+              following {allData?.followingCount}
             </Link>
           </li>
           {/* <li>
@@ -114,74 +174,35 @@ export default function Following() {
           </li> */}
         </ul>
       </nav>
-      {allData?.[showType]?.length > 0 ? (
-        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
-          {allData[showType].map((follow, index) => {
-            const checkFollow = allData.following.some(
-              (item) => item._id === follow._id
-            );
-            return (
-              <div
-                key={index}
-                className='bg-white flex gap-4 items-center flex-wrap justify-between p-5 rounded-lg shadow-sm border1 dark:bg-dark2'
-              >
-                <Link
-                  href={`/profile/${follow._id}`}
-                  className='relative lg:w-16 lg:h-16 w-10 h-10'
-                >
-                  <Image
-                    src={follow.avatar}
-                    alt='profile'
-                    className='rounded-full'
-                    fill={true}
-                    loading='lazy'
-                  />
-                </Link>
-                <div className='flex-1'>
-                  <Link href={`/profile/${follow._id}`}>
-                    <h4 className='font-semibold text-sm text-black dark:text-white'>
-                      {follow.fullName}
-                    </h4>
-                  </Link>
-                  <div className='mt-0.5'>
-                    {follow.followers?.length} followers
-                  </div>
-                </div>
-
-                {userDetails._id !== follow._id &&
-                  (checkFollow ? (
-                    <button
-                      type='button'
-                      className='button bg-secondery rounded-full py-1.5 font-semibold'
-                      onClick={() => handleFollow(follow._id, "unfollow")}
-                    >
-                      remove
-                    </button>
-                  ) : (
-                    <button
-                      type='submit'
-                      className='button lg:px-10 bg-primary text-white max-md:flex-1'
-                      onClick={() => handleFollow(follow._id, "follow")}
-                    >
-                      Follow <span className='ripple-overlay'></span>
-                    </button>
-                  ))}
-              </div>
-            );
-          })}
+      {loading ? (
+        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
+          <FollowPeoplePlaceholder />
+          <FollowPeoplePlaceholder />
+        </div>
+      ) : allData?.[showType]?.length > 0 ? (
+        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
+          {allData[showType].map((follow, index) => (
+            <FollowCard
+              key={index}
+              follow={follow}
+              handleFollow={handleFollow}
+              loadingStates={loadingStates[follow._id]}
+              showType={showType}
+            />
+          ))}
         </div>
       ) : (
-        <div className='text-2xl font-semibold text-center text-black mt-16'>{`No ${showType}`}</div>
+        <div className="text-2xl font-semibold text-center text-black mt-16">{`No ${showType}`}</div>
       )}
 
-      {/* <div className="flex justify-center my-10">
+      <div className="flex justify-center my-10">
         <button
           type="button"
           className="bg-white py-2 px-5 rounded-full shadow-md font-semibold text-sm dark:bg-dark2"
         >
           Load more...
         </button>
-      </div> */}
+      </div>
     </>
   );
 }

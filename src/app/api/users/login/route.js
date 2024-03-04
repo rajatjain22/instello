@@ -4,6 +4,7 @@ import Users from "../../../../schemas/UserModel";
 import createJWT from "../../../../jwt/createJWT";
 import dbConnect from "@/dbconfig/dbconfig";
 import Posts from "@/schemas/PostModel";
+import mongoose from "mongoose";
 
 dbConnect();
 
@@ -20,7 +21,58 @@ export async function POST(request) {
         }
       );
     }
-    const user = await Users.findOne({ email }).populate("posts");
+    const userQuery2 = await Users.aggregate([
+      { $match: { email: email } },
+      {
+        $project: {
+          username: 1,
+          fullName: 1,
+          email: 1,
+          password: 1,
+          avatar: 1,
+          bio: 1,
+          followersCount: { $size: "$followers" },
+          followingCount: { $size: "$following" },
+          postsCount: { $size: "$posts" },
+        },
+      },
+    ]);
+
+    const userQuery1 = await Posts.aggregate([
+      {
+        $match: {
+          user: new mongoose.Types.ObjectId(userQuery2[0]._id),
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          text: 1,
+          createdAt: 1,
+          post: 1,
+          hasLiked: {
+            $cond: {
+              if: {
+                $in: [new mongoose.Types.ObjectId(userQuery2[0]._id), "$likes"],
+              },
+              then: true,
+              else: false,
+            },
+          },
+          likesCount: { $size: "$likes" },
+          commentCount: { $size: "$comments" },
+          mediaCount: { $size: "$post" },
+        },
+      },
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $limit: 10,
+      },
+    ]).exec();
+
+    const user = { ...userQuery2[0], posts: userQuery1 };
 
     if (!user) {
       return NextResponse.json(
@@ -44,7 +96,7 @@ export async function POST(request) {
     const tokenData = {
       id: user._id,
       username: user.username,
-      fullName:user.fullName,
+      fullName: user.fullName,
       email: user.email,
     };
 
@@ -54,12 +106,11 @@ export async function POST(request) {
     const expirationTimeInHours = 10;
     const expirationTimeInSeconds = expirationTimeInHours * 60 * 60;
 
-    const userCopy = { ...user.toObject() }; // Convert Mongoose document to plain object
-    // delete userCopy.password;
+    delete user.password;
 
     const response = NextResponse.json({
       message: "Logged in successfully!",
-      user: userCopy,
+      user,
     });
 
     // Set cookie

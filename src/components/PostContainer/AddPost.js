@@ -17,7 +17,6 @@ export default function AddPost({ setPosts }) {
     element.target.style.height = (element.target.scrollHeight + 10) + "px";
   }
 
-  
   const handlePost = async () => {
     if (filesRef.length > 0 || postText.trim().length > 0) {
       setLoading(true);
@@ -75,7 +74,7 @@ export default function AddPost({ setPosts }) {
           />
         </div>
 
-        <div id="media" className="">
+        <div id="media" className={`${filesRef.length && '!mb-8 bg-[#f7f7f7] px-2 py-3 rounded-2xl'}`}>
           <ImageSlider
             filesRef={filesRef}
             setFileRef={setFileRef}

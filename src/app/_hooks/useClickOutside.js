@@ -9,6 +9,7 @@ function useOnClickOutside(ref, handler) {
         handler();
       }
     };
+    
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [ref, handler]);

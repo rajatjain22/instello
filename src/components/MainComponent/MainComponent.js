@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SideNavBar from "../SideNavBar/SideNavBar";
-import SearchModel from "../Search/SearchModel";
-import NotificationModel from "../Search/NotificationModel";
+import SearchModel from "../NavModel/SearchModel";
+import NotificationModel from "../NavModel/NotificationModel";
 import { usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
 import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
 
 export default function MainComponent({ children }) {
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
   const pathname = usePathname();
   const isPublicPath = pathname === "/login" || pathname === "/register";
 
@@ -19,7 +19,6 @@ export default function MainComponent({ children }) {
   });
 
   const handleToggle = (key) => {
-    console.log(key);
     setToggle((prevToggle) => ({
       ...prevToggle,
       [key]: !prevToggle[key],
