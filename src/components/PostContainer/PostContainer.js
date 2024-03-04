@@ -7,6 +7,7 @@ import PostPlaceholder from "./PostPlaceholder";
 import PostText from "./PostText";
 import PeopleKnow from "./Side/PeopleKnow";
 import SwiperPhotos from "./Side/SwiperPhotos";
+import EditNew from "../Profile/Edit/EditNew";
 
 export default function PostContainer() {
   const [posts, setPosts] = useState([]);
@@ -53,9 +54,7 @@ export default function PostContainer() {
 
         {/* right sidebar */}
         <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto gap-5'>
-          {/* <PeopleKnow /> */}
           <PeopleKnow />
-          {/* <SwiperPhotos /> */}
         </div>
       </div>
     </>

@@ -37,7 +37,6 @@ export async function POST(request) {
         },
       },
     ]);
-    console.log(userQuery2);
 
     const userQuery1 = await Posts.aggregate([
       {
