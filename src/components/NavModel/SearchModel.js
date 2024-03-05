@@ -8,10 +8,10 @@ import useOnClickOutside from "@/app/_hooks/useClickOutside";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
-export default function NewSearchModel({ onClose }) {
+export default function NewSearchModel({ onClose, sideNavBarSearchRef }) {
   const modalRef = useRef(null);
   const router = useRouter();
-  useOnClickOutside(modalRef, onClose);
+  useOnClickOutside(modalRef, onClose, sideNavBarSearchRef);
 
   const [search, setsearch] = useState({
     searchValue: "",
@@ -19,21 +19,7 @@ export default function NewSearchModel({ onClose }) {
     searchLoading: false,
   });
 
-  // useEffect(() => {
-  //   fetch("/api/users/all")
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       if (res?.message) {
-  //         setsearch((presVal) => ({ ...presVal, searchUsers: res.data }));
-  //       } else {
-  //         throw new Error(res?.error);
-  //       }
-  //     })
-  //     .catch((err) => console.log(err.message))
-  //     .finally(() => {
-  //       setsearch((presVal) => ({ ...presVal, searchLoading: false }));
-  //     });
-  // }, []);
+  
 
   const handleSearch = async (e) => {
     e.preventDefault();

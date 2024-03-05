@@ -55,7 +55,7 @@ export default function Profile({ userId }) {
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, userDetails]);
 
   const handleFollow = (val) => {
     setFollowBtnLoading(true);

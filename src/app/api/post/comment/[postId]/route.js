@@ -36,7 +36,7 @@ export async function GET(request, { params }) {
 
     // Return comments
     return NextResponse.json({
-      message: "Comments retrieved successfully",
+      message: "Comments retrieved",
       data: comments,
     });
   } catch (error) {

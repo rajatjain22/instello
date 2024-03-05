@@ -9,6 +9,7 @@ export default function CommentModel({
   isOpen,
   onClose,
   post,
+  user,
   handleCommentModel,
 }) {
   const { userDetails } = useContext(UserContext);
@@ -95,13 +96,13 @@ export default function CommentModel({
         <div className="relative w-9 h-9 mt-1">
           <Image
             className="rounded-full"
-            src={post.user.avatar}
+            src={user.avatar}
             alt="Profile picture"
             fill={true}
             loading="lazy"
           />
         </div>
-        <div>{post.user.username}</div>
+        <div>{user.username}</div>
       </div>
       <div className="bg-white flex flex-col text-black gap-3 sm:px-4 sm:py-3 p-2.5 h-72 overflow-y-scroll">
         {comment.pageLoading ? (
@@ -134,7 +135,7 @@ export default function CommentModel({
                     {formatTimestamp(val?.createdAt)}
                   </div>
                 </div>
-                <p className="mt-0.5 font-normal">{val.comment}</p>
+                <p className="mt-0.5 font-normal whitespace-pre-wrap">{val.comment}</p>
               </div>
             </div>
           ))

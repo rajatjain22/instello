@@ -45,14 +45,17 @@ function SideNavBar({ handleToggle }) {
     <>
       <div className='boock sm:hidden fixed top-0 left-0 z-40 max-md:top-auto max-md:bottom-0'>
         <div className='flex justify-between h-20 px-2 max-md:fixed max-md:top-0 max-md:w-full max-md:bg-white/80 max-md:left-0 max-md:px-4 max-md:h-14 max-md:shadow-sm max-md:dark:bg-slate-900/80 backdrop-blur-xl'>
-          <Link href='/' className='relative selection:flex items-center gap-3 w-24 text-2xl max-xl:!block shrink-0 uk-animation-scale-up'>
+          <Link
+            href='/'
+            className='relative selection:flex items-center gap-3 w-24 text-2xl max-xl:!block shrink-0 uk-animation-scale-up'
+          >
             <Image
               id='logo__icon'
               src='/logo.svg'
               alt='Logo'
               fill={true}
-              loading="lazy"
-              sizes="(max-width: 640px) 100vw, 50vw"
+              loading='lazy'
+              sizes='(max-width: 640px) 100vw, 50vw'
             />
           </Link>
 
@@ -103,12 +106,7 @@ function SideNavBar({ handleToggle }) {
           <div className=' italic font-semibold p-5 flex justify-center'>
             <FaInstagram className={`lg:hidden text-3xl`} />
             <span className={`hidden lg:block`}>
-              <Image
-                src='/logo.svg'
-                alt='Icon'
-                width={100}
-                height={100}
-              />
+              <Image src='/logo.svg' alt='Icon' width={100} height={100} />
             </span>
           </div>
         </div>

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "aos": "^2.3.4",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.0.1",
     "express": "^4.18.2",

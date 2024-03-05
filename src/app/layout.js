@@ -4,6 +4,7 @@ import MainComponent from "@/components/MainComponent/MainComponent";
 import { UserContextProvider } from "./_context/User";
 import { Toaster } from "react-hot-toast";
 import { PostContextProvider } from "./_context/Post";
+import "aos/dist/aos.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

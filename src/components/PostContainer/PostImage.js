@@ -15,6 +15,7 @@ import PostSwiper from "../PostSwiper/PostSwiper";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import CommentModel from "./CommentModel";
+import ViewModel from "./ViewModel";
 
 export default function PostImage({ user, post }) {
   const [postAction, setPostAction] = useState({
@@ -22,6 +23,7 @@ export default function PostImage({ user, post }) {
     likesCount: 0,
     commentCount: 0,
     commentModel: false,
+    viewModel: false,
   });
 
   const handleLike = async (val) => {
@@ -59,10 +61,16 @@ export default function PostImage({ user, post }) {
     }));
   }, [post]);
 
-  const handleCloseModel = () => {
+  const handleCloseCommentModel = () => {
     setPostAction((presVal) => ({
       ...presVal,
       commentModel: false,
+    }));
+  };
+  const handleCloseViewModel = () => {
+    setPostAction((presVal) => ({
+      ...presVal,
+      viewModel: false,
     }));
   };
 
@@ -106,7 +114,10 @@ export default function PostImage({ user, post }) {
 
       {post.post?.length > 0 ? (
         <div className='px-4'>
-          <div className='relative w-full h-[22rem]'>
+          <div
+            className='relative w-full h-[22rem] cursor-pointer'
+            onClick={() => console.log("Click")}
+          >
             <PostSwiper posts={post.post} />
           </div>
           {post.text && (
@@ -226,12 +237,16 @@ export default function PostImage({ user, post }) {
           More Comment
         </button>
       </div> */}
+      {postAction.viewModel && (
+        <ViewModel is/>
+      )}
 
       {postAction.commentModel && (
         <CommentModel
           isOpen={postAction.commentModel}
-          onClose={handleCloseModel}
+          onClose={handleCloseCommentModel}
           post={post}
+          user={user}
           handleCommentModel={handleCommentModel}
         />
       )}

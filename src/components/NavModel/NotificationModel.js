@@ -5,9 +5,9 @@ import NavModel from "./NavModel";
 import { useRef } from "react";
 import useOnClickOutside from "@/app/_hooks/useClickOutside";
 
-export default function NotificationModel({ onClose }) {
+export default function NotificationModel({ onClose, sideNavBarSearchRef }) {
   const modalRef = useRef(null);
-  useOnClickOutside(modalRef, onClose);
+  useOnClickOutside(modalRef, onClose, sideNavBarSearchRef);
 
   return (
     <div ref={modalRef}>
@@ -100,7 +100,7 @@ export default function NotificationModel({ onClose }) {
             <div className='flex-1 '>
               <p>
                 <b className='font-bold mr-1'> James Lewis</b> Start following
-                you on instello
+                you on Social
               </p>
               <div className='text-xs text-gray-500 mt-1.5 dark:text-white/80'>
                 8 hours ago

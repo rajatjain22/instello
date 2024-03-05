@@ -100,9 +100,9 @@ export default function PeopleKnow() {
     <div className="bg-white rounded-xl shadow-sm p-5 px-6 border1 dark:bg-dark2">
       <div className="flex justify-between text-black dark:text-white">
         <h3 className="font-bold text-base">People you might know </h3>
-        <button>
+        {/* <button>
           <IoSyncSharp className="text-xl" />
-        </button>
+        </button> */}
       </div>
       <div className="space-y-4 capitalize text-xs font-normal mt-5 mb-2 text-gray-500 dark:text-white/80">
         {loading ? (
@@ -111,6 +111,7 @@ export default function PeopleKnow() {
             <UserPlaceholderWithButton />
           </>
         ) : (
+          userData.length ? 
           userData.map((user, index) => {
             return (
               <div
@@ -149,6 +150,7 @@ export default function PeopleKnow() {
               </div>
             );
           })
+          : <div className="text-center">No suggestions</div>
         )}
       </div>
     </div>
