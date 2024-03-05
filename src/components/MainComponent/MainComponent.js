@@ -4,15 +4,17 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import SideNavBar from "../SideNavBar/SideNavBar";
 import SearchModel from "../NavModel/SearchModel";
 import NotificationModel from "../NavModel/NotificationModel";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
 import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
 import AOS from "aos";
+import { useRouter } from "next/router";
 
 export default function MainComponent({ children }) {
   const sideNavBarSearchRef = useRef(null);
   const { userDetails } = useContext(UserContext);
   const pathname = usePathname();
+
   const isPublicPath = pathname === "/login" || pathname === "/register";
 
   const [toggle, setToggle] = useState({
@@ -42,7 +44,7 @@ export default function MainComponent({ children }) {
 
   if (!userDetails && !isPublicPath) {
     return (
-      <div className='w-full h-screen flex justify-center items-center'>
+      <div className="w-full h-screen flex justify-center items-center">
         <InitialLoader />
       </div>
     );
@@ -50,16 +52,26 @@ export default function MainComponent({ children }) {
 
   return (
     <>
-      <main className='flex min-h-screen'>
+      <main className="flex min-h-screen">
         {!isPublicPath ? (
           <div ref={sideNavBarSearchRef}>
-            <SideNavBar handleToggle={handleToggle} />{" "}
+            <SideNavBar handleToggle={handleToggle} onClose={onClose} />{" "}
           </div>
         ) : (
           ""
         )}
-        <div className='w-full bg-body-color h-screen overflow-y-scroll relative'>
-          <div className='main__inner'>{children}</div>
+        <div
+          className={`w-full bg-body-color h-screen relative ${
+            pathname.startsWith("/messages") ? "" : "overflow-y-scroll"
+          }`}
+        >
+          <div
+            className={`${
+              pathname.startsWith("/messages") ? "" : "main__inner"
+            }`}
+          >
+            {children}
+          </div>
           {toggle.search && (
             <SearchModel
               sideNavBarSearchRef={sideNavBarSearchRef}

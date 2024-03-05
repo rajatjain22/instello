@@ -15,12 +15,13 @@ import { IoReorderThreeOutline } from "react-icons/io5";
 import { FaDivide, FaInstagram } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useContext, useEffect } from "react";
 import { UserContext } from "@/app/_context/User";
 
-function SideNavBar({ handleToggle }) {
+function SideNavBar({ handleToggle, onClose }) {
+  const pathname = usePathname();
   const { userDetails } = useContext(UserContext);
   const router = useRouter();
 
@@ -43,58 +44,64 @@ function SideNavBar({ handleToggle }) {
 
   return (
     <>
-      <div className='boock sm:hidden fixed top-0 left-0 z-40 max-md:top-auto max-md:bottom-0'>
-        <div className='flex justify-between h-20 px-2 max-md:fixed max-md:top-0 max-md:w-full max-md:bg-white/80 max-md:left-0 max-md:px-4 max-md:h-14 max-md:shadow-sm max-md:dark:bg-slate-900/80 backdrop-blur-xl'>
+      <div className="boock sm:hidden fixed top-0 left-0 z-40 max-md:top-auto max-md:bottom-0">
+        <div
+          className={`${
+            pathname.startsWith("/messages") ? "hidden" : ""
+          } md:hidden flex justify-between h-20 px-2 max-md:fixed max-md:top-0 max-md:w-full max-md:bg-white/80 max-md:left-0 max-md:px-4 max-md:h-14 max-md:shadow-sm max-md:dark:bg-slate-900/80 backdrop-blur-xl`}
+        >
           <Link
-            href='/'
-            className='relative selection:flex items-center gap-3 w-24 text-2xl max-xl:!block shrink-0 uk-animation-scale-up'
+            href="/"
+            className="relative selection:flex items-center gap-3 w-24 text-2xl max-xl:!block shrink-0 uk-animation-scale-up"
+            onClick={onClose}
           >
             <Image
-              id='logo__icon'
-              src='/logo.svg'
-              alt='Logo'
+              id="logo__icon"
+              src="/logo.svg"
+              alt="Logo"
               fill={true}
-              loading='lazy'
-              sizes='(max-width: 640px) 100vw, 50vw'
+              loading="lazy"
+              sizes="(max-width: 640px) 100vw, 50vw"
             />
           </Link>
 
-          <div className='flex gap-5'>
+          <div className="flex gap-5">
             <Link
               href={"#"}
-              className='relative text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
+              className="relative text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
               onClick={(e) => handleToggle("notifications")}
             >
-              <FiHeart className='text-2xl' />
+              <FiHeart className="text-2xl" />
             </Link>
             <Link
-              href={"#"}
-              className='relative text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
+              href={"/messages"}
+              className="relative text-base flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
+              onClick={onClose}
             >
-              <RiMessengerLine className='text-2xl' />
+              <RiMessengerLine className="text-2xl" />
             </Link>
           </div>
         </div>
 
-        <nav className='flex-1 max-md:flex max-md:justify-around md:space-y-2 w-full fixed bg-white -bottom-0.5 h-14  items-center'>
-          <Link href='/'>
-            <GoHomeFill className='text-2xl' />
+        <nav className="flex-1 max-md:flex max-md:justify-around md:space-y-2 w-full fixed bg-white -bottom-0.5 h-14  items-center">
+          <Link href="/" onClick={onClose}>
+            <GoHomeFill className="text-2xl" />
           </Link>
-          <Link href='#' onClick={(e) => handleToggle("search")}>
-            <IoIosSearch className='text-2xl' />
+          <Link href="#" onClick={(e) => handleToggle("search")}>
+            <IoIosSearch className="text-2xl" />
           </Link>
-          <Link href='#' className=''>
-            <MdOutlineExplore className='text-2xl' />
+          <Link href="#" className="" onClick={onClose}>
+            <MdOutlineExplore className="text-2xl" />
           </Link>
-          <Link href='#'>
-            <MdOutlineSlowMotionVideo className='text-2xl' />
+          <Link href="#" onClick={onClose}>
+            <MdOutlineSlowMotionVideo className="text-2xl" />
           </Link>
 
-          <Link href={`/profile/${userDetails?._id}`}>
-            <CgProfile className='text-2xl' />
+          <Link href={`/profile/${userDetails?._id}`} onClick={onClose}>
+            <CgProfile className="text-2xl" />
           </Link>
           <Link href={"#"} onClick={handleLogout}>
-            <IoMdLogOut className='text-2xl' />
+            <IoMdLogOut className="text-2xl" />
           </Link>
         </nav>
       </div>
@@ -102,64 +109,70 @@ function SideNavBar({ handleToggle }) {
       <div
         className={`hidden sm:flex flex-col min-w-24 lg:min-w-48 max-w-20 lg:max-w-64 border border-r-stone-200 h-screen overflow-hidden px-5 font-medium`}
       >
-        <div className='w-full hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'>
-          <div className=' italic font-semibold p-5 flex justify-center'>
+        <div className="w-full hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg">
+          <div className=" italic font-semibold p-5 flex justify-center">
             <FaInstagram className={`lg:hidden text-3xl`} />
             <span className={`hidden lg:block`}>
-              <Image src='/logo.svg' alt='Icon' width={100} height={100} />
+              <Image src="/logo.svg" alt="Icon" width={100} height={100} />
             </span>
           </div>
         </div>
-        <div className='w-full'>
+        <div className="w-full">
           {[
             {
-              icon: <GoHomeFill className='text-2xl' />,
+              icon: <GoHomeFill className="text-2xl" />,
               label: "Home",
               path: "/",
+              onclick: onClose,
             },
             {
-              icon: <IoIosSearch className='text-2xl' />,
+              icon: <IoIosSearch className="text-2xl" />,
               label: "Search",
               path: "#",
               onclick: handleToggle,
             },
             {
-              icon: <MdOutlineExplore className='text-2xl' />,
+              icon: <MdOutlineExplore className="text-2xl" />,
               label: "Explore",
               path: "#",
+              onclick: onClose,
             },
             {
-              icon: <MdOutlineSlowMotionVideo className='text-2xl' />,
+              icon: <MdOutlineSlowMotionVideo className="text-2xl" />,
               label: "Reels",
               path: "#",
+              onclick: onClose,
             },
             {
-              icon: <RiMessengerLine className='text-2xl' />,
+              icon: <RiMessengerLine className="text-2xl" />,
               label: "Messages",
-              path: "#",
+              path: "/messages",
+              onclick: onClose,
             },
             {
-              icon: <FiHeart className='text-2xl' />,
+              icon: <FiHeart className="text-2xl" />,
               label: "Notifications",
               path: "#",
               onclick: handleToggle,
             },
             {
-              icon: <MdAddCircleOutline className='text-2xl' />,
+              icon: <MdAddCircleOutline className="text-2xl" />,
               label: "Create",
               path: "#",
+              onclick: onClose,
             },
             {
-              icon: <CgProfile className='text-2xl' />,
+              icon: <CgProfile className="text-2xl" />,
               label: "Profile",
               path: `/profile/${userDetails?._id}`,
+              onclick: onClose,
             },
           ].map((item, index) => {
             return (
               <Link
                 key={index}
                 href={item.path}
-                className='hover:-translate-y-1 hover:scale-110 duration-300 relative text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
+                className="hover:-translate-y-1 hover:scale-110 duration-300 relative text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
                 onClick={(e) =>
                   item.onclick && item?.onclick(item.label.toLowerCase())
                 }
@@ -167,9 +180,9 @@ function SideNavBar({ handleToggle }) {
                 {item.icon}
                 {/* <div className="w-2 h-2 bg-red-600 rounded-full absolute left-7 top-2.5"></div> */}
 
-                <span className='p-2 hidden lg:block'>{item.label}</span>
+                <span className="p-2 hidden lg:block">{item.label}</span>
                 {item.label === "Messages" && (
-                  <span className='absolute border rounded-full bg-[red] text-white w-4 h-4 flex justify-center items-center text-xs top-1 left-10 lg:top-3 lg:left-5'>
+                  <span className="absolute border rounded-full bg-[red] text-white w-4 h-4 flex justify-center items-center text-xs top-1 left-10 lg:top-3 lg:left-5">
                     9
                   </span>
                 )}
@@ -177,18 +190,21 @@ function SideNavBar({ handleToggle }) {
             );
           })}
         </div>
-        <div className='w-full h-full flex flex-col justify-end'>
-          <button className='hover:-translate-y-1 hover:scale-110 duration-300 text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'>
-            <SiThreads className='text-2xl' />
-            <span className='p-2 hidden lg:block'>Threads</span>
+        <div className="w-full h-full flex flex-col justify-end">
+          <button
+            onClick={onClose}
+            className="hover:-translate-y-1 hover:scale-110 duration-300 text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
+          >
+            <SiThreads className="text-2xl" />
+            <span className="p-2 hidden lg:block">Threads</span>
           </button>
 
           <button
             onClick={handleLogout}
-            className='hover:-translate-y-1 hover:scale-110 duration-300 text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg'
+            className="hover:-translate-y-1 hover:scale-110 duration-300 text-sm flex items-center w-full p-2 justify-center lg:justify-start hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
           >
-            <IoReorderThreeOutline className='text-2xl' />
-            <span className='p-2 hidden lg:block'>Logout</span>
+            <IoReorderThreeOutline className="text-2xl" />
+            <span className="p-2 hidden lg:block">Logout</span>
           </button>
         </div>
       </div>
