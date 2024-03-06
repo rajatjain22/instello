@@ -41,14 +41,14 @@ export async function GET(request, { params }) {
         return {};
       });
 
-    if (user && user[type] && type === "following") {
+    if (user && user[type]) {
       for (const [index, e] of user[type].entries()) {
         try {
           const userQued = await Users.findOne({
             _id: new mongoose.Types.ObjectId(loggedUserId),
-            [type]: new mongoose.Types.ObjectId(e._id),
+            following: new mongoose.Types.ObjectId(e._id),
           });
-          user.following[index].followed_by_viewer = !!userQued;
+          user[type][index].followed_by_viewer = !!userQued;
         } catch (error) {
           console.error(error);
         }

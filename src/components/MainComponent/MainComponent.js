@@ -1,14 +1,23 @@
 "use client";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import SideNavBar from "../SideNavBar/SideNavBar";
 import SearchModel from "../NavModel/SearchModel";
 import NotificationModel from "../NavModel/NotificationModel";
-import { useParams, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
 import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
-import AOS from "aos";
-import { useRouter } from "next/router";
+
+// import dynamic from "next/dynamic";
+
+// const SideNavBar = dynamic(() => import("../SideNavBar/SideNavBar"));
+// const SearchModel = dynamic(() => import("../NavModel/SearchModel"));
+// const NotificationModel = dynamic(() =>
+//   import("../NavModel/NotificationModel")
+// );
+// const InitialLoader = dynamic(() =>
+//   import("../Loaders/InitialLoading/InitialLoader")
+// );
 
 export default function MainComponent({ children }) {
   const sideNavBarSearchRef = useRef(null);
@@ -21,10 +30,6 @@ export default function MainComponent({ children }) {
     search: false,
     notifications: false,
   });
-
-  useEffect(() => {
-    AOS.init();
-  }, []);
 
   const handleToggle = (key) => {
     setToggle((prevToggle) => ({
@@ -44,7 +49,7 @@ export default function MainComponent({ children }) {
 
   if (!userDetails && !isPublicPath) {
     return (
-      <div className="w-full h-screen flex justify-center items-center">
+      <div className='w-full h-screen flex justify-center items-center'>
         <InitialLoader />
       </div>
     );
@@ -52,7 +57,7 @@ export default function MainComponent({ children }) {
 
   return (
     <>
-      <main className="flex min-h-screen">
+      <main className='flex min-h-screen'>
         {!isPublicPath ? (
           <div ref={sideNavBarSearchRef}>
             <SideNavBar handleToggle={handleToggle} onClose={onClose} />{" "}

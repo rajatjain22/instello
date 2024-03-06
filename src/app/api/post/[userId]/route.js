@@ -9,6 +9,7 @@ dbConnect();
 export async function GET(request, { params }) {
   try {
     const query = params.userId;
+    console.log(query)
     const loggedUserId = request.headers.get("x-user-id");
 
     const userId = query === "user" ? loggedUserId : query;

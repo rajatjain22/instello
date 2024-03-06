@@ -1,7 +1,9 @@
-"use client";
+import dynamic from "next/dynamic";
 
-import PostContainer from "@/components/PostContainer/PostContainer";
-import Story from "@/components/Story/Story";
+const Story = dynamic(() => import("@/components/Story/Story"));
+const PostContainer = dynamic(() =>
+  import("@/components/PostContainer/PostContainer")
+);
 
 export default function Home() {
   return (
