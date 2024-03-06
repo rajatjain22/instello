@@ -1,14 +1,11 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
-// import MainComponent from "@/components/MainComponent/MainComponent";
+import MainComponent from "@/components/MainComponent/MainComponent";
 import { UserContextProvider } from "./_context/User";
 import { Toaster } from "react-hot-toast";
 import { PostContextProvider } from "./_context/Post";
-
-import dynamic from "next/dynamic";
-
-const MainComponent = dynamic(() => import("@/components/MainComponent/MainComponent"));
-
+import Head from "next/head";
+import Wrapper from "@/components/SideNavBar/Wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,10 +17,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="">
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <body>
         <UserContextProvider>
           <PostContextProvider>
-            <MainComponent>{children}</MainComponent>
+            {/* <MainComponent>{children}</MainComponent> */}
+            <Wrapper>{children}</Wrapper>
             <Toaster position="bottom-center" reverseOrder={false} />
           </PostContextProvider>
         </UserContextProvider>

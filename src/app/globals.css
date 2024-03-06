@@ -13,7 +13,7 @@
 }
 
 body {
-  overflow: hidden;
+  /* overflow: hidden; */
   font-family: "Inter", system-ui, sans-serif !important;
 }
 

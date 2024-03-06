@@ -4,10 +4,7 @@ import { useEffect, useState } from "react";
 import AddPost from "./AddPost";
 import PostImage from "./PostImage";
 import PostPlaceholder from "../Placeholders/PostPlaceholder";
-import PostText from "./PostText";
 import PeopleKnow from "./Side/PeopleKnow";
-import SwiperPhotos from "./Side/SwiperPhotos";
-import EditNew from "../Profile/Edit/EditNew";
 
 export default function PostContainer() {
   const [posts, setPosts] = useState([]);
