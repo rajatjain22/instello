@@ -4,6 +4,7 @@ import MainComponent from "@/components/MainComponent/MainComponent";
 import { UserContextProvider } from "./_context/User";
 import { Toaster } from "react-hot-toast";
 import { PostContextProvider } from "./_context/Post";
+import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,6 +16,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="">
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <body>
         <UserContextProvider>
           <PostContextProvider>

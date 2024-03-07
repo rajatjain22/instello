@@ -1,7 +1,6 @@
 "use client";
 
 import { UserContext } from "@/app/_context/User";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
@@ -33,10 +32,10 @@ export default function Login() {
     setLoginBtnLoading(true);
     const requestData = {
       method: "POST",
-      body: JSON.stringify(formData),
-      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData)
     };
     try {
+      console.log("object sent for login ",requestData.body);
       const response = await fetch("/api/users/login", requestData);
       const resJson = await response.json();
       if (!response.ok) throw new Error(resJson.error);

@@ -13,7 +13,7 @@ export default function PostList({ posts }) {
   return (
     <>
       {posts.length > 0 ? (
-        <div className='mt-8'>
+        <div className="mt-8">
           {/* <!-- post heading --> */}
           {/* <div className='flex items-center justify-between py-3'>
             <h1 className='text-xl font-bold text-black dark:text-white'>
@@ -27,33 +27,35 @@ export default function PostList({ posts }) {
           {/* </div> */}
 
           {/* <!-- Post list --> */}
-          <div className='grid grid-cols-3 gap-3 mt-6'>
+          <div className="grid grid-cols-3 gap-3 mt-6">
             {posts.map((post, index) => {
-              const isImage = /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(post.post[0]);
+              const isImage = /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(
+                post.post[0]
+              );
               const isVideo = /\.(mp4|webm|ogv|mpg|mpeg)$/.test(post.post[0]);
               return (
                 post?.post.length > 0 && (
                   <div
                     key={`post${index}`}
-                    className='cursor-pointer lg:hover:scale-105 hover:shadow-lg hover:z-10 duration-500 delay-100'
+                    className="shadow-slate-300 p-1 cursor-pointer lg:hover:scale-105 shadow-lg hover:shadow-2xl hover:z-10 duration-500 delay-100"
                   >
-                    <div className='relative w-full lg:h-60 h-full aspect-[3/3]'>
+                    <div className="relative w-full lg:h-60 h-full aspect-[3/3]">
                       {isImage && (
                         <Image
-                          className='object-cover'
+                          className="object-cover"
                           src={post.post[0]}
-                          alt='Picture of the author'
+                          alt="Picture of the author"
                           fill={true}
-                          loading='lazy'
+                          loading="lazy"
                         />
                       )}
 
                       {isVideo && (
                         <video
-                          className='block w-full h-full object-center absolute right-0 animate-parallax [animation-timeline:view(x)] mb-2'
+                          className="block w-full h-full object-center absolute right-0 animate-parallax [animation-timeline:view(x)] mb-2"
                           src={post.post[0]}
                           alt={`Preview of Post`}
-                          playsInline=''
+                          playsInline=""
                           // controls
                         />
                       )}
@@ -78,8 +80,8 @@ export default function PostList({ posts }) {
           </div>
         </div>
       ) : (
-        <div className='flex items-center justify-center h-48 py-3'>
-          <h1 className='text-xl font-bold text-black dark:text-white'>
+        <div className="flex items-center justify-center h-48 py-3">
+          <h1 className="text-xl font-bold text-black dark:text-white">
             No Posts
           </h1>
         </div>

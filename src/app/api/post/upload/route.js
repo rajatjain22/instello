@@ -66,7 +66,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       message: "Successfully!",
-      data: posts,
+      data: { ...posts, likesCount: 0, commentCount: 0 },
     });
   } catch (error) {
     console.error(error);

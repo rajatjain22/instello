@@ -55,7 +55,7 @@ export default function Profile({ userId }) {
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, userDetails]);
 
   const handleFollow = (val) => {
     setFollowBtnLoading(true);
@@ -286,12 +286,12 @@ export default function Profile({ userId }) {
                     />
 
                     {profile.followed_by_viewer && (
-                      <button
-                        type="submit"
+                      <Link
+                        href={`/messages/${profile._id}`}
                         className="button bg-pink-600 text-white"
                       >
                         Message
-                      </button>
+                      </Link>
                     )}
                   </>
                 )}
@@ -345,7 +345,6 @@ export default function Profile({ userId }) {
             </li>
           </ul>
         </nav>
-
         {stickyTabChange === "images-posts" && (
           <PostList posts={profile?.posts} />
         )}

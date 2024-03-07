@@ -6,18 +6,36 @@ import mongoose from "mongoose";
 
 dbConnect();
 
-export async function GET(request, { params }) {
+export async function GET(request) {
   try {
-    const query = params.userId;
-    console.log(query)
     const loggedUserId = request.headers.get("x-user-id");
 
-    const userId = query === "user" ? loggedUserId : query;
-    const data = await Posts.aggregate([
+    const currentUser = await Users.findById(loggedUserId).exec();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    const followingIds = [...currentUser.following, loggedUserId];
+
+    const allData = await Posts.aggregate([
       {
         $match: {
-          user: new mongoose.Types.ObjectId(userId),
+          user: {
+            $nin: followingIds.map((e) => new mongoose.Types.ObjectId(e)),
+          },
         },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      {
+        $unwind: "$user",
       },
       {
         $project: {
@@ -25,6 +43,7 @@ export async function GET(request, { params }) {
           text: 1,
           createdAt: 1,
           post: 1,
+          user: { _id: 1, username: 1, fullName: 1, avatar: 1 },
           hasLiked: {
             $cond: {
               if: {
@@ -49,7 +68,7 @@ export async function GET(request, { params }) {
 
     return NextResponse.json({
       message: "Successfully!",
-      data,
+      data: allData,
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
