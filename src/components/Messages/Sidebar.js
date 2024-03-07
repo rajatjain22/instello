@@ -27,24 +27,24 @@ export default function Sidebar() {
     >
 
         {/* <!-- heading title --> */}
-        <div class='p-4 border-b dark:border-slate-700'>
-          <div class='flex mt-2 items-center justify-between'>
-            <h2 class='text-2xl font-bold text-black ml-1 dark:text-white'>
+        <div className='p-4 border-b dark:border-slate-700'>
+          <div className='flex mt-2 items-center justify-between'>
+            <h2 className='text-2xl font-bold text-black ml-1 dark:text-white'>
               Chats
             </h2>
 
             {/* <!-- right action buttons --> */}
-            <div class='flex items-center gap-2.5'>
-              <button class='group' aria-haspopup='true' aria-expanded='false'>
+            <div className='flex items-center gap-2.5'>
+              <button className='group' aria-haspopup='true' aria-expanded='false'>
                 <IoSettingsOutline className='text-2xl flex group-aria-expanded:rotate-180 md' />
               </button>
 
-              <button class=''>
+              <button className=''>
                 <IoIosCheckmarkCircleOutline className='text-2xl flex md' />
               </button>
 
               {/* <!-- mobile toggle menu --> */}
-              <button type='button' class='md:hidden'>
+              <button type='button' className='md:hidden'>
                 <IoChevronDownOutline />
               </button>
             </div>
@@ -64,30 +64,30 @@ export default function Sidebar() {
         </div>
 
         {/* <!-- users list --> */}
-        <div class='space-y-2 p-2 overflow-y-auto h-[calc(100vh-127px)]'>
+        <div className='space-y-2 p-2 overflow-y-auto h-[calc(100vh-127px)]'>
           <Link
             href='/messages/1'
-            class='relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery'
+            className='relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery'
           >
-            <div class='relative w-14 h-14 shrink-0'>
+            <div className='relative w-14 h-14 shrink-0'>
               <Image
                 src='/people-know/avatar-6.jpg'
                 alt='profile'
                 className='rounded-full shadow'
                 fill={true}
               />
-              <div class='w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800'></div>
+              <div className='w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800'></div>
             </div>
-            <div class='flex-1 min-w-0'>
-              <div class='flex items-center gap-2 mb-1.5'>
-                <div class='mr-auto text-sm text-black dark:text-white font-medium'>
+            <div className='flex-1 min-w-0'>
+              <div className='flex items-center gap-2 mb-1.5'>
+                <div className='mr-auto text-sm text-black dark:text-white font-medium'>
                   Jesse Steeve
                 </div>
-                <div class='text-xs font-light text-gray-500 dark:text-white/70'>
+                <div className='text-xs font-light text-gray-500 dark:text-white/70'>
                   09:40AM
                 </div>
               </div>
-              <div class='font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap'>
+              <div className='font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap'>
                 Love your photos 😍
               </div>
             </div>

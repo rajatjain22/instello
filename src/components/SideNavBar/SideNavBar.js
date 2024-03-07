@@ -291,6 +291,7 @@ function SideNavBar({ handleToggle, onClose }) {
           </button>
         </div>
       </div>
+      
     </>
   );
 }

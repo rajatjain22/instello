@@ -1,14 +1,26 @@
 "use client";
 
-import React, { Fragment, useContext, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import SideNavBar from "../SideNavBar/SideNavBar";
 import SearchModel from "../NavModel/SearchModel";
 import NotificationModel from "../NavModel/NotificationModel";
 import { usePathname } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
 import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
-import RajatBar from "../SideNavBar/RajatBar";
-// import NewSideBar from "../SideNavBar/newSideBar";
+import SideRRRDideBar from "../SideNavBar/SideRRRDideBar";
+import TopRRDideBar from "../SideNavBar/TopRRDideBar";
+import BottoomRRDideBar from "../SideNavBar/BottoomRRDideBar";
+
+// import dynamic from "next/dynamic";
+
+// const SideNavBar = dynamic(() => import("../SideNavBar/SideNavBar"));
+// const SearchModel = dynamic(() => import("../NavModel/SearchModel"));
+// const NotificationModel = dynamic(() =>
+//   import("../NavModel/NotificationModel")
+// );
+// const InitialLoader = dynamic(() =>
+//   import("../Loaders/InitialLoading/InitialLoader")
+// );
 
 export default function MainComponent({ children }) {
   const sideNavBarSearchRef = useRef(null);
@@ -40,26 +52,29 @@ export default function MainComponent({ children }) {
 
   if (!userDetails && !isPublicPath) {
     return (
-      <div className="w-full h-screen flex justify-center items-center">
+      <div className='w-full h-screen flex justify-center items-center'>
         <InitialLoader />
       </div>
     );
   }
 
   return (
-    <div className="wrapper">
-      {!isPublicPath ? (
-        <Fragment ref={sideNavBarSearchRef}>
-          {/* <NewSideBar /> */}
-          <RajatBar />
-          {/* <SideNavBar handleToggle={handleToggle} onClose={onClose} />{" "} */}
-        </Fragment>
-      ) : (
-        ""
-      )}
-      <main>
+    <div className='wrapper relative'>
+      <SideRRRDideBar />
+      <TopRRDideBar />
+      <main className='ml:0 sm:ml-[--w-side-small] md:ml-[--w-side-md] lg:ml-[--w-side]'>
+        <div className='main__inner'>{children}</div>
+      </main>
+      <BottoomRRDideBar />
+      {/* <main className='flex min-h-screen'>
+        {!isPublicPath ? (
+          <div ref={sideNavBarSearchRef}>
+            <SideNavBar handleToggle={handleToggle} onClose={onClose} />{" "}
+          </div>
+        ) : (
+          ""
+        )}
         <div
-          // 2xl:ml-[--w-side] xl:ml-[--w-side-md] md:ml-[--w-side-small]
           className={`w-full bg-body-color h-screen relative ${
             pathname.startsWith("/messages") ? "" : "overflow-y-scroll"
           }`}
@@ -84,7 +99,7 @@ export default function MainComponent({ children }) {
             />
           )}
         </div>
-      </main>
+      </main> */}
     </div>
   );
 }

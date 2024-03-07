@@ -5,7 +5,6 @@ import { UserContextProvider } from "./_context/User";
 import { Toaster } from "react-hot-toast";
 import { PostContextProvider } from "./_context/Post";
 import Head from "next/head";
-import Wrapper from "@/components/SideNavBar/Wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,8 +22,7 @@ export default function RootLayout({ children }) {
       <body>
         <UserContextProvider>
           <PostContextProvider>
-            {/* <MainComponent>{children}</MainComponent> */}
-            <Wrapper>{children}</Wrapper>
+            <MainComponent>{children}</MainComponent>
             <Toaster position="bottom-center" reverseOrder={false} />
           </PostContextProvider>
         </UserContextProvider>
