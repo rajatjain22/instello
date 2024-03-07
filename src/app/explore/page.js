@@ -4,7 +4,7 @@ import PostPlaceholder from "@/components/Placeholders/PostPlaceholder";
 import PostImage from "@/components/PostContainer/PostImage";
 import React, { useEffect, useState } from "react";
 
-function page() {
+export default function Explore() {
   const [posts, setPosts] = useState([]);
   const [postLoading, setPostLoading] = useState(true);
 
@@ -47,5 +47,3 @@ function page() {
     </div>
   );
 }
-
-export default page;
