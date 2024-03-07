@@ -45,7 +45,7 @@ export default function PostImage({ user, post }) {
       if (response.ok) {
         toast.success("Liked");
       } else {
-        console.log("Error: ", response.error);
+        console.log("Error: ===> ", response.error);
       }
     } catch (error) {
       console.log(error.message);

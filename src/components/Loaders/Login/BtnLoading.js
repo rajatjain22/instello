@@ -1,6 +1,6 @@
 export default function BtnLoading() {
   return (
-    <div aria-label="Loading..." role="status">
+    <div className='flex justify-center' aria-label="Loading..." role="status">
       <svg className="animate-spin w-6 h-6 fill-white" viewBox="3 3 18 18">
         <path
           className="opacity-20"
