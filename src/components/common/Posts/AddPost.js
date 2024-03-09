@@ -14,7 +14,7 @@ export default function AddPost({ setPosts }) {
 
   function auto_grow(element) {
     element.target.style.height = "10px";
-    element.target.style.height = (element.target.scrollHeight + 10) + "px";
+    element.target.style.height = element.target.scrollHeight + 10 + "px";
   }
 
   const handlePost = async () => {
@@ -41,10 +41,17 @@ export default function AddPost({ setPosts }) {
         const resData = await response.json();
         const newPost = { ...resData.data, user: userDetails };
 
-        setPosts((prevPosts) => [newPost, ...prevPosts]);
+        setPosts((prevPosts) => [
+          { ...newPost, likesCount: 0, commentCount: 0 },
+          ...prevPosts,
+        ]);
         setUserDetails((presVal) => ({
           ...presVal,
-          posts: [resData.data, ...presVal.posts],
+          postsCount: presVal.postsCount + 1,
+          posts: [
+            { ...resData.data, likesCount: 0, commentCount: 0 },
+            ...presVal.posts,
+          ],
         }));
         setFileRef([]);
         setPostText("");
@@ -74,7 +81,12 @@ export default function AddPost({ setPosts }) {
           />
         </div>
 
-        <div id="media" className={`${filesRef.length && '!mb-8 bg-[#f7f7f7] px-2 py-3 rounded-2xl'}`}>
+        <div
+          id="media"
+          className={`${
+            filesRef.length && "!mb-8 bg-[#f7f7f7] px-2 py-3 rounded-2xl"
+          }`}
+        >
           <ImageSlider
             filesRef={filesRef}
             setFileRef={setFileRef}

@@ -17,7 +17,13 @@ export async function middleware(request) {
     const isAuth = verifyData?.payload;
 
     if (!isAuth) {
-      Response.json(
+      const response = NextResponse.next();
+      response.cookies.set("token", "", {
+        httpOnly: true,
+        expires: new Date(0),
+      });
+      return response
+      return response.json(
         { success: false, message: "authentication failed" },
         { status: 401 }
       );

@@ -1,5 +1,5 @@
 import { UserContext } from "@/app/_context/User";
-import ModelBox from "@/components/ModelBox/ModelBox";
+import ModelBox from "@/components/common/ModelBox";
 import { formatTimestamp } from "@/helpers/all";
 import Image from "next/image";
 import { useCallback, useContext, useEffect, useState } from "react";

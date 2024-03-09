@@ -106,6 +106,7 @@ export async function PUT(request, { params }) {
           height: 300, // Resize to 200px height (can be adjusted)
           gravity: "face", // Center the image within the resized frame
           crop: "fill", // Fill the entire frame (or use 'fit' for letterboxing)
+          quality: 70,
         },
       });
       user.avatar = avatarResult;

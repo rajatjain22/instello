@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import NavModel from "./NavModel";
+import NavModel from "../common/NavModel";
 import { useRef } from "react";
 import useOnClickOutside from "@/app/_hooks/useClickOutside";
 

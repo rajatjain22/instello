@@ -30,7 +30,7 @@ export default function LoginForm({ formType, onSubmit, loading }) {
   };
 
   return (
-    <form className="space-y-3" onSubmit={handleSubmit}>
+    <form method="POST" className="space-y-3" onSubmit={handleSubmit}>
       {!formType && (
         <>
           <input

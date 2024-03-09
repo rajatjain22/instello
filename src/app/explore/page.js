@@ -1,7 +1,7 @@
 "use client";
 
 import PostPlaceholder from "@/components/Placeholders/PostPlaceholder";
-import PostImage from "@/components/PostContainer/PostImage";
+import PostImage from "@/components/common/Posts/PostImage";
 import React, { useEffect, useState } from "react";
 
 export default function Explore() {

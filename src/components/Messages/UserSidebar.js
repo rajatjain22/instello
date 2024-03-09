@@ -4,7 +4,7 @@ import useResponsive from "@/app/_hooks/useResponsive";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import {
   IoChevronBackOutline,
@@ -12,10 +12,45 @@ import {
   IoSearch,
   IoSettingsOutline,
 } from "react-icons/io5";
+import SearchForm from "../common/SearchForm";
 
-export default function Sidebar() {
+export default function UserSidebar() {
   const { isMobile, isTablet } = useResponsive();
   const pathname = usePathname();
+
+  const [search, setSearch] = useState({
+    text: "",
+    searchUsers: [],
+    searchLoading: false,
+  });
+
+  console.log(search)
+
+  const handleSearch = async () => {
+    if (!search.searchValue) {
+      toast.error("Please enter value!");
+      return false;
+    }
+    try {
+      setSearch((presVal) => ({ ...presVal, searchLoading: true }));
+      const request = {
+        method: "POST",
+        body: JSON.stringify({ search: search.searchValue }),
+      };
+      const response = await fetch("/api/users/search", request);
+      const resJson = await response.json();
+      if (response.ok) {
+        setSearch((presVal) => ({ ...presVal, searchUsers: resJson.users }));
+      } else {
+        console.log(resJson.error);
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setSearch((presVal) => ({ ...presVal, searchLoading: false }));
+    }
+  };
+
   return (
     <div
       className={`${
@@ -60,16 +95,16 @@ export default function Sidebar() {
         </div>
 
         {/* <!-- search --> */}
-        <div className="relative mt-4">
-          <IoSearch className="absolute top-2.5 left-2 text-xl" />
-
-          <input
-            type="text"
-            placeholder="Search"
-            className="bg-transparen w-full !pl-10 !py-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none"
-          />
-          <button type="submit" hidden></button>
-        </div>
+        <SearchForm
+          search={search.text}
+          onChange={(e) =>
+            setSearch((presVal) => ({
+              ...presVal,
+              text: e.target.value,
+            }))
+          }
+          handleSearch={handleSearch}
+        />
       </div>
 
       {/* <!-- users list --> */}

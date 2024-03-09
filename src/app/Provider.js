@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useContext, useRef, useState } from "react";
-import SearchModel from "../NavModel/SearchModel";
-import NotificationModel from "../NavModel/NotificationModel";
 import { usePathname, useRouter } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
-import InitialLoader from "../Loaders/InitialLoading/InitialLoader";
 import toast from "react-hot-toast";
-import TopBar from "../NavBar/TopBar";
-import BottomBar from "../NavBar/BottomBar";
-import SideBar from "../NavBar/SideBar";
+import SideBar from "@/components/common/NavBars/SideBar";
+import TopBar from "@/components/common/NavBars/TopBar";
+import BottomBar from "@/components/common/NavBars/BottomBar";
+import NotificationModel from "@/components/layout/NotificationModel";
+import SearchModel from "@/components/layout/SearchModel";
+import InitialLoader from "@/components/Loaders/InitialLoading/InitialLoader";
 
-export default function MainComponent({ children }) {
+export default function Provider({ children }) {
   // const sideNavBarSearchRef = useRef(null);
   const { userDetails } = useContext(UserContext);
   const pathname = usePathname();
@@ -91,12 +91,16 @@ export default function MainComponent({ children }) {
 
       <main
         className={`${
-          !isPublicPath
-            &&  "ml-0 sm:ml-[--w-side-small] md:ml-[--w-side-md] lg:ml-[--w-side]"
+          !isPublicPath &&
+          "ml-0 sm:ml-[--w-side-small] md:ml-[--w-side-md] lg:ml-[--w-side]"
         }`}
       >
         <div
-          className={`${pathname.startsWith("/messages") || isPublicPath ? "" : "m-auto max-w-[935px] px-2 sm:px-5 pb-10"}`}
+          className={`${
+            pathname.startsWith("/messages") || isPublicPath
+              ? ""
+              : "m-auto max-w-[935px] px-2 sm:px-5 pb-10"
+          }`}
         >
           {children}
         </div>
@@ -127,41 +131,6 @@ export default function MainComponent({ children }) {
           onClose={onClose}
         />
       )}
-
-      {/* <main className='flex min-h-screen'>
-        {!isPublicPath ? (
-          <div ref={sideNavBarSearchRef}>
-            <SideNavBar handleToggle={handleToggle} onClose={onClose} />{" "}
-          </div>
-        ) : (
-          ""
-        )}
-        <div
-          className={`w-full bg-body-color h-screen relative ${
-            pathname.startsWith("/messages") ? "" : "overflow-y-scroll"
-          }`}
-        >
-          <div
-            className={`${
-              pathname.startsWith("/messages") ? "" : "main__inner"
-            }`}
-          >
-            {children}
-          </div>
-          {toggle.search && (
-            <SearchModel
-              sideNavBarSearchRef={sideNavBarSearchRef}
-              onClose={onClose}
-            />
-          )}
-          {toggle.notifications && (
-            <NotificationModel
-              sideNavBarSearchRef={sideNavBarSearchRef}
-              onClose={onClose}
-            />
-          )}
-        </div>
-      </main> */}
     </div>
   );
 }

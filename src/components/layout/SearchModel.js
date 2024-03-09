@@ -1,11 +1,13 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IoSearch } from "react-icons/io5";
-import NavModel from "./NavModel";
+import NavModel from "../common/NavModel";
 import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
 import useOnClickOutside from "@/app/_hooks/useClickOutside";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import SearchForm from "../common/SearchForm";
+import User from "../common/User";
 
 export default function NewSearchModel({
   onClose,
@@ -23,8 +25,7 @@ export default function NewSearchModel({
     searchLoading: false,
   });
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const handleSearch = async () => {
     if (!search.searchValue) {
       toast.error("Please enter value!");
       return false;
@@ -58,25 +59,16 @@ export default function NewSearchModel({
             Search
           </h3>
 
-          <form onSubmit={handleSearch}>
-            <div className="relative -mx-1">
-              <IoSearch className="absolute top-2.5 left-2 text-xl" />
-
-              <input
-                type="text"
-                placeholder="Search"
-                className="bg-transparen w-full !pl-10 !py-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none"
-                value={search.searchValue}
-                onChange={(e) =>
-                  setsearch((presVal) => ({
-                    ...presVal,
-                    searchValue: e.target.value,
-                  }))
-                }
-              />
-              <button type="submit" hidden></button>
-            </div>
-          </form>
+          <SearchForm
+            search={search.searchValue}
+            onChange={(e) =>
+              setsearch((presVal) => ({
+                ...presVal,
+                searchValue: e.target.value,
+              }))
+            }
+            handleSearch={handleSearch}
+          />
         </div>
 
         {/* <!-- contents list --> */}
@@ -96,33 +88,14 @@ export default function NewSearchModel({
             </>
           ) : search?.searchUsers?.length > 0 ? (
             search.searchUsers.map((user, index) => (
-              <div
-                // href={`/profile/${user._id}`}
+              <User
+                className={
+                  "cursor-pointer relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
+                }
+                user={user}
                 key={index}
-                className="cursor-pointer relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
-                onClick={() => {
-                  router.push(`/profile/${user._id}`);
-                  onClose();
-                }}
-              >
-                <div className="w-10 h-10 relative">
-                  <Image
-                    className="bg-gray-200 rounded-full"
-                    src={user.avatar}
-                    alt="Picture of the author"
-                    fill={true}
-                    loading="lazy"
-                  />
-                </div>
-                <div className="fldex-1 min-w-0">
-                  <h4 className="font-medium text-sm text-black dark:text-white">
-                    {user.fullName}
-                  </h4>
-                  <div className="text-xs text-gray-500 font-normal mt-0.5 dark:text-white-80">
-                    Suggested For You
-                  </div>
-                </div>
-              </div>
+                followButton={false}
+              />
             ))
           ) : (
             <div className="py-2.5 px-3">No users found.</div>

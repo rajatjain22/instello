@@ -11,11 +11,10 @@ import {
   IoChevronDownOutline,
   IoEllipsisHorizontal,
 } from "react-icons/io5";
-import PostSwiper from "../PostSwiper/PostSwiper";
+import PostSwiper from "./PostSwiper";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import CommentModel from "./CommentModel";
-import ViewModel from "./ViewModel";
+import CommentModel from "../CommentModel";
 
 export default function PostImage({ user, post }) {
   const [postAction, setPostAction] = useState({
@@ -67,6 +66,7 @@ export default function PostImage({ user, post }) {
       commentModel: false,
     }));
   };
+
   const handleCloseViewModel = () => {
     setPostAction((presVal) => ({
       ...presVal,
@@ -116,7 +116,7 @@ export default function PostImage({ user, post }) {
         <div className='px-4'>
           <div
             className='relative w-full h-[22rem] cursor-pointer'
-            onClick={() => console.log("Click")}
+            // onClick={() => console.log("Click")}
           >
             <PostSwiper posts={post.post} />
           </div>
@@ -145,7 +145,7 @@ export default function PostImage({ user, post }) {
             className={`button__ico ${
               postAction.hasLiked
                 ? "text-red-500 bg-red-100 dark:bg-slate-700"
-                : ""
+                : "bg-slate-200/70"
             }`}
             onClick={() => handleLike(!postAction.hasLiked)}
           >
@@ -237,9 +237,6 @@ export default function PostImage({ user, post }) {
           More Comment
         </button>
       </div> */}
-      {postAction.viewModel && (
-        <ViewModel is/>
-      )}
 
       {postAction.commentModel && (
         <CommentModel

@@ -8,12 +8,9 @@ function useOnClickOutside(ref, handler, sideref, topref, bottomref) {
       if (
         ref.current &&
         !ref.current.contains(event.target) &&
-        sideref.current &&
-        !sideref.current.contains(event.target) &&
-        topref.current &&
-        !topref.current.contains(event.target) &&
-        bottomref.current &&
-        !bottomref.current.contains(event.target)
+        ((sideref?.current && !sideref.current.contains(event.target)) ||
+          (topref?.current && !topref.current.contains(event.target)) ||
+          (bottomref?.current && !bottomref.current.contains(event.target)))
       ) {
         handler();
       }

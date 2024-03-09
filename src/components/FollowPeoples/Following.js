@@ -8,6 +8,8 @@ import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import FollowCard from "./FollowCard";
 import { FollowPeoplePlaceholder } from "../Placeholders/FollowPeoplePlaceholder";
+import { notFound } from 'next/navigation'
+import NotFoundCatchAll from "@/app/[...not_found]/page";
 
 export default function Following() {
   const { userDetails, setUserDetails } = useContext(UserContext);
@@ -17,10 +19,16 @@ export default function Following() {
   const [loading, setLoading] = useState(true);
   const [loadingStates, setLoadingStates] = useState({});
 
+  const [notFound, setNotFound] = useState(false);
+
   const fetchData = async (action) => {
     try {
       setLoading(true);
       const res = await fetch(`/api/users/profile/${id}/${action}`);
+      if (res.status === 404) {
+        setNotFound(true);
+        return;
+      }
       if (!res.ok) {
         throw new Error("Failed to fetch user profile");
       }
@@ -87,7 +95,7 @@ export default function Following() {
           };
         };
 
-        const followUserIndex = allData?.following?.findIndex(
+        const followUserIndex = allData?.[showType]?.findIndex(
           (e) => e._id === followerId
         );
 
@@ -245,13 +253,17 @@ export default function Following() {
       });
   };
 
+  if(notFound){
+    return <NotFoundCatchAll />
+  }
+
   return (
     <>
-      <nav className='border-b dark:border-slate-700'>
-        <ul className='flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80'>
-          <li className=''>
+      <nav className="border-b dark:border-slate-700">
+        <ul className="flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80">
+          <li className="">
             <Link
-              href='#'
+              href="#"
               className={`inline-block py-5 border-b-2 ${
                 showType === "followers"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -262,9 +274,9 @@ export default function Following() {
               followers {allData?.followersCount}
             </Link>
           </li>
-          <li className=''>
+          <li className="">
             <Link
-              href='#'
+              href="#"
               className={`inline-block py-5 border-b-2 ${
                 showType === "following"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -275,23 +287,15 @@ export default function Following() {
               following {allData?.followingCount}
             </Link>
           </li>
-          {/* <li>
-            <Link
-              href="#"
-              className="inline-block py-5 border-b-2 border-transparent"
-            >
-              Suggestions
-            </Link>
-          </li> */}
         </ul>
       </nav>
       {loading ? (
-        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
+        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
           <FollowPeoplePlaceholder />
           <FollowPeoplePlaceholder />
         </div>
       ) : allData?.[showType]?.length > 0 ? (
-        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
+        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
           {allData[showType].map((follow, index) => (
             <FollowCard
               key={follow._id}
@@ -303,13 +307,13 @@ export default function Following() {
           ))}
         </div>
       ) : (
-        <div className='text-2xl font-semibold text-center text-black mt-16'>{`No ${showType}`}</div>
+        <div className="text-2xl font-semibold text-center text-black mt-16">{`No ${showType}`}</div>
       )}
 
-      <div className='flex justify-center my-10'>
+      <div className="flex justify-center my-10">
         <button
-          type='button'
-          className='bg-white py-2 px-5 rounded-full shadow-md font-semibold text-sm dark:bg-dark2'
+          type="button"
+          className="bg-white py-2 px-5 rounded-full shadow-md font-semibold text-sm dark:bg-dark2"
         >
           Load more...
         </button>

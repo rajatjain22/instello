@@ -10,6 +10,17 @@ export async function GET(request, { params }) {
     const { id, type } = params;
     const loggedUserId = request.headers.get("x-user-id");
 
+    if (id !== loggedUserId) {
+      const checkFollow = await Users.findOne({
+        _id: loggedUserId,
+        following: { $in: new mongoose.Types.ObjectId(id) },
+      });
+
+      if (!checkFollow) {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
+      }
+    }
+
     const userQuery1 = Users.findById(id)
       .select(type)
       .populate([

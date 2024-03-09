@@ -1,7 +1,8 @@
 "use client";
 
 import { UserContext } from "@/app/_context/User";
-import FollowButton from "@/components/FollowButton/FollowButton";
+import FollowButton from "@/components/common/FollowButton";
+import User from "@/components/common/User";
 import { UserPlaceholderWithButton } from "@/components/Placeholders/UserPlaceholder";
 import Image from "next/image";
 import Link from "next/link";
@@ -100,9 +101,6 @@ export default function PeopleKnow() {
     <div className="bg-white rounded-xl shadow-sm p-5 px-6 border1 dark:bg-dark2">
       <div className="flex justify-between text-black dark:text-white">
         <h3 className="font-bold text-base">People you might know </h3>
-        {/* <button>
-          <IoSyncSharp className="text-xl" />
-        </button> */}
       </div>
       <div className="space-y-4 capitalize text-xs font-normal mt-5 mb-2 text-gray-500 dark:text-white/80">
         {loading ? (
@@ -110,47 +108,21 @@ export default function PeopleKnow() {
             <UserPlaceholderWithButton />
             <UserPlaceholderWithButton />
           </>
-        ) : (
-          userData.length ? 
+        ) : userData.length ? (
           userData.map((user, index) => {
             return (
-              <div
-                className="flex items-center gap-3 justify-between"
+              <User
                 key={index}
-              >
-                <Link href={`/profile/${user._id}`} className="flex gap-2">
-                  <div className="w-10 h-10 relative">
-                    <Image
-                      className="bg-gray-200 rounded-full w-10 h-10"
-                      src={user.avatar}
-                      alt="Picture of the author"
-                      fill={true}
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm text-black dark:text-white">
-                      {user.fullName}
-                    </h4>
-
-                    <div className="mt-0.5"> Suggested For You </div>
-                  </div>
-                </Link>
-                <FollowButton
-                  isFollowing={user.followed_by_viewer}
-                  isLoading={loadingStates[user._id]}
-                  onToggleFollow={() => {
-                    handleToggleFollow(
-                      user._id,
-                      user.followed_by_viewer ? "unfollow" : "follow"
-                    );
-                  }}
-                />
-              </div>
+                user={user}
+                className={"flex items-center gap-3 justify-between"}
+                followButton={true}
+                handleFollow={handleToggleFollow}
+                isLoading={loadingStates[user._id]}
+              />
             );
           })
-          : <div className="text-center">No suggestions</div>
+        ) : (
+          <div className="text-center">No suggestions</div>
         )}
       </div>
     </div>
