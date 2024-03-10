@@ -8,7 +8,6 @@ export default function PostList({ posts }) {
           {/* <!-- Post list --> */}
           <div className="grid grid-cols-3 gap-3 mt-6 ">
             {posts.map((post, index) => {
-              console.log(post?.post);
               return (
                 post?.post.length > 0 && (
                   <FilePreview file={post.post[0]} isFeed={true} />

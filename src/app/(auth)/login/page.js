@@ -4,11 +4,11 @@ import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { UserContext } from "@/app/_context/User";
 import LoginForm from "@/components/Login/LoginForm";
-import ForgotPasswordLink from "@/components/Login/ForgotPasswordLink";
 import JoinNowLink from "@/components/Login/JoinNowLink";
 import SocialLoginButtons from "@/components/Login/SocialLoginButtons";
 import { useRouter } from "next/navigation";
 import { PostContext } from "@/app/_context/Post";
+import Link from "next/link";
 
 export default function Login() {
   const { setUserDetails } = useContext(UserContext);
@@ -75,7 +75,7 @@ export default function Login() {
       toast.success(`${formType ? "Login" : "Register"} Successful`);
     } catch (error) {
       console.error("Login Failed", error);
-      toast.error("Login Failed");
+      toast.error(error.message);
     } finally {
       setLoginBtnLoading(false);
       setHomePostsLoading(false);
@@ -93,7 +93,11 @@ export default function Login() {
           onSubmit={handleLoginFormSubmit}
           loading={loginBtnLoading}
         />
-        <ForgotPasswordLink />
+        <Link href="#">
+          <div className="text-sm text-right text-gray-400 py-4">
+            Forget password
+          </div>
+        </Link>
         <SocialLoginButtons />
         <JoinNowLink formType={formType} setFormType={setFormType} />
       </div>

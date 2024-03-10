@@ -8,10 +8,10 @@ export default function TopBar({ settopref, handleToggle, onClose }) {
 
   useEffect(() => {
     if (sideref.current) {
-      console.log("object")
+      console.log("object");
       settopref(sideref);
     }
-  }, [settopref]);
+  }, [sideref]);
 
   const menu = [
     {
@@ -40,12 +40,15 @@ export default function TopBar({ settopref, handleToggle, onClose }) {
         </svg>
       ),
       label: "Profile",
-      onClose: onClose,
+      onClick: onClose,
     },
   ];
 
   return (
-    <div ref={sideref} className="flex sm:hidden h-14 items-center justify-between gap-2 sticky top-0 bg-white z-20 p-2 border-b shadow-lg">
+    <div
+      ref={sideref}
+      className="flex sm:hidden h-14 items-center justify-between gap-2 sticky top-0 bg-white z-20 p-2 border-b shadow-lg"
+    >
       <div className="relative w-20 h-6">
         <Image src="/logo.svg" fill={true} alt="logo" />
       </div>

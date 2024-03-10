@@ -11,11 +11,11 @@ const messageSchema = mongoose.Schema({
     ref: "users",
     required: true,
   },
-  content: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
+  message: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const Messages =
   mongoose.models.messages || mongoose.model("messages", messageSchema);
 
-module.exports = Messages;
+export default Messages;

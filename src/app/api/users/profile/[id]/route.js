@@ -117,6 +117,7 @@ export async function PUT(request, { params }) {
         _id: { $ne: user._id },
         username: username,
       });
+
       if (data) {
         return NextResponse.json(
           { error: "Username already exists" },
@@ -126,9 +127,25 @@ export async function PUT(request, { params }) {
       user.username = username;
     }
 
+    if (email) {
+      const data = await Users.findOne({
+        _id: { $ne: user._id },
+        email: email,
+      });
+
+      if (data) {
+        return NextResponse.json(
+          { error: "Email already exists" },
+          { status: 409 }
+        );
+      }
+      user.email = email;
+    }
+
     if (bio) {
       user.bio = bio ? bio : "";
     }
+      
     if (fullName) {
       user.fullName = fullName;
     }

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import FollowButton from "./FollowButton";
+import { UserContext } from "@/app/_context/User";
 
 export default function User({
   user,
@@ -9,7 +10,9 @@ export default function User({
   followButton,
   handleFollow,
   isLoading,
+  isRemove,
 }) {
+  const { userDetails } = useContext(UserContext);
   return (
     <div className={className}>
       <Link href={`/profile/${user._id}`} className="flex gap-2">
@@ -28,10 +31,10 @@ export default function User({
             {user.fullName}
           </h4>
 
-          <div className="mt-0.5 text-xs"> Suggested For You </div>
+          <div className="mt-0.5 text-xs"> {user.followed_by_viewer ? 'Following' : user.fullName} </div>
         </div>
       </Link>
-      {followButton && (
+      {followButton && user._id !== userDetails._id && (
         <FollowButton
           isFollowing={user.followed_by_viewer}
           isLoading={isLoading}
@@ -41,6 +44,7 @@ export default function User({
               user.followed_by_viewer ? "unfollow" : "follow"
             );
           }}
+          isRemove={isRemove}
         />
       )}
     </div>

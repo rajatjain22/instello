@@ -64,7 +64,7 @@ export default function BottomBar({
     if (sideRef.current) {
       setbottomref(sideRef);
     }
-  }, [setbottomref]);
+  }, [sideRef]);
 
   return (
     <div

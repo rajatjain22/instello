@@ -2,7 +2,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "./_context/User";
 import { PostContextProvider } from "./_context/Post";
-import Provider from "./provider";
+import Provider from "./Provider";
 
 export const metadata = {
   title: "Home",

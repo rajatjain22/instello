@@ -99,7 +99,7 @@ export default function Provider({ children }) {
           className={`${
             pathname.startsWith("/messages") || isPublicPath
               ? ""
-              : "m-auto max-w-[935px] px-2 sm:px-5 pb-10"
+              : "m-auto max-w-[935px] px-2 sm:px-5 pb-14"
           }`}
         >
           {children}

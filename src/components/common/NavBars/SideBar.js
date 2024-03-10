@@ -23,7 +23,7 @@ export default function SideBar({
     if (sideRef.current) {
       setSideref(sideRef);
     }
-  }, [setSideref]);
+  }, [sideRef]);
 
   const menu = [
     {

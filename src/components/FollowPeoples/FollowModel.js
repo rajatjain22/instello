@@ -8,17 +8,21 @@ import Image from "next/image";
 import FollowButton from "../common/FollowButton";
 import User from "../common/User";
 import { UserPlaceholderWithButton } from "../Placeholders/UserPlaceholder";
+import toast from "react-hot-toast";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function FollowModel({ isOpen, onClose, id, type }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
-  const [allData, setAllData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [allData, setAllData] = useState([]);
   const [loadingStates, setLoadingStates] = useState({});
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
   const fetchData = async (action) => {
     try {
-      setLoading(true);
-      const res = await fetch(`/api/users/profile/${id}/${action}`);
+      const res = await fetch(
+        `/api/users/profile/${id}/${action}?page=${page}`
+      );
       if (res.status === 404) {
         // setNotFound(true);
         return;
@@ -28,11 +32,11 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
         throw new Error("Failed to fetch user profile");
       }
       const data = await res.json();
-      setAllData(data.data);
+      setAllData((presVal) => [...presVal, ...data.data[type]]);
+      setPage((presVal) => presVal + 1);
+      setHasMore(data.hasMore);
     } catch (error) {
       console.error(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -57,60 +61,39 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
         return res.json();
       })
       .then((res) => {
-        const updateFollowStatus = (prevState, index, val, type) => {
-          const countField =
-            type === "following" ? "followingCount" : "followersCount";
-
-          const updatedUserData = [...prevState[type]];
-
-          updatedUserData[index] = {
-            ...updatedUserData[index],
-            followed_by_viewer: val === "follow",
-          };
-
-          const countChange =
-            val === "follow" && userDetails._id === allData._id
-              ? 1
-              : val === "unfollow" && userDetails._id === allData._id
-              ? -1
-              : 0;
-
-          return {
-            ...prevState,
-            [type]: updatedUserData,
-            [countField]: prevState[countField] + countChange,
-          };
-        };
-
-        const followUserIndex = allData?.[type]?.findIndex(
-          (e) => e._id === followerId
-        );
-
-        if (followUserIndex !== -1 && followUserIndex !== undefined) {
+        const followUserIndex = allData?.findIndex((e) => e._id === followerId);
+        if (
+          val !== "remove" &&
+          followUserIndex !== -1 &&
+          followUserIndex !== undefined
+        ) {
           setUserDetails((prevState) => ({
             ...prevState,
             followingCount:
               prevState.followingCount + (val === "follow" ? 1 : -1),
           }));
 
-          setAllData((prevState) =>
-            updateFollowStatus(prevState, followUserIndex, val, type)
-          );
+          setAllData((prevState) => {
+            const updatedUserData = [...prevState];
+
+            updatedUserData[followUserIndex] = {
+              ...updatedUserData[followUserIndex],
+              followed_by_viewer: val === "follow",
+            };
+
+            return updatedUserData;
+          });
         } else if (val === "remove") {
           setUserDetails((prevState) => ({
             ...prevState,
-            followers: prevState.followers - 1,
+            followersCount: prevState.followersCount - 1,
           }));
 
           setAllData((prevState) => {
-            const updatedUserData = prevState.followers.filter(
+            const updatedUserData = prevState.filter(
               (e) => e._id !== followerId
             );
-            return {
-              ...prevState,
-              followers: updatedUserData,
-              followersCount: prevState.followersCount - 1,
-            };
+            return updatedUserData;
           });
         }
 
@@ -124,10 +107,11 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
         }));
       });
   };
+  console.log(userDetails);
 
   useEffect(() => {
     fetchData(type);
-  }, [isOpen, onClose, id, type]);
+  }, []);
 
   return (
     <div>
@@ -135,17 +119,27 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
         <div className="sm:px-4 sm:py-3 p-2.5 border-b border-gray-100 capitalize text-lg font-medium text-center">
           {type}
         </div>
-        <div className="bg-white flex flex-col text-black gap-3 sm:px-4 sm:py-3 p-2.5 h-72 overflow-y-scroll">
-          {loading ? (
-            <>
-              <UserPlaceholderWithButton />
-              <UserPlaceholderWithButton />
-              <UserPlaceholderWithButton />
-              <UserPlaceholderWithButton />
-              <UserPlaceholderWithButton />
-            </>
-          ) : (
-            allData?.[type]?.map((user, index) => (
+        <div
+          id="scrollableDiv"
+          className="bg-white flex flex-col text-black gap-3 sm:px-4 sm:py-3 p-2.5 h-72 overflow-y-scroll"
+        >
+          <InfiniteScroll
+            dataLength={allData?.length}
+            next={() => fetchData(type)}
+            hasMore={hasMore}
+            loader={
+              <>
+                <UserPlaceholderWithButton />
+                <UserPlaceholderWithButton />
+                <UserPlaceholderWithButton />
+                <UserPlaceholderWithButton />
+                <UserPlaceholderWithButton />
+              </>
+            }
+            className="flex flex-col text-black gap-3"
+            scrollableTarget="scrollableDiv"
+          >
+            {allData?.map((user, index) => (
               <User
                 key={index}
                 className={"flex justify-between items-center"}
@@ -153,9 +147,10 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
                 followButton={true}
                 handleFollow={handleFollow}
                 isLoading={loadingStates[user._id]}
+                isRemove={type === "followers" && userDetails._id === id}
               />
-            ))
-          )}
+            ))}
+          </InfiniteScroll>
         </div>
       </ModelBox>
     </div>

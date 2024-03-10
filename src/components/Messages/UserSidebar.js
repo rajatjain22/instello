@@ -9,10 +9,12 @@ import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import {
   IoChevronBackOutline,
   IoChevronDownOutline,
-  IoSearch,
   IoSettingsOutline,
 } from "react-icons/io5";
 import SearchForm from "../common/SearchForm";
+import toast from "react-hot-toast";
+import User from "../common/User";
+import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
 
 export default function UserSidebar() {
   const { isMobile, isTablet } = useResponsive();
@@ -24,10 +26,8 @@ export default function UserSidebar() {
     searchLoading: false,
   });
 
-  console.log(search)
-
   const handleSearch = async () => {
-    if (!search.searchValue) {
+    if (!search.text) {
       toast.error("Please enter value!");
       return false;
     }
@@ -35,7 +35,7 @@ export default function UserSidebar() {
       setSearch((presVal) => ({ ...presVal, searchLoading: true }));
       const request = {
         method: "POST",
-        body: JSON.stringify({ search: search.searchValue }),
+        body: JSON.stringify({ search: search.text }),
       };
       const response = await fetch("/api/users/search", request);
       const resJson = await response.json();
@@ -51,6 +51,7 @@ export default function UserSidebar() {
     }
   };
 
+  
   return (
     <div
       className={`${
@@ -63,7 +64,7 @@ export default function UserSidebar() {
     >
       {/* <!-- heading title --> */}
       <div className="p-4 border-b dark:border-slate-700">
-        <div className="flex mt-2 items-center justify-between">
+        <div className="flex my-2 items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="md:hidden pl-2">
               <IoChevronBackOutline className="text-2xl -ml-4 md" />
@@ -108,34 +109,57 @@ export default function UserSidebar() {
       </div>
 
       {/* <!-- users list --> */}
-      <div className="space-y-2 p-2 overflow-y-auto h-[calc(100vh-127px)]">
-        <Link
-          href="/messages/1"
-          className="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery"
-        >
-          <div className="relative w-14 h-14 shrink-0">
-            <Image
-              src="/people-know/avatar-6.jpg"
-              alt="profile"
-              className="rounded-full shadow"
-              fill={true}
-            />
-            <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className="mr-auto text-sm text-black dark:text-white font-medium">
-                Jesse Steeve
+      <div className="p-2 overflow-y-auto h-[calc(100vh-127px)]">
+        {search.text ? (
+          search.searchLoading ? (
+            <>
+              <UserPlaceholder />
+              <UserPlaceholder />
+              <UserPlaceholder />
+              <UserPlaceholder />
+              <UserPlaceholder />
+            </>
+          ) : search.searchUsers.length ? (
+            search.searchUsers?.map((user, index) => (
+              <User
+                key={index}
+                className={"flex items-center p-2"}
+                user={user}
+                followButton={false}
+              />
+            ))
+          ) : (
+            <>No users</>
+          )
+        ) : (
+          <Link
+            href="/messages/1"
+            className="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery"
+          >
+            <div className="relative w-14 h-14 shrink-0">
+              <Image
+                src="/people-know/avatar-6.jpg"
+                alt="profile"
+                className="rounded-full shadow"
+                fill={true}
+              />
+              <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1.5">
+                <div className="mr-auto text-sm text-black dark:text-white font-medium">
+                  Jesse Steeve
+                </div>
+                <div className="text-xs font-light text-gray-500 dark:text-white/70">
+                  09:40AM
+                </div>
               </div>
-              <div className="text-xs font-light text-gray-500 dark:text-white/70">
-                09:40AM
+              <div className="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap">
+                Love your photos 😍
               </div>
             </div>
-            <div className="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap">
-              Love your photos 😍
-            </div>
-          </div>
-        </Link>
+          </Link>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { MdSlowMotionVideo } from "react-icons/md";
 
@@ -20,28 +21,33 @@ const FilePreview = ({ i, file, filesRef, setFileRef, isFeed }) => {
   return (
     <>
       <div
-        className={`slide flex-shrink-0  h-[calc(30vw*1.5)] sm:h-[calc(30vw*1.5)] md:h-[calc(16vw*1.5)] overflow-clip relative mx-2 snap-center rounded-3xl ${
-          !isFeed && "w-[36vw] sm:w-[36vw] md:w-[20vw]"
+        className={`bg-white flex-shrink-0  h-[calc(30vw*1.5)] sm:h-[calc(30vw*1.5)] md:h-[calc(16vw*1.5)]  relative ${
+          !isFeed && "w-[36vw] sm:w-[36vw] md:w-[20vw] mx-2"
         }`}
       >
         {isImage && (
-          <img
+          <Image
             src={url}
-            className=" block w-full h-full object-cover object-center absolute right-0 animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg"
+            className={`${
+              !isFeed ? "object-cover" : "object-contain"
+            } animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg`}
             alt={`Preview of post`}
+            fill
           />
         )}
         {isVideo && (
           <>
             <video
-              className=" block w-full h-full object-cover object-center absolute right-0 animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg"
-              autoPlay={!isFeed}
+              className={`${
+                !isFeed ? "object-cover" : "object-contain"
+              } w-full h-full animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg`}
+              autoPlay={false}
               src={url}
               alt={`Preview of Post`}
               muted={true}
               controls={!isFeed}
             />
-            <MdSlowMotionVideo className="absolute top-2 right-2 text-xl"/>
+            <MdSlowMotionVideo className="absolute top-2 right-2 text-xl" />
           </>
         )}
         {!isFeed && (

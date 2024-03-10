@@ -1,13 +1,10 @@
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { IoSearch } from "react-icons/io5";
+import { useCallback, useEffect, useRef, useState } from "react";
 import NavModel from "../common/NavModel";
 import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
 import useOnClickOutside from "@/app/_hooks/useClickOutside";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 import SearchForm from "../common/SearchForm";
 import User from "../common/User";
+import { debounce } from "@/helpers/debounce";
 
 export default function NewSearchModel({
   onClose,
@@ -16,39 +13,57 @@ export default function NewSearchModel({
   bottomref,
 }) {
   const modalRef = useRef(null);
-  const router = useRouter();
   useOnClickOutside(modalRef, onClose, sideref, topref, bottomref);
 
-  const [search, setsearch] = useState({
+  const [search, setSearch] = useState({
     searchValue: "",
     searchUsers: [],
     searchLoading: false,
   });
 
-  const handleSearch = async () => {
-    if (!search.searchValue) {
-      toast.error("Please enter value!");
-      return false;
-    }
+  const handleChangeInput = (e) => {
+    const { value } = e.target;
+    setSearch((prevState) => ({
+      ...prevState,
+      searchValue: value,
+      searchLoading: value ? true : false,
+    }));
+  };
+
+  const handleSearch = async (value, signal = "") => {
+    if (!value) return false;
     try {
-      setsearch((presVal) => ({ ...presVal, searchLoading: true }));
       const request = {
         method: "POST",
-        body: JSON.stringify({ search: search.searchValue }),
+        body: JSON.stringify({ search: value }),
+        signal,
       };
       const response = await fetch("/api/users/search", request);
       const resJson = await response.json();
       if (response.ok) {
-        setsearch((presVal) => ({ ...presVal, searchUsers: resJson.users }));
+        setSearch((presVal) => ({ ...presVal, searchUsers: resJson.users }));
       } else {
         console.log(resJson.error);
       }
     } catch (error) {
       console.log(error.message);
     } finally {
-      setsearch((presVal) => ({ ...presVal, searchLoading: false }));
+      setSearch((presVal) => ({ ...presVal, searchLoading: false }));
     }
   };
+
+  const debouncedSearch = useCallback(debounce(handleSearch, 300), []);
+
+  useEffect(() => {
+    let abortController = new AbortController();
+    const signal = abortController.signal;
+    setSearch((presVal) => ({ ...presVal, searchLoading: true }));
+    debouncedSearch(search.searchValue, signal);
+
+    return () => {
+      abortController.abort();
+    };
+  }, [search.searchValue]);
 
   return (
     <div ref={modalRef}>
@@ -61,13 +76,7 @@ export default function NewSearchModel({
 
           <SearchForm
             search={search.searchValue}
-            onChange={(e) =>
-              setsearch((presVal) => ({
-                ...presVal,
-                searchValue: e.target.value,
-              }))
-            }
-            handleSearch={handleSearch}
+            onChange={handleChangeInput}
           />
         </div>
 
@@ -98,7 +107,9 @@ export default function NewSearchModel({
               />
             ))
           ) : (
-            <div className="py-2.5 px-3">No users found.</div>
+            <div className="py-2.5 px-3 font-sm font-medium text-gray-600 ">
+              {search.searchValue ? "No users found." : "No  recent searches."}
+            </div>
           )}
         </div>
       </NavModel>

@@ -9,6 +9,9 @@ export async function GET(request, { params }) {
   try {
     const { id, type } = params;
     const loggedUserId = request.headers.get("x-user-id");
+    const nextPage = parseInt(request?.nextUrl?.searchParams.get("page")) || 0;
+    const pageSize = 10;
+    const skipCount = nextPage * pageSize;
 
     if (id !== loggedUserId) {
       const checkFollow = await Users.findOne({
@@ -21,36 +24,21 @@ export async function GET(request, { params }) {
       }
     }
 
-    const userQuery1 = Users.findById(id)
+    const user = await Users.findById(id)
       .select(type)
       .populate([
         {
           path: type,
           select: "_id username fullName avatar",
-          options: { sort: { createdAt: -1 }, limit: 10 },
+          options: {
+            sort: { createdAt: -1 },
+            limit: pageSize,
+            skip: skipCount,
+          },
         },
       ])
       .lean()
       .exec();
-
-    const userQuery2 = Users.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(id) } },
-      {
-        $project: {
-          followersCount: { $size: "$followers" },
-          followingCount: { $size: "$following" },
-        },
-      },
-    ]);
-
-    let user = await Promise.all([userQuery1, userQuery2])
-      .then(([userQuery1, userQuery2]) => {
-        return { ...userQuery1, ...userQuery2[0] };
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-        return {};
-      });
 
     if (user && user[type]) {
       for (const [index, e] of user[type].entries()) {
@@ -69,6 +57,7 @@ export async function GET(request, { params }) {
     return NextResponse.json({
       message: "User Found",
       data: user,
+      hasMore: user[type].length === pageSize,
     });
   } catch (error) {
     console.log(error);
