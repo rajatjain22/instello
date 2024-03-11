@@ -1,39 +1,57 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 const PostContext = createContext();
 
 const PostContextProvider = ({ children }) => {
+  const path = usePathname();
+  const isPublicPath = path === "/login" || path === "/register";
+
   const [posts, setPosts] = useState([]);
+  const [postPage, setPostPage] = useState(1);
   const [homePosts, setHomePosts] = useState([]);
+  const [homePostsLoading, setHomePostsLoading] = useState(true);
+
   const [explorePosts, setExplorePosts] = useState([]);
-  const [modalImage, setModalImage] = useState({
-    url: "",
-    open: false,
-  });
-  const [commentModal, setCommentModal] = useState({
-    open: false,
-    post: {},
-  });
-  const [comment, setComment] = useState({
-    text: "",
-  });
+
+  useEffect(() => {
+    console.log("Post context api start");
+    const getHomePost = () => {
+      fetch("/api/post/get")
+        .then((res) => res.json())
+        .then((res) => {
+          if (res?.message) {
+            setHomePosts(res.data);
+          } else {
+            console.log(res.error);
+          }
+        })
+        .catch((error) => {
+          console.log(error.message);
+        })
+        .finally(() => {
+          setHomePostsLoading(false);
+        });
+    };
+    if (!isPublicPath) {
+      getHomePost();
+    }
+  }, []);
 
   return (
     <PostContext.Provider
       value={{
         posts,
         setPosts,
-        modalImage,
-        setModalImage,
-        commentModal,
-        setCommentModal,
-        comment,
-        setComment,
+        postPage,
+        setPostPage,
         explorePosts,
         setExplorePosts,
         homePosts,
+        homePostsLoading,
+        setHomePostsLoading,
         setHomePosts,
       }}
     >

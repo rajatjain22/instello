@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useContext } from "react";
-import FollowButton from "../FollowButton/FollowButton";
+import FollowButton from "../common/FollowButton";
 import { UserContext } from "@/app/_context/User";
 import { useParams } from "next/navigation";
 

@@ -9,6 +9,9 @@ dbConnect();
 export async function GET(request) {
   try {
     const loggedUserId = request.headers.get("x-user-id");
+    const nextPage = parseInt(request?.nextUrl?.searchParams.get("page")) || 0;
+    const pageSize = 2;
+    const skipCount = nextPage * pageSize;
 
     const currentUser = await Users.findById(loggedUserId).exec();
 
@@ -61,14 +64,14 @@ export async function GET(request) {
       {
         $sort: { createdAt: -1 },
       },
-      {
-        $limit: 10,
-      },
+      { $skip: skipCount },
+      { $limit: pageSize },
     ]).exec();
 
     return NextResponse.json({
       message: "Successfully!",
       data: allData,
+      hasMore: allData.length === pageSize,
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

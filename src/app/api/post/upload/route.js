@@ -11,33 +11,62 @@ const app = express();
 app.use(fileUpload());
 
 dbConnect();
-
 const uploadFiles = async (files) => {
-  const uploadedFiles = Object.values(files);
-
   try {
+    // Convert files object to an array of file objects
+    const uploadedFiles = Object.values(files);
+
+    // Map over each file to upload it to Cloudinary
     const cloudinaryPromises = uploadedFiles.map(async (file) => {
-      const fileStream = Buffer.from(await file.arrayBuffer());
-      const base64Data = fileStream.toString("base64");
-      const finalData = `data:video/mp4;base64,` + base64Data;
+      // Convert file to base64 data
+      const fileBuffer = Buffer.from(await file.arrayBuffer());
+      const base64Data = fileBuffer.toString("base64");
+      const finalData = `data:${file.type};base64,${base64Data}`;
+
+      // Determine the upload method based on file size
       const uploadMethod =
         file.size > 10 * 1024 * 1024 ? "upload_large" : "upload";
 
-      // Configure your preferred transformation options here
-      let options = {
+      // Configure upload options
+      const options = {
         use_filename: true,
         unique_filename: false,
         overwrite: true,
         folder: "Instello/Posts",
         resource_type: "auto",
-      }; // Customize according to your requirements
+      };
 
-      return cloudinary.uploader[uploadMethod](finalData, options);
+      // Configure video transformation options for compression
+      const videoOptions = {
+        resource_type: "video",
+        eager: [
+          {
+            format: "mp4",
+            transformation: [
+              { width: 640, height: 360, crop: "limit" },
+              { video_codec: "h264" },
+              { quality: "auto:low" },
+            ],
+          },
+        ],
+      };
+
+      // Use appropriate options based on upload method
+      const uploadOptions = uploadMethod === "upload" ? options : videoOptions;
+
+      // Upload the file to Cloudinary
+      return cloudinary.uploader[uploadMethod](finalData, uploadOptions);
     });
 
+    // Wait for all uploads to complete
     const cloudinaryResponses = await Promise.all(cloudinaryPromises);
 
-    return cloudinaryResponses.map((response) => response.secure_url);
+    // Extract the secure URLs from the responses
+    const secureUrls = cloudinaryResponses.map(
+      (response) => response.secure_url
+    );
+
+    return secureUrls;
   } catch (error) {
     throw new Error(`Error uploading files: ${error.message}`);
   }
@@ -66,7 +95,7 @@ export async function POST(request) {
 
     return NextResponse.json({
       message: "Successfully!",
-      data: { ...posts, likesCount: 0, commentCount: 0 },
+      data: posts,
     });
   } catch (error) {
     console.error(error);

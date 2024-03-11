@@ -1,4 +1,4 @@
-import ModelBox from "@/components/ModelBox/ModelBox";
+import ModelBox from "@/components/common/ModelBox";
 import Image from "next/image";
 
 export default function EditNew({ isOpen, setIsOpen, profile }) {

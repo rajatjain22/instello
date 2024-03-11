@@ -1,27 +1,31 @@
-const authHeader = {
-  Accept: "application/json",
-  "Content-Type": "application/json;charset=UTF-8",
-};
+export const HTTP_SERVICE_CALL = (url, method = "GET", body) => {
+  const authHeader = {
+    Accept: "application/json",
+    "Content-Type": "application/json;charset=UTF-8",
+  };
 
-export const HTTP_SERVICE_CALL = async (url, type = "GET", body) => {
-  try {
-    const response = await fetch(url, {
-      method: type,
-      headers: authHeader,
-      body: JSON.stringify(body),
-    });
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await fetch(url, {
+        method: method,
+        headers: authHeader,
+        body: JSON.stringify(body),
+      });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || "Failed to perform action");
+      }
+
+      if (responseData && responseData.message) {
+        resolve(responseData.data);
+      } else {
+        throw new Error(responseData.error || "Unknown error occurred");
+      }
+    } catch (error) {
+      console.error("HTTP_SERVICE_CALL Error:", error);
+      reject(new Error("An error occurred while processing your request"));
     }
-
-    const data = await response.json();
-    if (data && data.message) {
-      return data.data;
-    } else {
-      throw new Error(data.error || "Unknown error occurred");
-    }
-  } catch (error) {
-    throw new Error(error.message || "An error occurred while processing your request");
-  }
+  });
 };

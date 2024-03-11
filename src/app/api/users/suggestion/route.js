@@ -48,7 +48,7 @@ export async function GET(request) {
         },
       },
       {
-        $limit: 10, // Limit the result to 10 documents
+        $limit: 5, // Limit the result to 10 documents
       },
     ]);
 
