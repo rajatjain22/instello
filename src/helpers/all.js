@@ -73,9 +73,9 @@ const formatTimestamp = (timestamp) => {
 
 //Username Validation
 const onValidUsername = (inputString) => {
-  const usernameRegex = /^[a-z0-9_.]+$/;
+  const usernameRegex = /^[a-z_][a-z0-9_.]{1,}$/;
   return usernameRegex.test(inputString);
-};
+}; 
 
 //Email Validation
 const onValidEmail = (inputString) => {

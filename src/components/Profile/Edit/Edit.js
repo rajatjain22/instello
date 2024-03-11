@@ -172,7 +172,7 @@ export default function ProfileSetting({ userId }) {
                     className="lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
                   /> */}
                   <UsernameInput
-                    className="lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
+                    className="w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
                     onChange={handleChangeInput}
                     value={editData.username}
                     onError={checkUsernameError}
@@ -188,7 +188,7 @@ export default function ProfileSetting({ userId }) {
                     value={editData.fullName}
                     onChange={handleChangeInput}
                     placeholder="Monroe"
-                    className="lg:w-1/2 w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
+                    className="w-full border-0 bg-slate-100 focus-visible:outline-none p-2.5 rounded-lg dark:text-white"
                   />
                 </div>
               </div>

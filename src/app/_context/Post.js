@@ -9,10 +9,10 @@ const PostContextProvider = ({ children }) => {
   const path = usePathname();
   const isPublicPath = path === "/login" || path === "/register";
 
-  const [posts, setPosts] = useState([]);
-  const [postPage, setPostPage] = useState(1);
   const [homePosts, setHomePosts] = useState([]);
   const [homePostsLoading, setHomePostsLoading] = useState(true);
+  const [homePostPage, setHomePostPage] = useState(0);
+  const [homePostHasMore, setHomePostHasMore] = useState(true);
 
   const [explorePosts, setExplorePosts] = useState([]);
 
@@ -24,6 +24,8 @@ const PostContextProvider = ({ children }) => {
         .then((res) => {
           if (res?.message) {
             setHomePosts(res.data);
+            setHomePostPage((presVal) => presVal + 1);
+            setHomePostHasMore(res.hasMore);
           } else {
             console.log(res.error);
           }
@@ -43,16 +45,17 @@ const PostContextProvider = ({ children }) => {
   return (
     <PostContext.Provider
       value={{
-        posts,
-        setPosts,
-        postPage,
-        setPostPage,
-        explorePosts,
-        setExplorePosts,
         homePosts,
+        setHomePosts,
         homePostsLoading,
         setHomePostsLoading,
-        setHomePosts,
+        homePostPage,
+        setHomePostPage,
+        homePostHasMore,
+        setHomePostHasMore,
+
+        explorePosts,
+        setExplorePosts,
       }}
     >
       {children}

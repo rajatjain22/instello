@@ -11,7 +11,7 @@ function SearchForm({ search, onChange }) {
     if (pathname !== "/messages") {
       inputRef?.current?.focus();
     }
-  }, []);
+  }, [pathname]);
 
   return (
     <form>
