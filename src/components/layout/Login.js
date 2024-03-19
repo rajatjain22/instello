@@ -8,7 +8,6 @@ import JoinNowLink from "@/components/Login/JoinNowLink";
 import SocialLoginButtons from "@/components/Login/SocialLoginButtons";
 import { useRouter } from "next/navigation";
 import { PostContext } from "@/app/_context/Post";
-import Link from "next/link";
 import ForgotPasswordLink from "@/components/Login/ForgotPasswordLink";
 
 export default function Login() {

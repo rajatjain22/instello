@@ -14,14 +14,11 @@ dbConnect();
 export async function GET(request) {
   const accessToken = request.headers.get("x-api-token");
   try {
-    const response = await fetch(
-      "https://www.googleapis.com/oauth2/v3/userinfo",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    const response = await fetch(process.env.NEXT_PUBLIC_GOOGLE_API, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
