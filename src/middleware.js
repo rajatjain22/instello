@@ -4,20 +4,28 @@ import verifyOnJWT from "./jwt/verifyOnEdge";
 export async function middleware(request) {
   const path = request.nextUrl.pathname;
   const token = request.cookies.get("token")?.value || "";
-  const isPublicPath = path === "/login" || path === "/register";
+  const isPublicPath =
+    path === "/login" || path === "/register" || path === "/forget-password";
 
   // Authenticate API calls
   if (
     !isPublicPath &&
     path.startsWith("/api/") &&
     !path.endsWith("login") &&
-    !path.endsWith("register")
+    !path.endsWith("register") &&
+    !path.endsWith("forget-password")
   ) {
     const verifyData = await verifyOnJWT(token);
     const isAuth = verifyData?.payload;
 
     if (!isAuth) {
-      Response.json(
+      const response = NextResponse.next();
+      response.cookies.set("token", "", {
+        httpOnly: true,
+        expires: new Date(0),
+      });
+      return response;
+      return response.json(
         { success: false, message: "authentication failed" },
         { status: 401 }
       );
@@ -53,6 +61,7 @@ export const config = {
     "/",
     "/login",
     "/register",
+    "/forget-password",
     "/explore",
     "/profile",
     "/profile/:path*",

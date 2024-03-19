@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 dbConnect();
 
 export async function GET(request) {
+  const userID = request.headers.get("x-user-id");
   try {
-    const userID = request.headers.get("x-user-id");
 
     // Check if userID is provided
     if (!userID) {
@@ -48,7 +48,7 @@ export async function GET(request) {
         },
       },
       {
-        $limit: 10, // Limit the result to 10 documents
+        $limit: 5, // Limit the result to 10 documents
       },
     ]);
 

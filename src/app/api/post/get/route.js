@@ -7,8 +7,11 @@ import mongoose from "mongoose";
 dbConnect();
 
 export async function GET(request) {
+  const loggedUserId = request.headers.get("x-user-id");
+  const nextPage = parseInt(request?.nextUrl?.searchParams.get("page")) || 0;
   try {
-    const loggedUserId = request.headers.get("x-user-id");
+    const pageSize = 5;
+    const skipCount = nextPage * pageSize;
 
     const currentUser = await Users.findById(loggedUserId).exec();
 
@@ -61,14 +64,14 @@ export async function GET(request) {
       {
         $sort: { createdAt: -1 },
       },
-      {
-        $limit: 10,
-      },
+      { $skip: skipCount },
+      { $limit: pageSize },
     ]).exec();
 
     return NextResponse.json({
       message: "Successfully!",
       data: allData,
+      hasMore: allData.length === pageSize,
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

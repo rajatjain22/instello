@@ -8,6 +8,8 @@ import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import FollowCard from "./FollowCard";
 import { FollowPeoplePlaceholder } from "../Placeholders/FollowPeoplePlaceholder";
+import { notFound } from "next/navigation";
+import NotFoundCatchAll from "@/app/[...not_found]/page";
 
 export default function Following() {
   const { userDetails, setUserDetails } = useContext(UserContext);
@@ -17,21 +19,30 @@ export default function Following() {
   const [loading, setLoading] = useState(true);
   const [loadingStates, setLoadingStates] = useState({});
 
-  const fetchData = async (action) => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/users/profile/${id}/${action}`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch user profile");
+  const [notFound, setNotFound] = useState(false);
+
+  const fetchData = useCallback(
+    async (action) => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/users/profile/${id}/${action}`);
+        if (res.status === 404) {
+          setNotFound(true);
+          return;
+        }
+        if (!res.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+        const data = await res.json();
+        setAllData(data.data);
+      } catch (error) {
+        console.error(error.message);
+      } finally {
+        setLoading(false);
       }
-      const data = await res.json();
-      setAllData(data.data);
-    } catch (error) {
-      console.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [id]
+  );
 
   useEffect(() => {
     setShowType(type);
@@ -39,7 +50,7 @@ export default function Following() {
 
   useEffect(() => {
     fetchData(showType);
-  }, [showType]);
+  }, [fetchData, showType]);
 
   const handleFollow = (followerId, val) => {
     setLoadingStates((prevLoadingStates) => ({
@@ -49,9 +60,6 @@ export default function Following() {
 
     const requestData = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ followeeId: followerId, action: val }),
     };
     fetch("/api/users/followToggle", requestData)
@@ -87,7 +95,7 @@ export default function Following() {
           };
         };
 
-        const followUserIndex = allData?.following?.findIndex(
+        const followUserIndex = allData?.[showType]?.findIndex(
           (e) => e._id === followerId
         );
 
@@ -118,122 +126,6 @@ export default function Following() {
             };
           });
         }
-        // const followUserIndex = allData[showType].findIndex(
-        //   (e) => e._id === followerId
-        // );
-
-        // if (followUserIndex !== -1) {
-        //   if (val === "follow") {
-        //     if (showType === "following") {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followingCount: prevState.followingCount + 1,
-        //       }));
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.following];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: true,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           following: updatedUserData,
-        //           followingCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followingCount + 1
-        //               : prevState.followingCount,
-        //         };
-        //       });
-        //     } else {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followersCount: prevState.followersCount + 1,
-        //       }));
-
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.followers];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: true,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           followers: updatedUserData,
-        //           followersCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followersCount + 1
-        //               : prevState.followersCount,
-        //         };
-        //       });
-        //     }
-        //   } else if (val === "unfollow") {
-        //     if (showType === "following") {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followingCount: prevState.followingCount - 1,
-        //       }));
-
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.following];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: false,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           following: updatedUserData,
-        //           followingCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followingCount - 1
-        //               : prevState.followingCount,
-        //         };
-        //       });
-        //     } else {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followersCount: prevState.followersCount - 1,
-        //       }));
-
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.followers];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: false,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           followers: updatedUserData,
-        //           followersCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followersCount - 1
-        //               : prevState.followersCount,
-        //         };
-        //       });
-        //     }
-        //   }
-        // } else {
-        //   if (val === "remove") {
-        //     setUserDetails((prevState) => ({
-        //       ...prevState,
-        //       followersCount: prevState.followersCount - 1,
-        //     }));
-        //     setAllData((prevState) => {
-        //       let updatedUserData = prevState.followers.filter(
-        //         (e) => e._id !== followerId
-        //       );
-
-        //       return {
-        //         ...prevState,
-        //         followers: updatedUserData,
-        //         followersCount: prevState.followersCount - 1,
-        //       };
-        //     });
-        //   }
-        // }
         toast.success(val);
       })
       .catch((err) => console.log(err.message))
@@ -244,6 +136,10 @@ export default function Following() {
         }));
       });
   };
+
+  if (notFound) {
+    return <NotFoundCatchAll />;
+  }
 
   return (
     <>
@@ -275,14 +171,6 @@ export default function Following() {
               following {allData?.followingCount}
             </Link>
           </li>
-          {/* <li>
-            <Link
-              href="#"
-              className="inline-block py-5 border-b-2 border-transparent"
-            >
-              Suggestions
-            </Link>
-          </li> */}
         </ul>
       </nav>
       {loading ? (

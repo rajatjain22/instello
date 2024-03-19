@@ -1,11 +1,15 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import React, { createContext, useEffect, useState } from "react";
 
 const UserContext = createContext(undefined);
 
 function UserContextProvider({ children }) {
+  const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
+  const isPublicPath =
+    path === "/login" || path === "/register" || path === "/forget-password";
 
   useEffect(() => {
     console.log("User context api start");
@@ -36,8 +40,10 @@ function UserContextProvider({ children }) {
       }
     };
 
-    fetchData();
-  }, []);
+    if (!isPublicPath) {
+      fetchData();
+    }
+  }, [isPublicPath]);
 
   return (
     <UserContext.Provider value={{ userDetails, setUserDetails }}>

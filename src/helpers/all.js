@@ -12,7 +12,7 @@ const AllWordFirstChar = (inputString) => {
     .join("");
 };
 
-function formatTimestamp(timestamp) {
+const formatTimestamp = (timestamp) => {
   const now = new Date();
   const messageTime = new Date(timestamp);
 
@@ -69,6 +69,32 @@ function formatTimestamp(timestamp) {
     hourCycle: "h12",
   };
   return messageTime.toLocaleDateString("en-US", optionsWithYear);
-}
+};
 
-export { capitalizeWords, AllWordFirstChar, formatTimestamp };
+//Username Validation
+const onValidUsername = (inputString) => {
+  const usernameRegex = /^[a-z_][a-z0-9_.]{1,}$/;
+  return usernameRegex.test(inputString);
+}; 
+
+//Email Validation
+const onValidEmail = (inputString) => {
+  return /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/.test(
+    inputString
+  );
+};
+
+//Password Validation
+const onValidPassword = (inputString) => {
+  var re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  return re.test(inputString);
+};
+
+export {
+  capitalizeWords,
+  AllWordFirstChar,
+  formatTimestamp,
+  onValidUsername,
+  onValidEmail,
+  onValidPassword,
+};

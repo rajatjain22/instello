@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { IoChevronBackOutline } from "react-icons/io5";
-import Suggestion from "./Suggestion";
 import Following from "./Following";
 import { useRouter } from "next/navigation";
 
@@ -19,7 +18,6 @@ export default function FollowPeoples() {
         <h1> Peoples</h1>
       </div>
       <Following />
-      {/* <Suggestion /> */}
     </div>
   );
 }

@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
 import axios from "axios";
 import React from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 const UnsplashImage = ({ url, key }) => (
-  <div className="image-item" key={key}>
+  <div className='image-item' key={key}>
     <img src={url} />
   </div>
 );
@@ -33,22 +33,21 @@ export default function RandomGallry() {
   };
 
   return (
-    <div className="hero is-fullheight is-bold is-info">
-      <div className="hero-body">
-        <div className="container">
-
+    <div className='hero is-fullheight is-bold is-info'>
+      <div className='hero-body'>
+        <div className='container'>
           <InfiniteScroll
             dataLength={images}
             next={() => fetchImages(5)}
             hasMore={true}
             loader={
               <img
-                src="https://res.cloudinary.com/chuloo/image/upload/v1550093026/scotch-logo-gif_jq4tgr.gif"
-                alt="loading"
+                src='https://res.cloudinary.com/chuloo/image/upload/v1550093026/scotch-logo-gif_jq4tgr.gif'
+                alt='loading'
               />
             }
           >
-            <div className="image-grid" style={{ marginTop: "30px" }}>
+            <div className='image-grid' style={{ marginTop: "30px" }}>
               {loaded
                 ? images.map((image, index) => (
                     <UnsplashImage url={image.urls.regular} key={index} />

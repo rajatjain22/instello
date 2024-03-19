@@ -1,6 +1,5 @@
-import Profile from "@/components/Profile/Profile";
+import Profile from "@/components/layout/Profile";
 
-export default function page({ params }) {
-  const userId = params.id;
-  return <Profile userId={userId} />;
+export default function page({ params: { id } }) {
+  return <Profile userId={id} />;
 }

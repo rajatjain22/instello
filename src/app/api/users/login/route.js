@@ -3,94 +3,34 @@ import bcryptjs from "bcryptjs";
 import Users from "../../../../schemas/UserModel";
 import createJWT from "../../../../jwt/createJWT";
 import dbConnect from "@/dbconfig/dbconfig";
-import Posts from "@/schemas/PostModel";
-import mongoose from "mongoose";
+// import { cookies } from "next/headers";
 
 dbConnect();
 
 export async function POST(request) {
   try {
-    const reqBody = await request.json();
-    const { email, password } = reqBody;
+    const { email, password } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "Please fill all required fields" },
-        {
-          status: 400,
-        }
+        { error: "Please provide both email and password" },
+        { status: 400 }
       );
     }
-    const userQuery2 = await Users.aggregate([
-      { $match: { email: email } },
-      {
-        $project: {
-          username: 1,
-          fullName: 1,
-          email: 1,
-          password: 1,
-          avatar: 1,
-          bio: 1,
-          followersCount: { $size: "$followers" },
-          followingCount: { $size: "$following" },
-          postsCount: { $size: "$posts" },
-        },
-      },
-    ]);
 
-    const userQuery1 = await Posts.aggregate([
-      {
-        $match: {
-          user: new mongoose.Types.ObjectId(userQuery2[0]._id),
-        },
-      },
-      {
-        $project: {
-          _id: 1,
-          text: 1,
-          createdAt: 1,
-          post: 1,
-          hasLiked: {
-            $cond: {
-              if: {
-                $in: [new mongoose.Types.ObjectId(userQuery2[0]._id), "$likes"],
-              },
-              then: true,
-              else: false,
-            },
-          },
-          likesCount: { $size: "$likes" },
-          commentCount: { $size: "$comments" },
-          mediaCount: { $size: "$post" },
-        },
-      },
-      {
-        $sort: { createdAt: -1 },
-      },
-      {
-        $limit: 10,
-      },
-    ]).exec();
-
-    const user = { ...userQuery2[0], posts: userQuery1 };
+    const user = await Users.findOne({ email }).select("+password");
 
     if (!user) {
       return NextResponse.json(
-        { error: "User not exist" },
-        {
-          status: 404,
-        }
+        { error: "User does not exist" },
+        { status: 404 }
       );
     }
 
     const isMatch = await bcryptjs.compare(password, user.password);
+
     if (!isMatch) {
-      return NextResponse.json(
-        { error: "Invalid password" },
-        {
-          status: 401,
-        }
-      );
+      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     const tokenData = {
@@ -100,28 +40,35 @@ export async function POST(request) {
       email: user.email,
     };
 
-    // Create token
     const token = createJWT(tokenData);
 
-    const expirationTimeInHours = 10;
+    const expirationTimeInHours = 1;
     const expirationTimeInSeconds = expirationTimeInHours * 60 * 60;
 
-    delete user.password;
+    const now = new Date();
+    await Users.updateOne({ _id: user._id }, { $set: { lastLoginAt: now } });
 
-    const response = NextResponse.json({
-      message: "Logged in successfully!",
-      user,
-    });
+    // cookies().set("token", token, {
+    //   httpOnly: true,
+    //   maxAge: expirationTimeInSeconds,
+    // });
 
-    // Set cookie
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      maxAge: expirationTimeInSeconds,
-    });
+    const headers = {
+      "Set-Cookie": `token=${token}; HttpOnly; Max-Age=${expirationTimeInSeconds}; Path=/`,
+    };
 
-    await Users.findByIdAndUpdate(user._id, { lastLoginAt: Date.now() }).exec();
-    return response;
+    return NextResponse.json(
+      {
+        message: "Logged in successfully!",
+      },
+      {
+        headers,
+      }
+    );
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }

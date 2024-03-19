@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { IoCameraOutline, IoPlayOutline, IoPricetagsOutline } from "react-icons/io5";
 

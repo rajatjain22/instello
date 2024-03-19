@@ -1,40 +1,62 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 const PostContext = createContext();
 
 const PostContextProvider = ({ children }) => {
-  const [posts, setPosts] = useState([]);
+  const path = usePathname();
+  const isPublicPath =
+    path === "/login" || path === "/register" || path === "/forget-password";
+
   const [homePosts, setHomePosts] = useState([]);
+  const [homePostsLoading, setHomePostsLoading] = useState(true);
+  const [homePostPage, setHomePostPage] = useState(0);
+  const [homePostHasMore, setHomePostHasMore] = useState(true);
+
   const [explorePosts, setExplorePosts] = useState([]);
-  const [modalImage, setModalImage] = useState({
-    url: "",
-    open: false,
-  });
-  const [commentModal, setCommentModal] = useState({
-    open: false,
-    post: {},
-  });
-  const [comment, setComment] = useState({
-    text: "",
-  });
+
+  useEffect(() => {
+    console.log("Post context api start");
+    const getHomePost = () => {
+      fetch("/api/post/get")
+        .then((res) => res.json())
+        .then((res) => {
+          if (res?.message) {
+            setHomePosts(res.data);
+            setHomePostPage((presVal) => presVal + 1);
+            setHomePostHasMore(res.hasMore);
+          } else {
+            console.log(res.error);
+          }
+        })
+        .catch((error) => {
+          console.log(error.message);
+        })
+        .finally(() => {
+          setHomePostsLoading(false);
+        });
+    };
+    if (!isPublicPath) {
+      getHomePost();
+    }
+  }, [isPublicPath]);
 
   return (
     <PostContext.Provider
       value={{
-        posts,
-        setPosts,
-        modalImage,
-        setModalImage,
-        commentModal,
-        setCommentModal,
-        comment,
-        setComment,
-        explorePosts,
-        setExplorePosts,
         homePosts,
         setHomePosts,
+        homePostsLoading,
+        setHomePostsLoading,
+        homePostPage,
+        setHomePostPage,
+        homePostHasMore,
+        setHomePostHasMore,
+
+        explorePosts,
+        setExplorePosts,
       }}
     >
       {children}

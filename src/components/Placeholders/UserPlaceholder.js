@@ -1,3 +1,5 @@
+"use client";
+
 export function UserPlaceholder() {
   return (
     <div className="animate-pulse flex space-x-4 p-2 items-center">
