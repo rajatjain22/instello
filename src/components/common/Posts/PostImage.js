@@ -95,7 +95,7 @@ export default function PostImage({ user, post }) {
         </Link>
 
         <div className='flex-1'>
-          <h4 className='text-black dark:text-white'>{user?.fullName}</h4>
+          <Link href={`/profile/${user._id}`} className='text-black dark:text-white'>{user?.fullName}</Link>
           <div className='text-xs text-gray-500 dark:text-white/80'>
             {formatTimestamp(post?.createdAt)}
           </div>
@@ -122,7 +122,7 @@ export default function PostImage({ user, post }) {
           </div>
           {post.text && (
             <div className='pt-2 flex gap-2'>
-              <Link href={"#"} className='font-bold'>
+              <Link href={`/profile/${user._id}`} className='font-bold'>
                 {user.fullName}
               </Link>
               <span className='font-medium whitespace-pre-line'>

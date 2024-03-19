@@ -1,3 +1,5 @@
+"use client";
+
 import PostImage from "./PostImage";
 
 const Post = ({ posts }) => {

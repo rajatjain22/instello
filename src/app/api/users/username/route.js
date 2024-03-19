@@ -6,9 +6,9 @@ import dbConnect from "@/dbconfig/dbconfig";
 dbConnect();
 
 export async function GET(request) {
+  const userID = request.headers.get("x-user-id");
+  const username = request?.nextUrl?.searchParams.get("val");
   try {
-    const userID = request.headers.get("x-user-id");
-    const username = request?.nextUrl?.searchParams.get("val");
 
     // Validate username presence
     if (!username) {

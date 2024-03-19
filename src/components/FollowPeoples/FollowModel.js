@@ -1,3 +1,4 @@
+"use client";
 import React, { useContext, useEffect, useState } from "react";
 import ModelBox from "../common/ModelBox";
 import FollowPeoples from "./FollowPeoples";
@@ -48,9 +49,6 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
 
     const requestData = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ followeeId: followerId, action: val }),
     };
     fetch("/api/users/followToggle", requestData)
@@ -107,21 +105,20 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
         }));
       });
   };
-  console.log(userDetails);
 
   useEffect(() => {
     fetchData(type);
-  }, []);
+  }, [type]);
 
   return (
     <div>
       <ModelBox isOpen={isOpen} onClose={onClose}>
-        <div className="sm:px-4 sm:py-3 p-2.5 border-b border-gray-100 capitalize text-lg font-medium text-center">
+        <div className='sm:px-4 sm:py-3 p-2.5 border-b border-gray-100 capitalize text-lg font-medium text-center'>
           {type}
         </div>
         <div
-          id="scrollableDiv"
-          className="bg-white flex flex-col text-black gap-3 sm:px-4 sm:py-3 p-2.5 h-72 overflow-y-scroll"
+          id='scrollableDiv'
+          className='bg-white flex flex-col text-black gap-3 sm:px-4 sm:py-3 p-2.5 h-72 overflow-y-scroll'
         >
           <InfiniteScroll
             dataLength={allData?.length}
@@ -136,8 +133,8 @@ export default function FollowModel({ isOpen, onClose, id, type }) {
                 <UserPlaceholderWithButton />
               </>
             }
-            className="flex flex-col text-black gap-3"
-            scrollableTarget="scrollableDiv"
+            className='flex flex-col text-black gap-3'
+            scrollableTarget='scrollableDiv'
           >
             {allData?.map((user, index) => (
               <User

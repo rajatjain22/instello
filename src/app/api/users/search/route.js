@@ -5,8 +5,8 @@ import mongoose from "mongoose";
 
 dbConnect();
 export async function POST(request) {
+  const loggedUserId = request.headers.get("x-user-id");
   try {
-    const loggedUserId = request.headers.get("x-user-id");
     const reqBody = await request.json();
     const searchValue = reqBody?.search?.toLowerCase();
 

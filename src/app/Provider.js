@@ -17,7 +17,10 @@ export default function Provider({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isPublicPath = pathname === "/login" || pathname === "/register";
+  const isPublicPath =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forget-password";
 
   const [sideref, setSideref] = useState(null);
   const [topref, settopref] = useState(null);
@@ -63,14 +66,14 @@ export default function Provider({ children }) {
 
   if (!userDetails && !isPublicPath) {
     return (
-      <div className="w-full h-screen flex justify-center items-center">
+      <div className='w-full h-screen flex justify-center items-center'>
         <InitialLoader />
       </div>
     );
   }
 
   return (
-    <div className="wrapper relative">
+    <div className='wrapper relative'>
       {!isPublicPath && (
         <>
           <SideBar

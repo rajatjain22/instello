@@ -6,9 +6,9 @@ import Posts from "@/schemas/PostModel";
 dbConnect();
 
 export async function PUT(request) {
+  const userID = request.headers.get("x-user-id");
   try {
     const reqBody = await request.json();
-    const userID = request.headers.get("x-user-id");
     const currentUser = await Users.findById(userID).exec();
     let updateQuery = "";
 

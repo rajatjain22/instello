@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   password: { type: String, required: [true, "Please provide a password"] },
+  resetPasswordOTP: { type: Number, required: false },
+  resetPasswordExpires: { type: Date, required: false },
   isVerified: { type: Boolean, default: false },
   fullName: { type: String, required: true },
   bio: { type: String },

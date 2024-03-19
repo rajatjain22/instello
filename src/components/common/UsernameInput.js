@@ -1,3 +1,5 @@
+"use client";
+
 import { onValidUsername } from "@/helpers/all";
 import { debounce } from "@/helpers/debounce";
 import { useCallback, useEffect, useState } from "react";
@@ -15,7 +17,7 @@ export default function UsernameInput({
   const [available, setAvailable] = useState(false);
   const [usernameValue, setUsernameValue] = useState(value);
 
-  function checkUserInput(e, signal) {
+  const checkUserInput = (e, signal) => {
     setUsernameLoading(true);
 
     fetch(`/api/users/username?val=${e}`, { signal })

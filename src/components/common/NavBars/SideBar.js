@@ -1,3 +1,5 @@
+"use client";
+
 import { UserContext } from "@/app/_context/User";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,7 +25,7 @@ export default function SideBar({
     if (sideRef.current) {
       setSideref(sideRef);
     }
-  }, [sideRef]);
+  }, [sideRef, setSideref]);
 
   const menu = [
     {
@@ -150,7 +152,7 @@ export default function SideBar({
             key={index}
             href={e.path}
             className={`flex items-center text-md gap-2 p-2 hover:-translate-y-1 duration-300 hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg ${
-              e.label === "Logout" && "absolute bottom-0 sm:w-[70%] md:w-[90%]"
+              e.label === "Logout" && "absolute bottom-0 sm:w-[70%] md:w-[90%] bg-white"
             }`}
             onClick={e.onClick}
           >

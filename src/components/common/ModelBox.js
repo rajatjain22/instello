@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef } from "react";
 import { IoClose } from "react-icons/io5";
 
@@ -16,7 +18,7 @@ export default function ModelBox({ children, isOpen, onClose }) {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [onClose]);
 
   return (
     <div>

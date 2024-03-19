@@ -44,9 +44,6 @@ export default function PeopleKnow() {
 
     const requestData = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ followeeId: userId, action: followAction }),
     };
 

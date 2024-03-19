@@ -1,3 +1,5 @@
+"use client";
+
 import PostPlaceholder from "./PostPlaceholder";
 
 export default function ProfilePlaceholder() {

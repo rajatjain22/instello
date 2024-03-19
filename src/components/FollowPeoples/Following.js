@@ -8,7 +8,7 @@ import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import FollowCard from "./FollowCard";
 import { FollowPeoplePlaceholder } from "../Placeholders/FollowPeoplePlaceholder";
-import { notFound } from 'next/navigation'
+import { notFound } from "next/navigation";
 import NotFoundCatchAll from "@/app/[...not_found]/page";
 
 export default function Following() {
@@ -21,25 +21,28 @@ export default function Following() {
 
   const [notFound, setNotFound] = useState(false);
 
-  const fetchData = async (action) => {
-    try {
-      setLoading(true);
-      const res = await fetch(`/api/users/profile/${id}/${action}`);
-      if (res.status === 404) {
-        setNotFound(true);
-        return;
+  const fetchData = useCallback(
+    async (action) => {
+      try {
+        setLoading(true);
+        const res = await fetch(`/api/users/profile/${id}/${action}`);
+        if (res.status === 404) {
+          setNotFound(true);
+          return;
+        }
+        if (!res.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+        const data = await res.json();
+        setAllData(data.data);
+      } catch (error) {
+        console.error(error.message);
+      } finally {
+        setLoading(false);
       }
-      if (!res.ok) {
-        throw new Error("Failed to fetch user profile");
-      }
-      const data = await res.json();
-      setAllData(data.data);
-    } catch (error) {
-      console.error(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [id]
+  );
 
   useEffect(() => {
     setShowType(type);
@@ -47,7 +50,7 @@ export default function Following() {
 
   useEffect(() => {
     fetchData(showType);
-  }, [showType]);
+  }, [fetchData, showType]);
 
   const handleFollow = (followerId, val) => {
     setLoadingStates((prevLoadingStates) => ({
@@ -57,9 +60,6 @@ export default function Following() {
 
     const requestData = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ followeeId: followerId, action: val }),
     };
     fetch("/api/users/followToggle", requestData)
@@ -126,122 +126,6 @@ export default function Following() {
             };
           });
         }
-        // const followUserIndex = allData[showType].findIndex(
-        //   (e) => e._id === followerId
-        // );
-
-        // if (followUserIndex !== -1) {
-        //   if (val === "follow") {
-        //     if (showType === "following") {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followingCount: prevState.followingCount + 1,
-        //       }));
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.following];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: true,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           following: updatedUserData,
-        //           followingCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followingCount + 1
-        //               : prevState.followingCount,
-        //         };
-        //       });
-        //     } else {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followersCount: prevState.followersCount + 1,
-        //       }));
-
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.followers];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: true,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           followers: updatedUserData,
-        //           followersCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followersCount + 1
-        //               : prevState.followersCount,
-        //         };
-        //       });
-        //     }
-        //   } else if (val === "unfollow") {
-        //     if (showType === "following") {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followingCount: prevState.followingCount - 1,
-        //       }));
-
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.following];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: false,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           following: updatedUserData,
-        //           followingCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followingCount - 1
-        //               : prevState.followingCount,
-        //         };
-        //       });
-        //     } else {
-        //       setUserDetails((prevState) => ({
-        //         ...prevState,
-        //         followersCount: prevState.followersCount - 1,
-        //       }));
-
-        //       setAllData((prevState) => {
-        //         let updatedUserData = [...prevState.followers];
-        //         updatedUserData[followUserIndex] = {
-        //           ...updatedUserData[followUserIndex],
-        //           followed_by_viewer: false,
-        //         };
-
-        //         return {
-        //           ...prevState,
-        //           followers: updatedUserData,
-        //           followersCount:
-        //             userDetails._id === allData._id
-        //               ? prevState.followersCount - 1
-        //               : prevState.followersCount,
-        //         };
-        //       });
-        //     }
-        //   }
-        // } else {
-        //   if (val === "remove") {
-        //     setUserDetails((prevState) => ({
-        //       ...prevState,
-        //       followersCount: prevState.followersCount - 1,
-        //     }));
-        //     setAllData((prevState) => {
-        //       let updatedUserData = prevState.followers.filter(
-        //         (e) => e._id !== followerId
-        //       );
-
-        //       return {
-        //         ...prevState,
-        //         followers: updatedUserData,
-        //         followersCount: prevState.followersCount - 1,
-        //       };
-        //     });
-        //   }
-        // }
         toast.success(val);
       })
       .catch((err) => console.log(err.message))
@@ -253,17 +137,17 @@ export default function Following() {
       });
   };
 
-  if(notFound){
-    return <NotFoundCatchAll />
+  if (notFound) {
+    return <NotFoundCatchAll />;
   }
 
   return (
     <>
-      <nav className="border-b dark:border-slate-700">
-        <ul className="flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80">
-          <li className="">
+      <nav className='border-b dark:border-slate-700'>
+        <ul className='flex gap-5 text-sm text-center text-gray-600 capitalize font-semibold -mb-px dark:text-white/80'>
+          <li className=''>
             <Link
-              href="#"
+              href='#'
               className={`inline-block py-5 border-b-2 ${
                 showType === "followers"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -274,9 +158,9 @@ export default function Following() {
               followers {allData?.followersCount}
             </Link>
           </li>
-          <li className="">
+          <li className=''>
             <Link
-              href="#"
+              href='#'
               className={`inline-block py-5 border-b-2 ${
                 showType === "following"
                   ? "text-black border-black dark:text-white dark:border-white"
@@ -290,12 +174,12 @@ export default function Following() {
         </ul>
       </nav>
       {loading ? (
-        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
+        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
           <FollowPeoplePlaceholder />
           <FollowPeoplePlaceholder />
         </div>
       ) : allData?.[showType]?.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80">
+        <div className='grid sm:grid-cols-2 gap-2 mt-5 mb-2 text-xs font-normal text-gray-500 dark:text-white/80'>
           {allData[showType].map((follow, index) => (
             <FollowCard
               key={follow._id}
@@ -307,13 +191,13 @@ export default function Following() {
           ))}
         </div>
       ) : (
-        <div className="text-2xl font-semibold text-center text-black mt-16">{`No ${showType}`}</div>
+        <div className='text-2xl font-semibold text-center text-black mt-16'>{`No ${showType}`}</div>
       )}
 
-      <div className="flex justify-center my-10">
+      <div className='flex justify-center my-10'>
         <button
-          type="button"
-          className="bg-white py-2 px-5 rounded-full shadow-md font-semibold text-sm dark:bg-dark2"
+          type='button'
+          className='bg-white py-2 px-5 rounded-full shadow-md font-semibold text-sm dark:bg-dark2'
         >
           Load more...
         </button>

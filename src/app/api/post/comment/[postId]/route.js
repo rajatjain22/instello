@@ -49,10 +49,10 @@ export async function GET(request, { params }) {
 }
 
 export async function POST(request, { params }) {
+  const loggedUserId = request.headers.get("x-user-id");
   try {
     const { postId } = params;
     const reqBody = await request.json();
-    const loggedUserId = request.headers.get("x-user-id");
 
     // Validate request body
     if (!reqBody || !reqBody.comment) {

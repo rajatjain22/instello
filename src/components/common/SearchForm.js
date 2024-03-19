@@ -1,3 +1,5 @@
+"use client";
+
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { IoSearch } from "react-icons/io5";

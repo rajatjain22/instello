@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import React, { useContext, useState } from "react";
 import { MdOutlineVerified } from "react-icons/md";
@@ -25,9 +27,6 @@ export default function ProfileHeader({ profile, setProfile }) {
     setFollowBtnLoading(true);
     const requestData = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({
         followeeId: profile._id,
         action: val,
@@ -85,7 +84,7 @@ export default function ProfileHeader({ profile, setProfile }) {
       </p>
 
       <div className="flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4">
-        <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-36 text-center">
+        <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-24 text-center">
           <div>
             <p>Posts</p>
             <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">

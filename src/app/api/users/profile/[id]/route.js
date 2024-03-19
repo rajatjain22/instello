@@ -14,10 +14,10 @@ app.use(fileUpload());
 dbConnect();
 
 export async function GET(request, { params }) {
+  const loggedUserId = request.headers.get("x-user-id");
   try {
     const query = params.id;
     // const token = request.cookies.get("token")?.value || "";
-    const loggedUserId = request.headers.get("x-user-id");
 
     let userId;
     if (query == "user") {

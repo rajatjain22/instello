@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
@@ -8,10 +10,9 @@ export default function TopBar({ settopref, handleToggle, onClose }) {
 
   useEffect(() => {
     if (sideref.current) {
-      console.log("object");
       settopref(sideref);
     }
-  }, [sideref]);
+  }, [sideref, settopref]);
 
   const menu = [
     {

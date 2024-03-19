@@ -1,3 +1,5 @@
+"use client";
+
 import { IoDocumentText, IoGift, IoImage, IoImages } from "react-icons/io5";
 
 export default function DocumentModel() {

@@ -8,7 +8,10 @@ const MessageContext = createContext(undefined);
 function MessageContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
-  const isPublicPath = path === "/login" || path === "/register";
+  const isPublicPath =
+    path === "/login" ||
+    path === "/register" ||
+    pathname === "/forget-password";
 
   useEffect(() => {
     console.log("User context api start");
@@ -26,14 +29,13 @@ function MessageContextProvider({ children }) {
         .catch((error) => {
           console.log(error.message);
         })
-        .finally(() => {
-        });
+        .finally(() => {});
     };
 
-    if (!isPublicPath) {  
+    if (!isPublicPath) {
       fetchData();
     }
-  }, []);
+  }, [isPublicPath]);
 
   return (
     <MessageContext.Provider value={{ userDetails, setUserDetails }}>

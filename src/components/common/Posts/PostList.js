@@ -1,3 +1,5 @@
+"use client";
+
 import FilePreview from "./FilePreview";
 
 export default function PostList({ posts }) {

@@ -1,3 +1,5 @@
+"use client";
+
 export function FollowPeoplePlaceholder() {
   return (
     <div className='animate-pulse bg-white flex gap-4 items-center flex-wrap justify-between p-5 rounded-lg shadow-sm border1 dark:bg-dark2'>

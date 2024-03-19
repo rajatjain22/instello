@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import PostPlaceholder from "../Placeholders/PostPlaceholder";
 import Post from "../common/Posts/Post";

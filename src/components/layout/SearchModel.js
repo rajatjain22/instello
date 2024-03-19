@@ -1,3 +1,4 @@
+"use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import NavModel from "../common/NavModel";
 import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
@@ -55,22 +56,25 @@ export default function NewSearchModel({
   const debouncedSearch = useCallback(debounce(handleSearch, 300), []);
 
   useEffect(() => {
-    let abortController = new AbortController();
-    const signal = abortController.signal;
-    setSearch((presVal) => ({ ...presVal, searchLoading: true }));
-    debouncedSearch(search.searchValue, signal);
+    if (search.searchValue) {
+      let abortController = new AbortController();
+      const signal = abortController.signal;
+      setSearch((presVal) => ({ ...presVal, searchLoading: true }));
+      console.log("object");
+      debouncedSearch(search.searchValue, signal);
 
-    return () => {
-      abortController.abort();
-    };
-  }, [search.searchValue]);
+      return () => {
+        abortController.abort();
+      };
+    }
+  }, [search.searchValue, debouncedSearch]);
 
   return (
     <div ref={modalRef}>
       <NavModel>
         {/* <!-- header --> */}
-        <div className="px-5 py-4 space-y-5 border-b border-gray-100 dark:border-slate-700">
-          <h3 className="md:text-xl text-2xl font-medium mt-3 text-black dark:text-white">
+        <div className='px-5 py-4 space-y-5 border-b border-gray-100 dark:border-slate-700'>
+          <h3 className='md:text-xl text-2xl font-medium mt-3 text-black dark:text-white'>
             Search
           </h3>
 
@@ -81,10 +85,10 @@ export default function NewSearchModel({
         </div>
 
         {/* <!-- contents list --> */}
-        <div className="p-2 space-y-2 dark:text-white">
-          <div className="flex items-center justify-between py-2.5 px-3 font-semibold">
+        <div className='p-2 space-y-2 dark:text-white'>
+          <div className='flex items-center justify-between py-2.5 px-3 font-semibold'>
             <h4>Recent</h4>
-            <button type="button" className="text-blue-500 text-sm">
+            <button type='button' className='text-blue-500 text-sm'>
               Clear all
             </button>
           </div>
@@ -97,17 +101,20 @@ export default function NewSearchModel({
             </>
           ) : search?.searchUsers?.length > 0 ? (
             search.searchUsers.map((user, index) => (
-              <User
-                className={
-                  "cursor-pointer relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
-                }
-                user={user}
-                key={index}
-                followButton={false}
-              />
+              <div key={index} className='m-0' onClick={onClose}>
+                <User
+                  className={
+                    "cursor-pointer relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
+                  }
+                  user={user}
+                  key={index}
+                  followButton={false}
+                  onClose={onClose}
+                />
+              </div>
             ))
           ) : (
-            <div className="py-2.5 px-3 font-sm font-medium text-gray-600 ">
+            <div className='py-2.5 px-3 font-sm font-medium text-gray-600 '>
               {search.searchValue ? "No users found." : "No  recent searches."}
             </div>
           )}

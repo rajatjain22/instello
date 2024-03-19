@@ -7,7 +7,8 @@ const PostContext = createContext();
 
 const PostContextProvider = ({ children }) => {
   const path = usePathname();
-  const isPublicPath = path === "/login" || path === "/register";
+  const isPublicPath =
+    path === "/login" || path === "/register" || path === "/forget-password";
 
   const [homePosts, setHomePosts] = useState([]);
   const [homePostsLoading, setHomePostsLoading] = useState(true);
@@ -40,7 +41,7 @@ const PostContextProvider = ({ children }) => {
     if (!isPublicPath) {
       getHomePost();
     }
-  }, []);
+  }, [isPublicPath]);
 
   return (
     <PostContext.Provider

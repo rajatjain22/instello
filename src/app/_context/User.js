@@ -8,7 +8,8 @@ const UserContext = createContext(undefined);
 function UserContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
-  const isPublicPath = path === "/login" || path === "/register";
+  const isPublicPath =
+    path === "/login" || path === "/register" || path === "/forget-password";
 
   useEffect(() => {
     console.log("User context api start");
@@ -39,10 +40,10 @@ function UserContextProvider({ children }) {
       }
     };
 
-    if (!isPublicPath) {  
+    if (!isPublicPath) {
       fetchData();
     }
-  }, []);
+  }, [isPublicPath]);
 
   return (
     <UserContext.Provider value={{ userDetails, setUserDetails }}>

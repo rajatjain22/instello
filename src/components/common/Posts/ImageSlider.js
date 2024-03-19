@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useRef } from "react";
 import FilePreview from "./FilePreview";
 
@@ -19,13 +21,16 @@ const ImageSlider = ({ filesRef, setFileRef, isFeed }) => {
       slidesContainerRef.current.scrollLeft -= slideWidth;
     };
 
-    nextButtonRef?.current?.addEventListener("click", handleNextClick);
-    prevButtonRef?.current?.addEventListener("click", handlePrevClick);
+    const nextButton = nextButtonRef?.current;
+    const prevButton = prevButtonRef?.current;
+
+    nextButton?.addEventListener("click", handleNextClick);
+    prevButton?.addEventListener("click", handlePrevClick);
 
     return () => {
       // Cleanup function for event listeners
-      nextButtonRef?.current?.removeEventListener("click", handleNextClick);
-      prevButtonRef?.current?.removeEventListener("click", handlePrevClick);
+      nextButton?.removeEventListener("click", handleNextClick);
+      prevButton?.removeEventListener("click", handlePrevClick);
     };
   }, [filesRef]);
 

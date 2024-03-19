@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 dbConnect();
 
 export async function GET(request) {
+  const userID = request.headers.get("x-user-id");
   try {
-    const userID = request.headers.get("x-user-id");
 
     // Check if userID is provided
     if (!userID) {

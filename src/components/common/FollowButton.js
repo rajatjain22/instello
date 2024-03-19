@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
 

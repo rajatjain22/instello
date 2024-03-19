@@ -1,18 +1,32 @@
+"use client";
+
 import PostList from "@/components/common/Posts/PostList";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { IoCameraOutline } from "react-icons/io5";
 import PostImage from "../Posts/PostImage";
 import { UserContext } from "@/app/_context/User";
 
 function ProfilePosts({ profile }) {
-  const { userDetails } = useContext(UserContext);
   const [stickyTabChange, setStickyTabChange] = useState("images-posts");
+  const [userInfo, setUserInfo] = useState({});
+
+  useEffect(() => {
+    const { _id, avatar, username, fullName, email, bio } = profile;
+    setUserInfo({
+      _id,
+      avatar,
+      username,
+      fullName,
+      email,
+      bio,
+    });
+  }, [profile]);
 
   return (
-    <div className="mt-10 flex flex-col gap-8 max-w-[600px] my-0 mx-auto">
+    <div className='mt-10 flex flex-col gap-8 max-w-[600px] my-0 mx-auto'>
       {/* <!-- sticky tabs --> */}
-      <nav className="text-sm text-center text-gray-500 capitalize font-semibold dark:text-white">
-        <ul className="flex gap-2 justify-center border-t dark:border-slate-700">
+      <nav className='text-sm text-center text-gray-500 capitalize font-semibold dark:text-white'>
+        <ul className='flex gap-2 justify-center border-t dark:border-slate-700'>
           <li>
             <button
               onClick={() => setStickyTabChange("images-posts")}
@@ -21,9 +35,9 @@ function ProfilePosts({ profile }) {
                   ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
                   : ""
               }`}
-              aria-expanded="true"
+              aria-expanded='true'
             >
-              <IoCameraOutline className="text-lg" />
+              <IoCameraOutline className='text-lg' />
               Images
             </button>
           </li>
@@ -35,9 +49,9 @@ function ProfilePosts({ profile }) {
                   ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
                   : ""
               }`}
-              aria-expanded="true"
+              aria-expanded='true'
             >
-              <IoCameraOutline className="text-lg" />
+              <IoCameraOutline className='text-lg' />
               All Posts
             </button>
           </li>
@@ -48,11 +62,11 @@ function ProfilePosts({ profile }) {
         <PostList posts={profile?.posts} />
       ) : stickyTabChange === "all-posts" && profile?.posts?.length ? (
         profile?.posts?.map((post, index) => (
-          <PostImage key={index} user={userDetails} post={post} />
+          <PostImage key={index} user={userInfo} post={post} />
         ))
       ) : (
-        <div className="flex items-center justify-center h-48 py-3">
-          <h1 className="text-xl font-bold text-black dark:text-white">
+        <div className='flex items-center justify-center h-48 py-3'>
+          <h1 className='text-xl font-bold text-black dark:text-white'>
             No Posts
           </h1>
         </div>

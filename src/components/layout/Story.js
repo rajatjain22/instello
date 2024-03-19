@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { IoIosCamera } from "react-icons/io";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";

@@ -1,6 +1,6 @@
 import { PiMessengerLogoBold } from "react-icons/pi";
 
-export default function Home() {
+export default function page() {
   return (
     <div className="hidden flex-1 md:flex flex-col justify-center items-center">
       <PiMessengerLogoBold className="w-[15%] h-auto pb-1" />

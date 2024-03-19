@@ -1,3 +1,5 @@
+"use client";
+
 import style from "./profile.module.css";
 
 export function ImageLoading1() {

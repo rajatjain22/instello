@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { IoClose } from "react-icons/io5";
 import { MdSlowMotionVideo } from "react-icons/md";

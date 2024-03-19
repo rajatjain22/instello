@@ -7,8 +7,8 @@ import mongoose from "mongoose";
 dbConnect();
 
 export async function GET(request) {
+  const loggedUserId = request.headers.get("x-user-id");
   try {
-    const loggedUserId = request.headers.get("x-user-id");
 
     const currentUser = await Users.findById(loggedUserId).exec();
 

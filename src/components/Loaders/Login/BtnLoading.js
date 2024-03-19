@@ -1,3 +1,5 @@
+"use client";
+
 export default function BtnLoading({className, svgClass}) {
   return (
     <div className={className} aria-label="Loading..." role="status">

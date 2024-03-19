@@ -1,3 +1,5 @@
+"use client";
+
 import { UserContext } from "@/app/_context/User";
 import Image from "next/image";
 import Link from "next/link";
@@ -64,7 +66,7 @@ export default function BottomBar({
     if (sideRef.current) {
       setbottomref(sideRef);
     }
-  }, [sideRef]);
+  }, [sideRef, setbottomref]);
 
   return (
     <div

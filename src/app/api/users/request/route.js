@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 
 dbConnect();
 export async function GET(request) {
+  const userId = request.headers.get("x-user-id");
   try {
-    const userId = request.headers.get("x-user-id");
 
     if (!userId) {
       return NextResponse.json(

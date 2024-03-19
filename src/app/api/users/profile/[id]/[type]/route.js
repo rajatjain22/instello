@@ -6,10 +6,10 @@ import mongoose from "mongoose";
 dbConnect();
 
 export async function GET(request, { params }) {
+  const loggedUserId = request.headers.get("x-user-id");
+  const nextPage = parseInt(request?.nextUrl?.searchParams.get("page")) || 0;
   try {
     const { id, type } = params;
-    const loggedUserId = request.headers.get("x-user-id");
-    const nextPage = parseInt(request?.nextUrl?.searchParams.get("page")) || 0;
     const pageSize = 10;
     const skipCount = nextPage * pageSize;
 

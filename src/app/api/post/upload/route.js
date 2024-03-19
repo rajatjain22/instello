@@ -73,8 +73,8 @@ const uploadFiles = async (files) => {
 };
 
 export async function POST(request) {
+  const userId = request.headers.get("x-user-id");
   try {
-    const userId = request.headers.get("x-user-id");
     const form = await request.formData();
     const postText = form.get("postText");
 

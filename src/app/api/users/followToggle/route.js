@@ -5,10 +5,10 @@ import dbConnect from "@/dbconfig/dbconfig";
 dbConnect();
 
 export async function POST(request) {
+  const userId = request.headers.get("x-user-id");
   try {
     const reqBody = await request.json();
     const { followeeId, action } = reqBody;
-    const userId = request.headers.get("x-user-id");
     const followerId = userId;
     let updateQuery = "";
 
