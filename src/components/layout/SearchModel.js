@@ -85,7 +85,7 @@ export default function NewSearchModel({
         </div>
 
         {/* <!-- contents list --> */}
-        <div className='p-2 space-y-2 dark:text-white'>
+        <div className='p-2 dark:text-white'>
           <div className='flex items-center justify-between py-2.5 px-3 font-semibold'>
             <h4>Recent</h4>
             <button type='button' className='text-blue-500 text-sm'>
@@ -101,7 +101,7 @@ export default function NewSearchModel({
             </>
           ) : search?.searchUsers?.length > 0 ? (
             search.searchUsers.map((user, index) => (
-              <div key={index} className='m-0' onClick={onClose}>
+              <div key={index} className='m-0 hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg' onClick={onClose}>
                 <User
                   className={
                     "cursor-pointer relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"

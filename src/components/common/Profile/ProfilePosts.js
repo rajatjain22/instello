@@ -49,7 +49,6 @@ function ProfilePosts({ profile }) {
                   ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
                   : ""
               }`}
-              aria-expanded='true'
             >
               <IoCameraOutline className='text-lg' />
               All Posts

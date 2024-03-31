@@ -131,7 +131,7 @@ export default function CommentModel({
                     href='#'
                     className='text-black font-medium inline-block dark:text-white'
                   >
-                    {val.user.fullName}
+                    {val.user.username}
                   </a>
                   <div className='text-gray-400 text-xs font-normal'>
                     {formatTimestamp(val?.createdAt)}

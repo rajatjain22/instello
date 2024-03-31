@@ -21,50 +21,48 @@ const FilePreview = ({ i, file, filesRef, setFileRef, isFeed }) => {
   }
 
   return (
-    <>
-      <div
-        className={`bg-white flex-shrink-0  h-[calc(30vw*1.5)] sm:h-[calc(30vw*1.5)] md:h-[calc(16vw*1.5)]  relative ${
-          !isFeed && "w-[36vw] sm:w-[36vw] md:w-[20vw] mx-2"
-        }`}
-      >
-        {isImage && (
-          <Image
-            src={url}
+    <div
+      className={`bg-white flex-shrink-0  h-[calc(30vw*1.5)] sm:h-[calc(30vw*1.5)] md:h-[calc(16vw*1.5)]  relative ${
+        !isFeed && "w-[36vw] sm:w-[36vw] md:w-[20vw] mx-2"
+      }`}
+    >
+      {isImage && (
+        <Image
+          src={url}
+          className={`${
+            !isFeed ? "object-cover" : "object-contain"
+          } animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg`}
+          alt={`Preview of post`}
+          fill
+        />
+      )}
+      {isVideo && (
+        <>
+          <video
             className={`${
               !isFeed ? "object-cover" : "object-contain"
-            } animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg`}
-            alt={`Preview of post`}
-            fill
+            } w-full h-full animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg`}
+            autoPlay={false}
+            src={url}
+            alt={`Preview of Post`}
+            muted={true}
+            controls={!isFeed}
           />
-        )}
-        {isVideo && (
-          <>
-            <video
-              className={`${
-                !isFeed ? "object-cover" : "object-contain"
-              } w-full h-full animate-parallax [animation-timeline:view(x)] mb-2 rounded-lg`}
-              autoPlay={false}
-              src={url}
-              alt={`Preview of Post`}
-              muted={true}
-              controls={!isFeed}
-            />
-            <MdSlowMotionVideo className="absolute top-2 right-2 text-xl" />
-          </>
-        )}
-        {!isFeed && (
-          <div
-            onClick={() => {
-              filesRef.splice(i, 1);
-              return setFileRef([...filesRef]);
-            }}
-            className="absolute right-3 top-2 px-2 py-2 rounded-full bg-bg-card text-black bg-[#f7f7f7] group cursor-pointer backdrop-blur-[2px]"
-          >
-            <IoClose />
-          </div>
-        )}
-      </div>
-    </>
+          <MdSlowMotionVideo className="absolute top-2 right-2 text-xl" />
+        </>
+      )}
+      {!isFeed && (
+        <div
+          onClick={() => {
+            filesRef.splice(i, 1);
+            return setFileRef([...filesRef]);
+          }}
+          className="absolute right-3 top-2 px-2 py-2 rounded-full bg-bg-card text-black bg-[#f7f7f7] group cursor-pointer backdrop-blur-[2px]"
+        >
+          <IoClose />
+        </div>
+      )}
+    </div>
   );
 };
 

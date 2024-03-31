@@ -1,8 +1,23 @@
 "use client";
 
+import { useState } from "react";
 import FilePreview from "./FilePreview";
+import ModelPost from "./ModelPost";
 
 export default function PostList({ posts }) {
+  const [model, setModel] = useState({
+    open: false,
+    post: null,
+  });
+
+  const handleShowPosts = (post) => {
+    setModel((presVal) => ({ ...presVal, open: true, post: post }));
+  };
+
+  const onClose = () => {
+    setModel((presVal) => ({ ...presVal, open: false }));
+  };
+
   return (
     <>
       {posts.length > 0 ? (
@@ -12,11 +27,18 @@ export default function PostList({ posts }) {
             {posts.map((post, index) => {
               return (
                 post?.post.length > 0 && (
-                  <FilePreview file={post.post[0]} isFeed={true} />
+                  <div
+                    className="cursor-pointer"
+                    key={index}
+                    onClick={() => handleShowPosts(post)}
+                  >
+                    <FilePreview file={post.post[0]} isFeed={true} />
+                  </div>
                 )
               );
             })}
           </div>
+          <ModelPost model={model} onClose={onClose} />
         </div>
       ) : (
         <div className="flex items-center justify-center h-48 py-3">
