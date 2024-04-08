@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MdOutlineVerified } from "react-icons/md";
 import FollowButton from "../FollowButton";
 import { UserContext } from "@/app/_context/User";
 import FollowModel from "@/components/FollowPeoples/FollowModel";
 
 export default function ProfileHeader({ profile, setProfile }) {
-  const { userDetails, setUserDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails, socket } = useContext(UserContext);
   const [isOpen, setIsOpen] = useState(false);
   const [modelVal, setModelVal] = useState("");
   const [followBtnLoading, setFollowBtnLoading] = useState(false);
@@ -68,26 +68,32 @@ export default function ProfileHeader({ profile, setProfile }) {
       });
   };
 
+  useEffect(() => {
+    socket.on("followRequest", (data)=>{
+      console.log("followRequest ==> ", data);
+    })
+  }, [socket])
+
   return (
-    <div className="max-w-2x flex-1">
-      <h3 className="md:text-xl text-base font-semibold text-black dark:text-white">
+    <div className='max-w-2x flex-1'>
+      <h3 className='md:text-xl text-base font-semibold text-black dark:text-white'>
         {profile.fullName}
         {profile.isVerified ? <MdOutlineVerified /> : ""}
       </h3>
 
-      <p className="sm:text-sm text-blue-600 mt-1 font-normal text-xs">
+      <p className='sm:text-sm text-blue-600 mt-1 font-normal text-xs'>
         @{profile.username}
       </p>
 
-      <p className="text-sm mt-2 md:font-normal font-light whitespace-pre-line">
+      <p className='text-sm mt-2 md:font-normal font-light whitespace-pre-line'>
         {profile?.bio}
       </p>
 
-      <div className="flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4">
-        <div className="flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-24 text-center">
+      <div className='flex md:items-end justify-between md:mt-8 mt-4 max-md:flex-col gap-4'>
+        <div className='flex sm:gap-10 gap-6 sm:text-sm text-xs max-sm:absolute max-sm:top-10 max-sm:left-24 text-center'>
           <div>
             <p>Posts</p>
-            <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+            <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
               {profile?.postsCount}
             </h3>
           </div>
@@ -102,7 +108,7 @@ export default function ProfileHeader({ profile, setProfile }) {
             }`}
           >
             <p>Followers</p>
-            <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+            <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
               {profile.followersCount}
             </h3>
           </Link>
@@ -116,18 +122,18 @@ export default function ProfileHeader({ profile, setProfile }) {
             }`}
           >
             <p>Following</p>
-            <h3 className="sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal">
+            <h3 className='sm:text-xl sm:font-bold mt-1 text-black dark:text-white text-base font-normal'>
               {profile.followingCount}
             </h3>
           </Link>
         </div>
 
-        <div className="flex items-center gap-3 text-sm">
+        <div className='flex items-center gap-3 text-sm'>
           {userDetails?._id === profile._id ? (
             <Link
               href={`/profile/${userDetails._id}/edit`}
-              type="button"
-              className="button bg-pink-100 text-pink-600 border border-pink-200"
+              type='button'
+              className='button bg-pink-100 text-pink-600 border border-pink-200'
             >
               Edit
             </Link>
@@ -136,17 +142,31 @@ export default function ProfileHeader({ profile, setProfile }) {
               <FollowButton
                 isFollowing={profile.followed_by_viewer}
                 isLoading={followBtnLoading}
-                onToggleFollow={() =>
-                  handleFollow(
-                    profile.followed_by_viewer ? "unfollow" : "follow"
-                  )
+                onToggleFollow={
+                  () => {
+                    console.log("object");
+                    socket.emit(
+                      "follow",
+                      {
+                        type: profile.followed_by_viewer
+                          ? "unfollow"
+                          : "follow",
+                        senderId: userDetails._id,
+                        receiverId: profile._id,
+                      },
+                      () => {}
+                    );
+                  }
+                  // handleFollow(
+                  //   profile.followed_by_viewer ? "unfollow" : "follow"
+                  // )
                 }
               />
 
               {profile.followed_by_viewer && (
                 <Link
                   href={`/messages/${profile._id}`}
-                  className="button bg-pink-600 text-white"
+                  className='button bg-pink-600 text-white'
                 >
                   Message
                 </Link>

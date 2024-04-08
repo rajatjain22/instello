@@ -1,14 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { UserContext } from "@/app/_context/User";
+import { useContext, useEffect } from "react";
 
 export default function Location() {
+  const { userDetails, socket } = useContext(UserContext);
+
   function success(pos) {
-    var crd = pos.coords;
+    const { latitude, longitude, accuracy } = pos.coords;
+    const { _id, username, email } = userDetails;
     console.log("Your current position is:");
-    console.log(`Latitude : ${crd.latitude}`);
-    console.log(`Longitude: ${crd.longitude}`);
-    console.log(`More or less ${crd.accuracy} meters.`);
+
+    socket.emit("location", {
+      user: { _id, username, email },
+      location: { latitude, longitude, accuracy },
+    });
   }
 
   function errors(err) {
@@ -41,6 +47,8 @@ export default function Location() {
       console.log("Geolocation is not supported by this browser.");
     }
   }, []);
+
+  console.log(socket);
 
   return <>Rajat</>;
 }
