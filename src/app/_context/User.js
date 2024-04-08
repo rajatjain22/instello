@@ -9,6 +9,7 @@ const UserContext = createContext(undefined);
 function UserContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [socket, setSocket] = useState(null);
 
   const isPublicPath =
@@ -37,7 +38,6 @@ function UserContextProvider({ children }) {
           setUserDetails({ ...userData.data, posts: postData.data });
           const socketData = io("http://localhost:8080");
           setSocket(socketData);
-          console.log(userData);
           socketData?.emit("addUser", {
             userId: userData.data?._id,
             username: userData.data?.username,
@@ -57,10 +57,12 @@ function UserContextProvider({ children }) {
     if (!isPublicPath) {
       fetchData();
     }
-  }, [isPublicPath]);
+  }, [isPublicPath, isLoggedIn]);
 
   return (
-    <UserContext.Provider value={{ userDetails, setUserDetails, socket }}>
+    <UserContext.Provider
+      value={{ userDetails, setUserDetails, isLoggedIn, setIsLoggedIn, socket }}
+    >
       {children}
     </UserContext.Provider>
   );

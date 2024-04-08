@@ -15,8 +15,17 @@ export default function PeopleKnow() {
   const [userData, setUserData] = useState([]);
 
   const [loadingStates, setLoadingStates] = useState({});
+  const [isFixed, setIsFixed] = useState(false);
 
   useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      setIsFixed(scrollTop >= 192);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
     fetch("/api/users/suggestion")
       .then((res) => res.json())
       .then((res) => {
@@ -32,6 +41,10 @@ export default function PeopleKnow() {
       .finally(() => {
         setLoading(false);
       });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const handleToggleFollow = (userId, followAction) => {
@@ -95,7 +108,11 @@ export default function PeopleKnow() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 px-6 border1 dark:bg-dark2">
+    <div
+      className={`bg-white rounded-xl shadow-sm p-5 px-6 border1 dark:bg-dark2 ${
+        isFixed ? "sticky top-0" : "static"
+      }`}
+    >
       <div className="flex justify-between text-black dark:text-white">
         <h3 className="font-bold text-base">People you might know </h3>
       </div>
