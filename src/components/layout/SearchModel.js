@@ -14,7 +14,7 @@ export default function NewSearchModel({
   bottomref,
 }) {
   const modalRef = useRef(null);
-  useOnClickOutside(modalRef, onClose, sideref, topref, bottomref);
+  useOnClickOutside([modalRef, sideref, topref, bottomref], onClose);
 
   const [search, setSearch] = useState({
     searchValue: "",
@@ -73,8 +73,8 @@ export default function NewSearchModel({
     <div ref={modalRef}>
       <NavModel>
         {/* <!-- header --> */}
-        <div className='px-5 py-4 space-y-5 border-b border-gray-100 dark:border-slate-700'>
-          <h3 className='md:text-xl text-2xl font-medium mt-3 text-black dark:text-white'>
+        <div className="px-5 py-4 space-y-5 border-b border-gray-100 dark:border-slate-700">
+          <h3 className="md:text-xl text-2xl font-medium mt-3 text-black dark:text-white">
             Search
           </h3>
 
@@ -85,10 +85,10 @@ export default function NewSearchModel({
         </div>
 
         {/* <!-- contents list --> */}
-        <div className='p-2 dark:text-white'>
-          <div className='flex items-center justify-between py-2.5 px-3 font-semibold'>
+        <div className="p-2 dark:text-white">
+          <div className="flex items-center justify-between py-2.5 px-3 font-semibold">
             <h4>Recent</h4>
-            <button type='button' className='text-blue-500 text-sm'>
+            <button type="button" className="text-blue-500 text-sm">
               Clear all
             </button>
           </div>
@@ -101,7 +101,11 @@ export default function NewSearchModel({
             </>
           ) : search?.searchUsers?.length > 0 ? (
             search.searchUsers.map((user, index) => (
-              <div key={index} className='m-0 hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg' onClick={onClose}>
+              <div
+                key={index}
+                className="m-0 hover:bg-[rgba(0,0,0,.05)] hover:rounded-lg"
+                onClick={onClose}
+              >
                 <User
                   className={
                     "cursor-pointer relative flex items-center gap-3 p-2 duration-200 rounded-xl hover:bg-secondery"
@@ -114,7 +118,7 @@ export default function NewSearchModel({
               </div>
             ))
           ) : (
-            <div className='py-2.5 px-3 font-sm font-medium text-gray-600 '>
+            <div className="py-2.5 px-3 font-sm font-medium text-gray-600 ">
               {search.searchValue ? "No users found." : "No  recent searches."}
             </div>
           )}

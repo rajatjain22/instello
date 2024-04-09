@@ -32,7 +32,7 @@ function ProfilePosts({ profile }) {
               onClick={() => setStickyTabChange("images-posts")}
               className={`flex items-center gap-1 p-4 py-2.5 -mb-px border-t-2 border-transparent ${
                 stickyTabChange === "images-posts"
-                  ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
+                  ? " text-black border-[black] dark:text-white dark:border-white"
                   : ""
               }`}
               aria-expanded='true'
@@ -46,7 +46,7 @@ function ProfilePosts({ profile }) {
               onClick={() => setStickyTabChange("all-posts")}
               className={`flex items-center gap-1 p-4 py-2.5 -mb-px border-t-2 border-transparent ${
                 stickyTabChange === "all-posts"
-                  ? " aria-expanded:text-black aria-expanded:border-black aria-expanded:dark:text-white aria-expanded:dark:border-white"
+                  ? " text-black border-[black] dark:text-white dark:border-white"
                   : ""
               }`}
             >

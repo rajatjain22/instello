@@ -2,26 +2,24 @@
 
 import { useEffect } from "react";
 
-function useOnClickOutside(ref, handler, sideref, topref, bottomref) {
+function useOnClickOutside(refs, handler) {
   useEffect(() => {
     const handleClick = (event) => {
-      if (
-        ref.current &&
-        !ref.current.contains(event.target) &&
-        sideref?.current &&
-        !sideref.current.contains(event.target) &&
-        topref?.current &&
-        !topref.current.contains(event.target) &&
-        bottomref?.current &&
-        !bottomref.current.contains(event.target)
-      ) {
+      let isOutside = true;
+      for (const ref of refs) {
+        if (ref.current && ref.current.contains(event.target)) {
+          isOutside = false;
+          break;
+        }
+      }
+      if (isOutside) {
         handler();
       }
     };
 
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [ref, handler, sideref, topref, bottomref]);
+  }, [refs, handler]);
 }
 
 export default useOnClickOutside;
