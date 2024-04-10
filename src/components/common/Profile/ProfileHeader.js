@@ -144,22 +144,22 @@ export default function ProfileHeader({ profile, setProfile }) {
                 isLoading={followBtnLoading}
                 onToggleFollow={
                   () => {
-                    console.log("object");
-                    socket.emit(
-                      "follow",
-                      {
-                        type: profile.followed_by_viewer
-                          ? "unfollow"
-                          : "follow",
-                        senderId: userDetails._id,
-                        receiverId: profile._id,
-                      },
-                      () => {}
-                    );
+                    // console.log("object");
+                    // socket.emit(
+                    //   "follow",
+                    //   {
+                    //     type: profile.followed_by_viewer
+                    //       ? "unfollow"
+                    //       : "follow",
+                    //     senderId: userDetails._id,
+                    //     receiverId: profile._id,
+                    //   },
+                    //   () => {}
+                    // );
+                    handleFollow(
+                      profile.followed_by_viewer ? "unfollow" : "follow"
+                    )
                   }
-                  // handleFollow(
-                  //   profile.followed_by_viewer ? "unfollow" : "follow"
-                  // )
                 }
               />
 

@@ -13,17 +13,27 @@ dbConnect();
 
 export async function GET(request) {
   const accessToken = request.headers.get("x-api-token");
+
+  // Validate access token
+  if (!accessToken) {
+    return NextResponse.json(
+      { error: "Missing access token" },
+      { status: 401 }
+    );
+  }
+
   try {
-    console.log(process.env.NEXT_PUBLIC_GOOGLE_API)
     const response = await fetch(process.env.NEXT_PUBLIC_GOOGLE_API, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    console.log(response)
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      return NextResponse.json({
+        error: "Failed to fetch user data from Google API",
+        status: response.status,
+      });
     }
 
     const responseJson = await response.json();
@@ -63,8 +73,11 @@ export async function GET(request) {
 
       const savedUser = await newUser.save();
 
-      if (!savedUser) {
-        throw new Error("Error saving user");
+      if (!user) {
+        return NextResponse.json({
+          error: "Failed to create a new user",
+          status: 500,
+        });
       }
 
       tokenData = {
@@ -99,9 +112,11 @@ export async function GET(request) {
   } catch (error) {
     console.error("Error while registering user:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
       {
-        status: 500,
+        error: error.message || "Internal server error",
+      },
+      {
+        status: error.status || 500,
       }
     );
   }

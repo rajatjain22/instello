@@ -7,10 +7,9 @@ import { UserPlaceholderWithButton } from "@/components/Placeholders/UserPlaceho
 import Image from "next/image";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
-import { IoSyncSharp } from "react-icons/io5";
 
 export default function PeopleKnow() {
-  const { userDetails, setUserDetails } = useContext(UserContext);
+  const { setUserDetails } = useContext(UserContext);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState([]);
 
