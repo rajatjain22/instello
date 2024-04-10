@@ -99,71 +99,79 @@ export default function PostImage({ user, post }) {
   };
 
   return (
-    <div className="relative bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2">
-      <div className="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
-        <Link href={`/profile/${user._id}`} className="relative w-9 h-9">
+    <div className='relative bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2'>
+      <div className='flex gap-3 sm:p-4 p-2.5 text-sm font-medium'>
+        <Link href={`/profile/${user._id}`} className='relative w-9 h-9'>
           <Image
-            className="rounded-3xl"
+            className='rounded-3xl'
             src={user?.avatar}
-            alt="Picture of the author"
+            alt='Picture of the author'
             fill={true}
-            loading="lazy"
+            loading='lazy'
           />
         </Link>
 
-        <div className="flex-1">
+        <div className='flex-1'>
           <Link
             href={`/profile/${user._id}`}
-            className="text-black dark:text-white"
+            className='text-black dark:text-white'
           >
             {user?.fullName}
           </Link>
-          <div className="text-xs text-gray-500 dark:text-white/80">
+          <div className='text-xs text-gray-500 dark:text-white/80'>
             {formatTimestamp(post?.createdAt)}
           </div>
         </div>
-        <div className="-mr-1" ref={buttonRef}>
+        <div className='-mr-1' ref={buttonRef}>
           <button
-            type="button"
-            className="button__ico w-8 h-8"
+            type='button'
+            className='button__ico w-8 h-8'
             onClick={handleOptionModel}
           >
             <IoEllipsisHorizontal />
           </button>
         </div>
       </div>
-      {postAction.optionsModel && <OptionsModel buttonRef={buttonRef} onClose={handleOtionModelClose} postId={post._id}/>}
+
+      {postAction.optionsModel && (
+        <OptionsModel
+          buttonRef={buttonRef}
+          onClose={handleOtionModelClose}
+          postId={post._id}
+          userId={post?.user ?? user._id}
+        />
+      )}
 
       {post.post?.length > 0 ? (
-        <div className="px-4">
+        <div className='px-4'>
           <div
-            className="relative w-full h-[22rem] cursor-pointer"
+            className='relative w-full h-[22rem] cursor-pointer'
             // onClick={() => console.log("Click")}
           >
             <PostSwiper posts={post.post} />
           </div>
           {post.text && (
-            <div className="pt-2 flex gap-2">
-              <Link href={`/profile/${user._id}`} className="font-bold">
+            <div className='pt-2 flex gap-2'>
+              <Link href={`/profile/${user._id}`} className='font-bold'>
                 {user.fullName}
               </Link>
-              <span className="font-medium whitespace-pre-line">
+              <span className='font-medium whitespace-pre-line'>
                 {post.text}
               </span>
             </div>
           )}
         </div>
       ) : (
-        <div className="sm:px-4 p-2.5 pt-0">
-          <p className="font-medium whitespace-pre-line">{post.text}</p>
+        <div className='sm:px-4 p-2.5 pt-0'>
+          <p className='font-medium whitespace-pre-line'>{post.text}</p>
         </div>
       )}
 
       {/* <!-- post icons --> */}
-      <div className="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
-        <div className="flex items-center gap-2.5">
+      <div className='sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold'>
+        <div className='flex items-center gap-2.5'>
           <button
-            type="button"
+            type='button'
             className={`button__ico ${
               postAction.hasLiked
                 ? "text-red-500 bg-red-100 dark:bg-slate-700"
@@ -171,14 +179,14 @@ export default function PostImage({ user, post }) {
             }`}
             onClick={() => handleLike(!postAction.hasLiked)}
           >
-            <IoHeart className="text-lg" />
+            <IoHeart className='text-lg' />
           </button>
-          <a href="#">{postAction.likesCount}</a>
+          <a href='#'>{postAction.likesCount}</a>
         </div>
-        <div className="flex items-center gap-3">
+        <div className='flex items-center gap-3'>
           <button
-            type="button"
-            className="button__ico bg-slate-200/70 dark:bg-slate-700"
+            type='button'
+            className='button__ico bg-slate-200/70 dark:bg-slate-700'
             onClick={() => {
               setPostAction((presVal) => ({
                 ...presVal,
@@ -186,24 +194,24 @@ export default function PostImage({ user, post }) {
               }));
             }}
           >
-            <IoChatbubbleEllipses className="text-lg" />
+            <IoChatbubbleEllipses className='text-lg' />
           </button>
           <span>{postAction.commentCount}</span>
         </div>
-        <button type="button" className="button__ico ml-auto">
-          <IoPaperPlaneOutline className="text-lg" />
+        <button type='button' className='button__ico ml-auto'>
+          <IoPaperPlaneOutline className='text-lg' />
         </button>
-        <button type="button" className="button__ico">
-          <IoShareOutline className="text-lg" />
+        <button type='button' className='button__ico'>
+          <IoShareOutline className='text-lg' />
         </button>
       </div>
 
       {/* <!-- post caption --> */}
       {post?.length > 0 && post?.text?.trim()?.length > 0 && (
-        <div className="sm:px-4 p-2.5 flex items-center gap-4">
-          <p className="font-normal">
-            <span className="font-bold">{user?.fullName}</span>{" "}
-            <span className="whitespace-pre-line">{post?.text}</span>
+        <div className='sm:px-4 p-2.5 flex items-center gap-4'>
+          <p className='font-normal'>
+            <span className='font-bold'>{user?.fullName}</span>{" "}
+            <span className='whitespace-pre-line'>{post?.text}</span>
           </p>
         </div>
       )}

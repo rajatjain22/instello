@@ -29,6 +29,13 @@ export async function DELETE(request, { params }) {
     // Delete the post
     await Posts.deleteOne({ _id: postId });
 
+    await Users.findByIdAndUpdate(
+      { _id: loggedUserId },
+      {
+        $pull: { posts: postId },
+      }
+    ).exec();
+
     return NextResponse.json({
       message: "Post deleted successfully",
     });
