@@ -30,7 +30,6 @@ export default function UsernameInput({
           setError(res.error);
           onError(res.error);
         }
-        console.log(res);
       })
       .catch((error) => {
         console.log(error);
@@ -38,7 +37,7 @@ export default function UsernameInput({
       .finally(() => {
         setUsernameLoading(false);
       });
-  }
+  };
 
   const checkUsername = useCallback(debounce(checkUserInput, 400), []);
 
@@ -61,11 +60,11 @@ export default function UsernameInput({
 
   return (
     <>
-      <div className='relative'>
+      <div className="relative">
         <input
-          name='username'
-          type='text'
-          placeholder='Username'
+          name="username"
+          type="text"
+          placeholder="Username"
           value={usernameValue}
           className={`!pr-7 ${className} ${
             error ? "border-2 border-red-400 focus:outline-red-400" : ""
@@ -81,17 +80,17 @@ export default function UsernameInput({
         {!error &&
           (usernameLoading ? (
             <BtnLoading
-              className='absolute top-3 right-2'
-              svgClass='w-4 h-4 fill-red'
+              className="absolute top-3 right-2"
+              svgClass="w-4 h-4 fill-red"
             />
           ) : (
             usernameValue &&
             available && (
-              <FaCheck className='absolute top-3 right-2 text-green-500' />
+              <FaCheck className="absolute top-3 right-2 text-green-500" />
             )
           ))}
       </div>
-      {error && <span className='text-[red] text-sm pl-1'>{error}</span>}
+      {error && <span className="text-[red] text-sm pl-1">{error}</span>}
     </>
   );
 }

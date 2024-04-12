@@ -13,7 +13,7 @@ import InitialLoader from "@/components/Loaders/InitialLoading/InitialLoader";
 
 export default function Provider({ children }) {
   // const sideNavBarSearchRef = useRef(null);
-  const { userDetails } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -53,6 +53,7 @@ export default function Provider({ children }) {
       .then((res) => {
         if (res?.message) {
           router.push("/login");
+          setUserDetails(null);
           toast.success("Logout Successfull");
         } else {
           throw new Error("Logout Failed");
@@ -66,14 +67,14 @@ export default function Provider({ children }) {
 
   if (!userDetails && !isPublicPath) {
     return (
-      <div className='w-full h-screen flex justify-center items-center'>
+      <div className="w-full h-screen flex justify-center items-center">
         <InitialLoader />
       </div>
     );
   }
 
   return (
-    <div className='wrapper relative'>
+    <div className="wrapper relative">
       {!isPublicPath && (
         <>
           <SideBar

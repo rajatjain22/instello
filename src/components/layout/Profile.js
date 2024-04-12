@@ -6,7 +6,7 @@ import ProfileHeader from "@/components/common/Profile/ProfileHeader";
 import ProfilePicture from "@/components/common/Profile/ProfilePicture";
 import ProfilePosts from "@/components/common/Profile/ProfilePosts";
 import { useContext, useEffect, useState } from "react";
-import IsPrivate from "../Profile/IsPrivate";
+import IsPrivate from "../common/Profile/IsPrivate";
 
 export default function Profile({ userId }) {
   const { userDetails } = useContext(UserContext);

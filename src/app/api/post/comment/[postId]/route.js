@@ -4,11 +4,16 @@ import Posts from "@/schemas/PostModel";
 import Comments from "@/schemas/CommetModel";
 import { IoConstructOutline } from "react-icons/io5";
 
+
 dbConnect();
 
 export async function GET(request, { params }) {
   try {
     const { postId } = params;
+    const nextPage = parseInt(request?.nextUrl?.searchParams.get("page")) || 0;
+
+    const pageSize = 10;
+    const skipCount = nextPage * pageSize;
 
     // Validate postId
     if (!postId) {
@@ -25,7 +30,8 @@ export async function GET(request, { params }) {
         options: { select: "_id username fullName avatar" },
       })
       .sort({ createdAt: -1 })
-      .limit(10)
+      .limit(pageSize)
+      .skip(skipCount)
       .lean()
       .exec();
 
@@ -38,6 +44,7 @@ export async function GET(request, { params }) {
     return NextResponse.json({
       message: "Comments retrieved",
       data: comments,
+      hasMore: comments.length === pageSize,
     });
   } catch (error) {
     console.error("Error retrieving comments:", error);

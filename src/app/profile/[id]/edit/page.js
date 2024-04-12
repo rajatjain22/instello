@@ -1,4 +1,4 @@
-import ProfileSetting from "@/components/Profile/Edit/Edit";
+import ProfileSetting from "@/components/common/Profile/Edit";
 
 export default function page({ params }) {
   const userId = params.id;

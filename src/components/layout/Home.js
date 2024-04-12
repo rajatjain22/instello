@@ -7,9 +7,8 @@ import { useContext, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import PostPlaceholder from "@/components/Placeholders/PostPlaceholder";
 
-import dynamic from "next/dynamic";
 import { PostContext } from "@/app/_context/Post";
-const Story = dynamic(() => import("@/components/layout/Story"));
+import Story from "@/components/layout/Story";
 
 export default function Home() {
   const {

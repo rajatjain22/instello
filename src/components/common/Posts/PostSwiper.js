@@ -39,13 +39,13 @@ export default function PostSwiper({ posts }) {
               {isVideo && (
                 <video
                   className="block w-full h-full object-center absolute right-0 animate-parallax [animation-timeline:view(x)] mb-2"
-                  // autoPlay={false}
+                  autoPlay={false}
                   // loop={true}
                   src={post}
                   alt={`Preview of Post`}
                   // playsInline=""
-                  muted
-                  // controls
+                  muted={false}
+                  controls={true}
                 />
               )}
             </>

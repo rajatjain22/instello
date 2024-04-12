@@ -1,3 +1,4 @@
+'use client'
 import UserSidebar from "@/components/Messages/UserSidebar";
 
 export default function MessageLayout({ children }) {

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { IoClose } from "react-icons/io5";
 
-export default function ModelBox({ children, isOpen, onClose }) {
+export default function ModelBox({ children, isOpen, onClose, className }) {
   const modalRef = useRef();
 
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function ModelBox({ children, isOpen, onClose }) {
             </span>
             <div
               ref={modalRef}
-              className='inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform sm:my-8 sm:align-middle sm:max-w-md w-full'
+              className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform sm:my-8 sm:align-middle sm:max-w-md w-full ${className}`}
             >
               {children}
               <div
