@@ -11,8 +11,8 @@ import { PostContext } from "@/app/_context/Post";
 import ForgotPasswordLink from "@/components/Login/ForgotPasswordLink";
 
 export default function Login() {
-  const { setUserDetails } = useContext(UserContext);
-  const { setHomePosts, setHomePostsLoading } = useContext(PostContext);
+  const { setIsLoggedIn } = useContext(UserContext);
+  const { setHomePostsLoading } = useContext(PostContext);
 
   const router = useRouter();
   const [loginBtnLoading, setLoginBtnLoading] = useState(false);
@@ -43,31 +43,8 @@ export default function Login() {
       if (!response.ok) throw new Error(resJson.error);
 
       if (formType) {
+        setIsLoggedIn(true);
         router.push("/");
-
-        const [userDataResponse, postDataResponse, homePostDataResponse] =
-          await Promise.all([
-            fetch("/api/users/profile/user"),
-            fetch("/api/post/user"),
-            fetch("/api/post/get"),
-          ]);
-
-        if (
-          !userDataResponse.ok ||
-          !postDataResponse.ok ||
-          !homePostDataResponse.ok
-        ) {
-          throw new Error("Network response was not ok");
-        }
-
-        const [userData, postData, homepostData] = await Promise.all([
-          userDataResponse.json(),
-          postDataResponse.json(),
-          homePostDataResponse.json(),
-        ]);
-
-        setUserDetails({ ...userData.data, posts: postData.data });
-        setHomePosts(homepostData.data);
       } else {
         setFormType(true);
       }
@@ -83,9 +60,9 @@ export default function Login() {
   };
 
   return (
-    <div className='flex flex-col h-screen justify-center items-center'>
-      <div className='max-w-sm mx-auto md:px-10 p-4 w-full'>
-        <div className='relative w-6 h-16 bg-fuchsia-100 px-3 rounded-2xl p-2.5 my-5 mx-auto'>
+    <div className="flex flex-col h-screen justify-center items-center">
+      <div className="max-w-sm mx-auto md:px-10 p-4 w-full">
+        <div className="relative w-6 h-16 bg-fuchsia-100 px-3 rounded-2xl p-2.5 my-5 mx-auto">
           {/* Your image component */}
         </div>
         <LoginForm

@@ -6,21 +6,28 @@ dbConnect();
 
 export async function GET(request) {
   const loggedUserId = request.headers.get("x-user-id");
+  const userId = request?.nextUrl?.searchParams.get("q");
+
   try {
-    if (!loggedUserId) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    if (!loggedUserId || !userId) {
+      return NextResponse.json(
+        { error: "User ID not provided" },
+        { status: 400 }
+      );
     }
 
-    const conversation = await Conversations.find({
-      participants: { $in: [loggedUserId] },
-    }).populate("participants");
+    console.log(loggedUserId, userId)
+    const conversation = await Conversations.findOne({
+      participants: { $all: [loggedUserId, userId] },
+    }).select("_id");
 
+    console.log(conversation)
     return NextResponse.json({
       message: "Success",
-      data: conversation,
+      id: conversation?._id,
     });
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

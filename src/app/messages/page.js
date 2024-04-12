@@ -1,3 +1,5 @@
+'use client'
+
 import { PiMessengerLogoBold } from "react-icons/pi";
 
 export default function page() {

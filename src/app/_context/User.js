@@ -1,13 +1,18 @@
 "use client";
 
+import { connectSocket, socketData } from "@/helpers/socket";
 import { usePathname } from "next/navigation";
 import React, { createContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const UserContext = createContext(undefined);
 
 function UserContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [socket, setSocket] = useState(null);
+
   const isPublicPath =
     path === "/login" || path === "/register" || path === "/forget-password";
 
@@ -32,6 +37,13 @@ function UserContextProvider({ children }) {
 
         if (userData?.message && postData?.message) {
           setUserDetails({ ...userData.data, posts: postData.data });
+          if (!socketData && userData.data._id) {
+            setSocket(connectSocket(userData.data._id));
+          }
+
+          socketData?.on("getUsers", (users) => {
+            console.log("activeUsers ==> ", users);
+          });
         } else {
           throw new Error("Response did not contain expected data");
         }
@@ -43,10 +55,12 @@ function UserContextProvider({ children }) {
     if (!isPublicPath) {
       fetchData();
     }
-  }, [isPublicPath]);
+  }, [isPublicPath, isLoggedIn]);
 
   return (
-    <UserContext.Provider value={{ userDetails, setUserDetails }}>
+    <UserContext.Provider
+      value={{ userDetails, setUserDetails, isLoggedIn, setIsLoggedIn, socket }}
+    >
       {children}
     </UserContext.Provider>
   );

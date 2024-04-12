@@ -35,6 +35,9 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, require: true, default: new Date() },
   updatedAt: { type: Date, require: true, default: new Date() },
   lastLoginAt: { type: Date, require: true, default: new Date() },
+  socket_id: {
+    type: String,
+  },
 });
 
 const Users = mongoose.models.users || mongoose.model("users", userSchema);

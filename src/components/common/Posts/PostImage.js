@@ -12,17 +12,20 @@ import {
   IoEllipsisHorizontal,
 } from "react-icons/io5";
 import PostSwiper from "./PostSwiper";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import CommentModel from "../CommentModel";
+import OptionsModel from "./OptionsModel";
 
 export default function PostImage({ user, post }) {
+  const buttonRef = useRef(null);
   const [postAction, setPostAction] = useState({
     hasLiked: false,
     likesCount: 0,
     commentCount: 0,
     commentModel: false,
     viewModel: false,
+    optionsModel: false,
   });
 
   const handleLike = async (val) => {
@@ -81,8 +84,22 @@ export default function PostImage({ user, post }) {
     }));
   };
 
+  const handleOptionModel = () => {
+    setPostAction((presVal) => ({
+      ...presVal,
+      optionsModel: !presVal.optionsModel,
+    }));
+  };
+
+  const handleOtionModelClose = () => {
+    setPostAction((presVal) => ({
+      ...presVal,
+      optionsModel: false,
+    }));
+  };
+
   return (
-    <div className='bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2'>
+    <div className='relative bg-white rounded-xl shadow-sm text-sm font-medium border-1 dark:bg-dark2'>
       <div className='flex gap-3 sm:p-4 p-2.5 text-sm font-medium'>
         <Link href={`/profile/${user._id}`} className='relative w-9 h-9'>
           <Image
@@ -95,22 +112,35 @@ export default function PostImage({ user, post }) {
         </Link>
 
         <div className='flex-1'>
-          <Link href={`/profile/${user._id}`} className='text-black dark:text-white'>{user?.fullName}</Link>
+          <Link
+            href={`/profile/${user._id}`}
+            className='text-black dark:text-white'
+          >
+            {user?.fullName}
+          </Link>
           <div className='text-xs text-gray-500 dark:text-white/80'>
             {formatTimestamp(post?.createdAt)}
           </div>
         </div>
-        <div className='-mr-1'>
+        <div className='-mr-1' ref={buttonRef}>
           <button
             type='button'
             className='button__ico w-8 h-8'
-            aria-haspopup='true'
-            aria-expanded='false'
+            onClick={handleOptionModel}
           >
             <IoEllipsisHorizontal />
           </button>
         </div>
       </div>
+
+      {postAction.optionsModel && (
+        <OptionsModel
+          buttonRef={buttonRef}
+          onClose={handleOtionModelClose}
+          postId={post._id}
+          userId={post?.user ?? user._id}
+        />
+      )}
 
       {post.post?.length > 0 ? (
         <div className='px-4'>

@@ -34,12 +34,11 @@ export default function User({
         </div>
 
         <div className='flex-1'>
-          <h4 className='font-medium text-sm text-black dark:text-white'>
-            {user.fullName}
+          <h4 className='font-medium text-sm text-black dark:text-white lowercase'>
+            {user.username}
           </h4>
 
           <div className='mt-0.5 text-xs'>
-            {" "}
             {user.followed_by_viewer ? "Following" : user.fullName}{" "}
           </div>
         </div>

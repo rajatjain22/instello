@@ -12,7 +12,7 @@ export default function NotificationModel({
   bottomref,
 }) {
   const modalRef = useRef(null);
-  useOnClickOutside(modalRef, onClose, sideref, topref, bottomref);
+  useOnClickOutside([modalRef, sideref, topref, bottomref], onClose);
 
   return (
     <div ref={modalRef}>
