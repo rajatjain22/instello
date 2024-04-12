@@ -134,8 +134,8 @@ export default function UserSidebar() {
           )
         ) : (
           conversations?.map((val) => (
-
             <Link
+              key={val.user_id}
               href={`/messages/${val.user_id}`}
               className='relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery'
             >
