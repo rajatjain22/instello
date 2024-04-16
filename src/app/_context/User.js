@@ -36,13 +36,6 @@ function UserContextProvider({ children }) {
 
         if (userData?.message && postData?.message) {
           setUserDetails({ ...userData.data, posts: postData.data });
-          if (!socketData && userData.data._id) {
-            connectSocket(userData.data._id, setSocket);
-          }
-
-          socketData?.on("getUsers", (users) => {
-            console.log("activeUsers ==> ", users);
-          });
         } else {
           throw new Error("Response did not contain expected data");
         }

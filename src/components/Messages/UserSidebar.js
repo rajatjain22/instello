@@ -18,11 +18,14 @@ import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
 import { MessageContext } from "@/app/_context/Message";
 import { debounce } from "@/helpers/debounce";
 import { formatTimestamp } from "@/helpers/all";
+import { UserContext } from "@/app/_context/User";
 
 export default function UserSidebar() {
   const { isMobile, isTablet } = useResponsive();
   const pathname = usePathname();
-  const { conversations, conversationsLoading } = useContext(MessageContext);
+  const { conversations, conversationsLoading, socket } =
+    useContext(MessageContext);
+  const { userDetails } = useContext(UserContext);
 
   const [search, setSearch] = useState({
     text: "",
@@ -72,6 +75,21 @@ export default function UserSidebar() {
     }
   }, [search.text, debouncedSearch]);
 
+  useEffect(() => {
+    if (socket && socket.connected) {
+      console.log("Socket connected. Emitting get_conversations event.");
+      try {
+        socket.emit("get_all_conversations", { userId: userDetails?._id });
+      } catch (error) {
+        console.error("Error emitting get_conversations event:", error);
+      }
+    } else {
+      console.log(
+        "Socket is not connected. Unable to emit get_conversations event."
+      );
+    }
+  }, [socket]);
+
   return (
     <div
       className={`${
@@ -83,33 +101,33 @@ export default function UserSidebar() {
       } w-full md:w-[360px] relative border-r dark:border-slate-700`}
     >
       {/* <!-- heading title --> */}
-      <div className='p-4 border-b dark:border-slate-700'>
-        <div className='flex my-2 items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Link href='/' className='md:hidden pl-2'>
-              <IoChevronBackOutline className='text-2xl -ml-4 md' />
+      <div className="p-4 border-b dark:border-slate-700">
+        <div className="flex my-2 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Link href="/" className="md:hidden pl-2">
+              <IoChevronBackOutline className="text-2xl -ml-4 md" />
             </Link>
-            <h2 className='text-2xl font-bold text-black ml-1 dark:text-white'>
+            <h2 className="text-2xl font-bold text-black ml-1 dark:text-white">
               Chats
             </h2>
           </div>
 
           {/* <!-- right action buttons --> */}
-          <div className='flex items-center gap-2.5'>
+          <div className="flex items-center gap-2.5">
             <button
-              className='group'
-              aria-haspopup='true'
-              aria-expanded='false'
+              className="group"
+              aria-haspopup="true"
+              aria-expanded="false"
             >
-              <IoSettingsOutline className='text-2xl flex group-aria-expanded:rotate-180 md' />
+              <IoSettingsOutline className="text-2xl flex group-aria-expanded:rotate-180 md" />
             </button>
 
-            <button className=''>
-              <IoIosCheckmarkCircleOutline className='text-2xl flex md' />
+            <button className="">
+              <IoIosCheckmarkCircleOutline className="text-2xl flex md" />
             </button>
 
             {/* <!-- mobile toggle menu --> */}
-            <button type='button' className='md:hidden'>
+            <button type="button" className="md:hidden">
               <IoChevronDownOutline />
             </button>
           </div>
@@ -129,7 +147,7 @@ export default function UserSidebar() {
       </div>
 
       {/* <!-- users list --> */}
-      <div className='p-2 overflow-y-auto h-[calc(100vh-127px)]'>
+      <div className="p-2 overflow-y-auto h-[calc(100vh-127px)]">
         {search.text ? (
           search.searchLoading ? (
             <>

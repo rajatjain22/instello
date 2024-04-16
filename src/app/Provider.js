@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { UserContext } from "@/app/_context/User";
 import toast from "react-hot-toast";
@@ -10,12 +10,10 @@ import BottomBar from "@/components/common/NavBars/BottomBar";
 import NotificationModel from "@/components/layout/NotificationModel";
 import SearchModel from "@/components/layout/SearchModel";
 import InitialLoader from "@/components/Loaders/InitialLoading/InitialLoader";
-import { CustomToast } from "@/components/common/CustomToast";
 
 export default function Provider({ children }) {
   // const sideNavBarSearchRef = useRef(null);
   const { userDetails, setUserDetails } = useContext(UserContext);
-  const { socket } = useContext(UserContext);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -66,14 +64,6 @@ export default function Provider({ children }) {
         toast.error("Logout Failed");
       });
   };
-
-  useEffect(() => {
-    socket?.on("new_friend_request", (data) => {
-      toast.custom((t) => (
-        <CustomToast id={t.id} visible={t.visible} data={data} />
-      ));
-    });
-  }, [socket]);
 
   if (!userDetails && !isPublicPath) {
     return (

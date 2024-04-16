@@ -4,7 +4,6 @@ import { UserContextProvider } from "./_context/User";
 import { PostContextProvider } from "./_context/Post";
 import Provider from "./Provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import SocketConnect from "@/components/layout/SocketConnect";
 import { MessageContextProvider } from "./_context/Message";
 
 export const metadata = {
@@ -23,7 +22,6 @@ export default function RootLayout({ children }) {
             <PostContextProvider>
               <MessageContextProvider>
                 <Provider>{children}</Provider>
-                {/* <SocketConnect /> */}
                 <Toaster position="top-right" reverseOrder={false} />
               </MessageContextProvider>
             </PostContextProvider>
