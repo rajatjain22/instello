@@ -11,7 +11,6 @@ function UserContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [socket, setSocket] = useState(null);
 
   const isPublicPath =
     path === "/login" || path === "/register" || path === "/forget-password";
@@ -59,7 +58,7 @@ function UserContextProvider({ children }) {
 
   return (
     <UserContext.Provider
-      value={{ userDetails, setUserDetails, isLoggedIn, setIsLoggedIn, socket }}
+      value={{ userDetails, setUserDetails, isLoggedIn, setIsLoggedIn }}
     >
       {children}
     </UserContext.Provider>

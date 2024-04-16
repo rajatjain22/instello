@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
             <PostContextProvider>
               <MessageContextProvider>
                 <Provider>{children}</Provider>
-                <SocketConnect />
+                {/* <SocketConnect /> */}
                 <Toaster position="top-right" reverseOrder={false} />
               </MessageContextProvider>
             </PostContextProvider>

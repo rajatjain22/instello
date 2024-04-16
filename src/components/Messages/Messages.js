@@ -18,20 +18,17 @@ import { MessageContext } from "@/app/_context/Message";
 
 export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
-  const { userDetails, socket } = useContext(UserContext);
+  const { userDetails } = useContext(UserContext);
+  const { socket } = useContext(MessageContext);
+
   const [msgData, setMsgData] = useState({
     user: {},
     message: "",
     pageLoading: true,
   });
 
-  const {
-    conversationId,
-    setConversationId,
-    messageData,
-    setMessageData
-  } = useContext(MessageContext);
-
+  const { conversationId, setConversationId, messageData, setMessageData } =
+    useContext(MessageContext);
 
   useEffect(() => {
     if (bottomScroll.current) {
@@ -98,6 +95,7 @@ export default function Messages({ userId }) {
       type: "text",
       text: msgData.message,
     });
+    console.log(conversationId);
     setMsgData((presVal) => ({ ...presVal, message: "" }));
   };
 
@@ -122,11 +120,21 @@ export default function Messages({ userId }) {
               className='rounded-full shadow'
               fill={true}
             />
-            <div className={`w-2 h-2 ${msgData.user.status && 'bg-teal-500'} rounded-full absolute right-0 bottom-0 m-px`}></div>
+            <div
+              className={`w-2 h-2 ${
+                msgData.user.status && "bg-teal-500"
+              } rounded-full absolute right-0 bottom-0 m-px`}
+            ></div>
           </div>
           <div className='cursor-pointer'>
             <div className='text-base font-bold'>{msgData?.user?.fullName}</div>
-            <div className={`text-xs ${msgData.user.status ? 'text-green-500' :'text-gray-500'} font-semibold`}>{msgData.user.status ? "Online" : "Offline"}</div>
+            <div
+              className={`text-xs ${
+                msgData.user.status ? "text-green-500" : "text-gray-500"
+              } font-semibold`}
+            >
+              {msgData.user.status ? "Online" : "Offline"}
+            </div>
           </div>
         </div>
 

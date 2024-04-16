@@ -6,9 +6,11 @@ import { MdOutlineVerified } from "react-icons/md";
 import FollowButton from "../FollowButton";
 import { UserContext } from "@/app/_context/User";
 import FollowModel from "@/components/FollowPeoples/FollowModel";
+import { MessageContext } from "@/app/_context/Message";
 
 export default function ProfileHeader({ profile, setProfile }) {
-  const { userDetails, setUserDetails, socket } = useContext(UserContext);
+  const { userDetails, setUserDetails } = useContext(UserContext);
+  const { socket } = useContext(MessageContext);
   const [isOpen, setIsOpen] = useState(false);
   const [modelVal, setModelVal] = useState("");
   const [followBtnLoading, setFollowBtnLoading] = useState(false);

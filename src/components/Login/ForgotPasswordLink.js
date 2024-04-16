@@ -6,7 +6,7 @@ export default function ForgotPasswordLink() {
   const handleForgetPassword = () => {
     fetch("/api/users/forgetPassword", {
       method: "POST",
-      body: JSON.stringify({ email: "johnwick2@yopmail.com" }),
+      body: JSON.stringify({ email: "test@yopmail.com" }),
     })
       .then(res=>res.json())
       .then((res) => console.log(res))

@@ -1,10 +1,12 @@
 "use client";
 
+import { MessageContext } from "@/app/_context/Message";
 import { UserContext } from "@/app/_context/User";
 import { useContext, useEffect } from "react";
 
 export default function Location() {
-  const { userDetails, socket } = useContext(UserContext);
+  const { userDetails } = useContext(UserContext);
+  const { socket } = useContext(MessageContext);
 
   function success(pos) {
     const { latitude, longitude, accuracy } = pos.coords;

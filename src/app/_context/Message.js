@@ -3,20 +3,45 @@
 import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UserContext } from "./User";
+import { connectSocket, socketData } from "@/helpers/socket";
+import { io } from "socket.io-client";
 
 const MessageContext = createContext(undefined);
 
 function MessageContextProvider({ children }) {
   const path = usePathname();
+  const { userDetails } = useContext(UserContext);
   const [conversationId, setConversationId] = useState("new");
   const [conversations, setConversations] = useState([]);
   const [conversationsLoading, setConversationsLoading] = useState(true);
   const [messageData, setMessageData] = useState(null);
+  const [socket, setSocket] = useState(null);
 
-  const { socket, userDetails } = useContext(UserContext);
+  useEffect(() => {
+    let socketData = null;
+    if (userDetails?._id) {
+      const socketData = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+        query: `user_id=${userDetails?._id}`,
+      });
 
-  const isPublicPath =
-    path === "/login" || path === "/register" || path === "/forget-password";
+      socketData.on("connect", () => {
+        console.log("Socket connected");
+        setSocket(socketData);
+      });
+
+      socketData.on("getUsers", (users) => {
+        console.log("Active users:", users);
+      });
+    }
+
+    // Cleanup function to disconnect socket when component unmounts
+    return () => {
+      if (socketData) {
+        console.log("Socket disconnected");
+        socketData.disconnect();
+      }
+    };
+  }, [userDetails]);
 
   useEffect(() => {
     socket?.emit(
@@ -113,7 +138,7 @@ function MessageContextProvider({ children }) {
         return presConversations;
       });
     });
-  }, [socket?.connected]);
+  }, [socket]);
 
   return (
     <MessageContext.Provider
@@ -125,6 +150,7 @@ function MessageContextProvider({ children }) {
         conversationsLoading,
         messageData,
         setMessageData,
+        socket,
       }}
     >
       {children}
