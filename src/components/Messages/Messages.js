@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FaPhoneAlt } from "react-icons/fa";
 import {
   IoAddCircleOutline,
@@ -13,32 +13,71 @@ import {
   IoVideocamOutline,
 } from "react-icons/io5";
 import { BsInfoCircle } from "react-icons/bs";
+import { UserContext } from "@/app/_context/User";
+import { MessageContext } from "@/app/_context/Message";
 
 export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
-
+  const { userDetails, socket } = useContext(UserContext);
   const [msgData, setMsgData] = useState({
     user: {},
-    allMessages: [],
     message: "",
     pageLoading: true,
   });
+
+  const {
+    conversationId,
+    setConversationId,
+    messageData,
+    setMessageData
+  } = useContext(MessageContext);
+
 
   useEffect(() => {
     if (bottomScroll.current) {
       bottomScroll.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-  }, []);
+  }, [messageData, conversationId]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userDataResponse = await fetch(`/api/users/profile/${userId}`);
-        if (!userDataResponse.ok) {
-          throw new Error("Network response was not ok");
+        const [userDataResponse, conversationResponse] = await Promise.all([
+          fetch(`/api/users/profile/${userId}`),
+          fetch(`/api/conversations?q=${userId}`),
+        ]);
+
+        if (!userDataResponse.ok || !conversationResponse.ok) {
+          throw new Error("Failed to fetch data");
         }
-        const userData = await userDataResponse.json();
-        setMsgData((presVal) => ({ ...presVal, user: userData.data }));
+
+        const [userData, conversationData] = await Promise.all([
+          userDataResponse.json(),
+          conversationResponse.json(),
+        ]);
+
+        setMsgData((prevData) => ({ ...prevData, user: userData.data }));
+
+        setConversationId(conversationData?.id ? conversationData.id : "new");
+
+        if (
+          conversationData?.id &&
+          (!messageData || !messageData[conversationData.id])
+        ) {
+          socket?.emit(
+            "get_messages",
+            { conversationId: conversationData?.id },
+            (messages) => {
+              setMessageData((prevState) => ({
+                ...prevState,
+                [conversationData?.id]: [
+                  ...(prevState?.[conversationData?.id] || []),
+                  ...messages,
+                ],
+              }));
+            }
+          );
+        }
       } catch (error) {
         console.error("Error while fetching user data:", error.message);
       } finally {
@@ -47,7 +86,20 @@ export default function Messages({ userId }) {
     };
 
     fetchData();
-  }, [userId]);
+  }, [userId, socket]);
+
+  const handleSendMessage = () => {
+    socket.emit("send_message", {
+      conversationId: conversationId ?? "new",
+      senderId: userDetails?._id,
+      receiverId: userId,
+      avatar: msgData?.user?.avatar,
+      username: msgData?.user?.username,
+      type: "text",
+      text: msgData.message,
+    });
+    setMsgData((presVal) => ({ ...presVal, message: "" }));
+  };
 
   if (msgData.pageLoading) {
     return <div>Loading...</div>;
@@ -70,11 +122,11 @@ export default function Messages({ userId }) {
               className='rounded-full shadow'
               fill={true}
             />
-            <div className='w-2 h-2 bg-teal-500 rounded-full absolute right-0 bottom-0 m-px'></div>
+            <div className={`w-2 h-2 ${msgData.user.status && 'bg-teal-500'} rounded-full absolute right-0 bottom-0 m-px`}></div>
           </div>
           <div className='cursor-pointer'>
             <div className='text-base font-bold'>{msgData?.user?.fullName}</div>
-            <div className='text-xs text-green-500 font-semibold'> Online</div>
+            <div className={`text-xs ${msgData.user.status ? 'text-green-500' :'text-gray-500'} font-semibold`}>{msgData.user.status ? "Online" : "Offline"}</div>
           </div>
         </div>
 
@@ -127,68 +179,74 @@ export default function Messages({ userId }) {
         </div>
 
         <div className='text-sm font-medium space-y-6'>
-          {/* <!-- received --> */}
-          <div className='flex gap-3'>
-            <div className='relative w-9 h-9'>
-              <Image
-                src='/people-know/avatar-6.jpg'
-                alt='profile'
-                className='rounded-full shadow'
-                fill={true}
-              />
+          {messageData?.[conversationId]?.map((e, i) => (
+            <div key={i}>
+              {e.senderId === userDetails?._id ? (
+                // {/* <!-- sent --> */}
+                <div className='flex gap-2 flex-row-reverse items-end'>
+                  <div className='relative w-5 h-5'>
+                    <Image
+                      src={userDetails?.avatar}
+                      alt='profile'
+                      className='rounded-full shadow'
+                      fill={true}
+                    />
+                  </div>
+                  <div className='px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow'>
+                    {e.text}
+                  </div>
+                </div>
+              ) : (
+                // {/* <!-- received --> */}
+                <div className='flex gap-3'>
+                  <div className='relative w-9 h-9'>
+                    <Image
+                      src={msgData?.user?.avatar}
+                      alt='profile'
+                      className='rounded-full shadow'
+                      fill={true}
+                    />
+                  </div>
+                  <div className='px-4 py-2 rounded-[20px] max-w-sm bg-secondery'>
+                    {e.text}
+                  </div>
+                </div>
+              )}
             </div>
-            <div className='px-4 py-2 rounded-[20px] max-w-sm bg-secondery'>
-              Hi, I’m John
-            </div>
-          </div>
-
-          {/* <!-- sent --> */}
-          <div className='flex gap-2 flex-row-reverse items-end'>
-            <div className='relative w-5 h-5'>
-              <Image
-                src='/people-know/avatar-3.jpg'
-                alt='profile'
-                className='rounded-full shadow'
-                fill={true}
-              />
-            </div>
-            <div className='px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow'>
-              I’m Lisa. welcome John
-            </div>
-          </div>
-
+          ))}
           {/* <!-- time --> */}
-          <div className='flex justify-center '>
-            <div className='font-medium text-gray-500 text-sm dark:text-white/70'>
+          {/* <div className="flex justify-center ">
+            <div className="font-medium text-gray-500 text-sm dark:text-white/70">
               April 8,2023,6:30 AM
             </div>
-          </div>
+          </div> */}
 
           {/* <!-- sent media--> */}
-          <div className='flex gap-2 flex-row-reverse items-end'>
-            <div className='relative w-4 h-4'>
+          {/* <div className="flex gap-2 flex-row-reverse items-end">
+            <div className="relative w-4 h-4">
               <Image
-                src='/people-know/avatar-3.jpg'
-                alt='profile'
-                className='rounded-full shadow'
+                src="/people-know/avatar-3.jpg"
+                alt="profile"
+                className="rounded-full shadow"
                 fill={true}
               />
             </div>
 
-            <a className='block rounded-[18px] border overflow-hidden' href='#'>
-              <div className='max-w-md'>
-                <div className='max-w-full relative w-72 h-52'>
+            <a className="block rounded-[18px] border overflow-hidden" href="#">
+              <div className="max-w-md">
+                <div className="max-w-full relative w-72 h-52">
                   <Image
-                    src='/product-3.jpg'
-                    alt='profile'
-                    className='object-cover'
+                    src="/product-3.jpg"
+                    alt="profile"
+                    className="object-cover"
                     fill={true}
                   />
                 </div>
               </div>
             </a>
-          </div>
+          </div> */}
         </div>
+        <div ref={bottomScroll}></div>
       </div>
 
       {/* <!-- sending message area --> */}
@@ -209,11 +267,16 @@ export default function Messages({ userId }) {
             placeholder='Write your message'
             rows='1'
             className='w-full resize-none bg-secondery rounded-full px-4 p-2'
+            onChange={(e) =>
+              setMsgData((presVal) => ({ ...presVal, message: e.target.value }))
+            }
+            value={msgData.message}
           ></textarea>
 
           <button
             type='button'
             className='shrink-0 p-2 absolute right-0.5 top-0'
+            onClick={handleSendMessage}
           >
             <IoSendOutline className='text-xl flex md' />
           </button>

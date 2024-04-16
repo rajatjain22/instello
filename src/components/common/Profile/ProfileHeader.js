@@ -50,6 +50,13 @@ export default function ProfileHeader({ profile, setProfile }) {
             ...presVal,
             followingCount: presVal.followingCount + 1,
           }));
+
+          socket.emit("follow_request", {
+            type: val,
+            senderId: userDetails._id,
+            receiverId: profile._id,
+          });
+          
         } else if (val === "unfollow") {
           setProfile((prevState) => ({
             ...prevState,
@@ -67,12 +74,6 @@ export default function ProfileHeader({ profile, setProfile }) {
         setFollowBtnLoading(false);
       });
   };
-
-  useEffect(() => {
-    socket.on("followRequest", (data)=>{
-      console.log("followRequest ==> ", data);
-    })
-  }, [socket])
 
   return (
     <div className='max-w-2x flex-1'>
@@ -142,25 +143,11 @@ export default function ProfileHeader({ profile, setProfile }) {
               <FollowButton
                 isFollowing={profile.followed_by_viewer}
                 isLoading={followBtnLoading}
-                onToggleFollow={
-                  () => {
-                    // console.log("object");
-                    // socket.emit(
-                    //   "follow",
-                    //   {
-                    //     type: profile.followed_by_viewer
-                    //       ? "unfollow"
-                    //       : "follow",
-                    //     senderId: userDetails._id,
-                    //     receiverId: profile._id,
-                    //   },
-                    //   () => {}
-                    // );
-                    handleFollow(
-                      profile.followed_by_viewer ? "unfollow" : "follow"
-                    )
-                  }
-                }
+                onToggleFollow={() => {
+                  handleFollow(
+                    profile.followed_by_viewer ? "unfollow" : "follow"
+                  );
+                }}
               />
 
               {profile.followed_by_viewer && (

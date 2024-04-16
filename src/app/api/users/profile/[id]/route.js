@@ -59,6 +59,7 @@ export async function GET(request, { params }) {
           followersCount: { $size: "$followers" },
           followingCount: { $size: "$following" },
           postsCount: { $size: "$posts" },
+          status: 1,
         },
       },
     ]).exec();
@@ -145,7 +146,7 @@ export async function PUT(request, { params }) {
     if (bio) {
       user.bio = bio ? bio : "";
     }
-      
+
     if (fullName) {
       user.fullName = fullName;
     }

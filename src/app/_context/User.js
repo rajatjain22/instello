@@ -1,8 +1,9 @@
 "use client";
 
+import { connectSocket, socketData } from "@/helpers/socket";
 import { usePathname } from "next/navigation";
 import React, { createContext, useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import toast from "react-hot-toast";
 
 const UserContext = createContext(undefined);
 
@@ -36,13 +37,10 @@ function UserContextProvider({ children }) {
 
         if (userData?.message && postData?.message) {
           setUserDetails({ ...userData.data, posts: postData.data });
-          const socketData = io("http://localhost:8080");
-          setSocket(socketData);
-          socketData?.emit("addUser", {
-            userId: userData.data?._id,
-            username: userData.data?.username,
-            avatar: userData.data?.avatar,
-          });
+          if (!socketData && userData.data._id) {
+            connectSocket(userData.data._id, setSocket);
+          }
+
           socketData?.on("getUsers", (users) => {
             console.log("activeUsers ==> ", users);
           });

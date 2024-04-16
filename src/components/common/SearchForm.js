@@ -10,25 +10,25 @@ function SearchForm({ search, onChange }) {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (pathname !== "/messages") {
+    if (!pathname.startsWith("/messages")) {
       inputRef?.current?.focus();
     }
   }, [pathname]);
 
   return (
     <form>
-      <div className="relative -mx-1">
-        <IoSearch className="absolute top-2.5 left-2 text-xl" />
+      <div className='relative -mx-1'>
+        <IoSearch className='absolute top-2.5 left-2 text-xl' />
 
         <input
           ref={inputRef}
-          type="text"
-          placeholder="Search"
-          className="bg-transparen w-full !pl-10 !py-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none focus-visible:outline-black"
+          type='text'
+          placeholder='Search'
+          className='bg-transparen w-full !pl-10 !py-2 !rounded-lg bg-slate-100 hover:bg-opacity-80 transition-all focus:outline:none focus-visible:outline-black'
           value={search}
           onChange={onChange}
         />
-        <button type="submit" hidden></button>
+        <button type='submit' hidden></button>
       </div>
     </form>
   );

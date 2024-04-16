@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/dbconfig/dbconfig";
 import Posts from "@/schemas/PostModel";
 import mongoose from "mongoose";
+import Comments from "@/schemas/CommetModel";
 
 dbConnect();
 
@@ -35,6 +36,8 @@ export async function DELETE(request, { params }) {
         $pull: { posts: postId },
       }
     ).exec();
+
+    await Comments.deleteMany({ post: postId });
 
     return NextResponse.json({
       message: "Post deleted successfully",

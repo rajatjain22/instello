@@ -12,7 +12,7 @@ import { useContext, useRef, useState } from "react";
 import { MdOutlineDelete } from "react-icons/md";
 import toast from "react-hot-toast";
 import { UserContext } from "@/app/_context/User";
-import DeleteConfirmModel from "./Posts/DeleteConfirmModel";
+import DeleteConfirmModel from "./DeleteConfirmModel";
 
 function OptionsModel({ buttonRef, onClose, postId, userId }) {
   const modalRef = useRef(null);

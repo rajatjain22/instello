@@ -14,12 +14,13 @@ export default function User({
   isLoading,
   isRemove,
   onClose = "",
+  message = false,
 }) {
   const { userDetails } = useContext(UserContext);
   return (
     <div className={className}>
       <Link
-        href={`/profile/${user._id}`}
+        href={message ? `/messages/${user._id}` : `/profile/${user._id}`}
         className='flex gap-2'
         onClick={onClose}
       >

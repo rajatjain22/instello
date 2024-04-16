@@ -32,6 +32,7 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL("/login", request.nextUrl));
     }
 
+    
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-user-id", isAuth.id);
     const response = NextResponse.next({

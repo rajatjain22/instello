@@ -4,7 +4,7 @@ import useResponsive from "@/app/_hooks/useResponsive";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import {
   IoChevronBackOutline,
@@ -15,10 +15,14 @@ import SearchForm from "../common/SearchForm";
 import toast from "react-hot-toast";
 import User from "../common/User";
 import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
+import { MessageContext } from "@/app/_context/Message";
+import { debounce } from "@/helpers/debounce";
+import { formatTimestamp } from "@/helpers/all";
 
 export default function UserSidebar() {
   const { isMobile, isTablet } = useResponsive();
   const pathname = usePathname();
+  const { conversations, conversationsLoading } = useContext(MessageContext);
 
   const [search, setSearch] = useState({
     text: "",
@@ -26,8 +30,8 @@ export default function UserSidebar() {
     searchLoading: false,
   });
 
-  const handleSearch = async () => {
-    if (!search.text) {
+  const handleSearch = async (value, signal = "") => {
+    if (!value) {
       toast.error("Please enter value!");
       return false;
     }
@@ -35,7 +39,8 @@ export default function UserSidebar() {
       setSearch((presVal) => ({ ...presVal, searchLoading: true }));
       const request = {
         method: "POST",
-        body: JSON.stringify({ search: search.text }),
+        body: JSON.stringify({ search: value }),
+        signal,
       };
       const response = await fetch("/api/users/search", request);
       const resJson = await response.json();
@@ -51,7 +56,22 @@ export default function UserSidebar() {
     }
   };
 
-  
+  const debouncedSearch = useCallback(debounce(handleSearch, 300), []);
+
+  useEffect(() => {
+    if (search.text) {
+      let abortController = new AbortController();
+      const signal = abortController.signal;
+      setSearch((presVal) => ({ ...presVal, searchLoading: true }));
+      console.log("object");
+      debouncedSearch(search.text, signal);
+
+      return () => {
+        abortController.abort();
+      };
+    }
+  }, [search.text, debouncedSearch]);
+
   return (
     <div
       className={`${
@@ -126,39 +146,56 @@ export default function UserSidebar() {
                 className={"flex items-center p-2"}
                 user={user}
                 followButton={false}
+                message={true}
+                onClose={() =>
+                  setSearch((presVal) => ({ ...presVal, text: "" }))
+                }
               />
             ))
           ) : (
             <>No users</>
           )
+        ) : conversationsLoading ? (
+          <>
+            <UserPlaceholder />
+            <UserPlaceholder />
+            <UserPlaceholder />
+          </>
+        ) : conversations.length ? (
+          conversations?.map((val, index) => (
+            <Link
+              key={index}
+              href={`/messages/${val.user_id}`}
+              className="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery"
+            >
+              <div className="relative w-14 h-14 shrink-0">
+                <Image
+                  src={val.avatar}
+                  alt="profile"
+                  className="rounded-full shadow"
+                  fill={true}
+                />
+                {val.status && (
+                  <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="mr-auto text-sm text-black dark:text-white font-medium">
+                    {val.username}
+                  </div>
+                  <div className="text-xs font-light text-gray-500 dark:text-white/70">
+                    {formatTimestamp(val?.lastMessageCreatedAt)}
+                  </div>
+                </div>
+                <div className=" overflow-hidden text-ellipsis text-sm whitespace-nowrap">
+                  {val?.lastMessage}
+                </div>
+              </div>
+            </Link>
+          ))
         ) : (
-          <Link
-            href="/messages/1"
-            className="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery"
-          >
-            <div className="relative w-14 h-14 shrink-0">
-              <Image
-                src="/people-know/avatar-6.jpg"
-                alt="profile"
-                className="rounded-full shadow"
-                fill={true}
-              />
-              <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1.5">
-                <div className="mr-auto text-sm text-black dark:text-white font-medium">
-                  Jesse Steeve
-                </div>
-                <div className="text-xs font-light text-gray-500 dark:text-white/70">
-                  09:40AM
-                </div>
-              </div>
-              <div className="font-medium overflow-hidden text-ellipsis text-sm whitespace-nowrap">
-                Love your photos 😍
-              </div>
-            </div>
-          </Link>
+          <>No conversations</>
         )}
       </div>
     </div>

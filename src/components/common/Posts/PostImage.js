@@ -15,7 +15,7 @@ import PostSwiper from "./PostSwiper";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import CommentModel from "../CommentModel";
-import OptionsModel from "../OptionsModel";
+import OptionsModel from "./OptionsModel";
 
 export default function PostImage({ user, post }) {
   const buttonRef = useRef(null);

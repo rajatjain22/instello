@@ -7,7 +7,7 @@ function useOnClickOutside(refs, handler) {
     const handleClick = (event) => {
       let isOutside = true;
       for (const ref of refs) {
-        if (ref.current && ref.current.contains(event.target)) {
+        if (ref?.current && ref.current.contains(event.target)) {
           isOutside = false;
           break;
         }
