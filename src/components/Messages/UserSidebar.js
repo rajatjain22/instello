@@ -76,17 +76,8 @@ export default function UserSidebar() {
   }, [search.text, debouncedSearch]);
 
   useEffect(() => {
-    if (socket && socket.connected) {
-      console.log("Socket connected. Emitting get_conversations event.");
-      try {
-        socket.emit("get_all_conversations", { userId: userDetails?._id });
-      } catch (error) {
-        console.error("Error emitting get_conversations event:", error);
-      }
-    } else {
-      console.log(
-        "Socket is not connected. Unable to emit get_conversations event."
-      );
+    if (socket) {
+      socket.emit("get_all_conversations", { userId: userDetails?._id });
     }
   }, [socket]);
 
@@ -101,33 +92,33 @@ export default function UserSidebar() {
       } w-full md:w-[360px] relative border-r dark:border-slate-700`}
     >
       {/* <!-- heading title --> */}
-      <div className="p-4 border-b dark:border-slate-700">
-        <div className="flex my-2 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Link href="/" className="md:hidden pl-2">
-              <IoChevronBackOutline className="text-2xl -ml-4 md" />
+      <div className='p-4 border-b dark:border-slate-700'>
+        <div className='flex my-2 items-center justify-between'>
+          <div className='flex items-center gap-2'>
+            <Link href='/' className='md:hidden pl-2'>
+              <IoChevronBackOutline className='text-2xl -ml-4 md' />
             </Link>
-            <h2 className="text-2xl font-bold text-black ml-1 dark:text-white">
+            <h2 className='text-2xl font-bold text-black ml-1 dark:text-white'>
               Chats
             </h2>
           </div>
 
           {/* <!-- right action buttons --> */}
-          <div className="flex items-center gap-2.5">
+          <div className='flex items-center gap-2.5'>
             <button
-              className="group"
-              aria-haspopup="true"
-              aria-expanded="false"
+              className='group'
+              aria-haspopup='true'
+              aria-expanded='false'
             >
-              <IoSettingsOutline className="text-2xl flex group-aria-expanded:rotate-180 md" />
+              <IoSettingsOutline className='text-2xl flex group-aria-expanded:rotate-180 md' />
             </button>
 
-            <button className="">
-              <IoIosCheckmarkCircleOutline className="text-2xl flex md" />
+            <button className=''>
+              <IoIosCheckmarkCircleOutline className='text-2xl flex md' />
             </button>
 
             {/* <!-- mobile toggle menu --> */}
-            <button type="button" className="md:hidden">
+            <button type='button' className='md:hidden'>
               <IoChevronDownOutline />
             </button>
           </div>
@@ -147,7 +138,7 @@ export default function UserSidebar() {
       </div>
 
       {/* <!-- users list --> */}
-      <div className="p-2 overflow-y-auto h-[calc(100vh-127px)]">
+      <div className='p-2 overflow-y-auto h-[calc(100vh-127px)]'>
         {search.text ? (
           search.searchLoading ? (
             <>
@@ -184,30 +175,39 @@ export default function UserSidebar() {
             <Link
               key={index}
               href={`/messages/${val.user_id}`}
-              className="relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery"
+              className={`relative flex items-center gap-4 p-2 duration-200 rounded-xl hover:bg-secondery ${
+                val.unreadMessagesCount > 0 && "font-bold"
+              }`}
             >
-              <div className="relative w-14 h-14 shrink-0">
+              <div className='relative w-14 h-14 shrink-0'>
                 <Image
                   src={val.avatar}
-                  alt="profile"
-                  className="rounded-full shadow"
+                  alt='profile'
+                  className='rounded-full shadow'
                   fill={true}
                 />
                 {val.status && (
-                  <div className="w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800"></div>
+                  <div className='w-4 h-4 absolute bottom-0 right-0  bg-green-500 rounded-full border border-white dark:border-slate-800'></div>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <div className="mr-auto text-sm text-black dark:text-white font-medium">
+              <div className='relative flex-1 min-w-0'>
+                <div className='flex items-center gap-2 mb-1.5'>
+                  <div className='mr-auto text-sm text-black dark:text-white font-medium'>
                     {val.username}
                   </div>
-                  <div className="text-xs font-light text-gray-500 dark:text-white/70">
+                  <div className='text-xs font-light text-gray-500 dark:text-white/70'>
                     {formatTimestamp(val?.lastMessageCreatedAt)}
                   </div>
                 </div>
-                <div className=" overflow-hidden text-ellipsis text-sm whitespace-nowrap">
-                  {val?.lastMessage}
+                <div className='flex items-center justify-between gap-2 mb-1.5'>
+                  <div className=' overflow-hidden text-ellipsis text-sm whitespace-nowrap'>
+                    {val?.lastMessage}
+                  </div>
+                  {val.unreadMessagesCount > 0 && (
+                    <div className='w-5 h-5 border rounded-full bg-[#353535] text-white text-xs text-center flex justify-center items-center'>
+                      {val.unreadMessagesCount}
+                    </div>
+                  )}
                 </div>
               </div>
             </Link>

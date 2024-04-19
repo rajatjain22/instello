@@ -27,8 +27,13 @@ export default function Messages({ userId }) {
     pageLoading: true,
   });
 
-  const { conversationId, setConversationId, messageData, setMessageData } =
-    useContext(MessageContext);
+  const {
+    conversations,
+    conversationId,
+    setConversationId,
+    messageData,
+    setMessageData,
+  } = useContext(MessageContext);
 
   useEffect(() => {
     if (bottomScroll.current) {
@@ -82,8 +87,27 @@ export default function Messages({ userId }) {
       }
     };
 
-    fetchData();
+    if (userId && socket) {
+      fetchData();
+    }
   }, [userId, socket]);
+
+  // useEffect(() => {
+    
+  //   console.log(conversations);
+
+  //   socket?.emit(
+  //     "read_message",
+  //     {
+  //       conversationId: conversationData?.id,
+  //       senderId: userDetails?._id,
+  //       receiverId: userData.data._id,
+  //     },
+  //     () => {
+  //       console.log(conversationData?.id);
+  //     }
+  //   );
+  // }, [socket, ])
 
   const handleSendMessage = () => {
     socket.emit("send_message", {
