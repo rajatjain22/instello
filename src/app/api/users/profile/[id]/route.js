@@ -38,6 +38,7 @@ export async function GET(request, { params }) {
           email: 1,
           bio: 1,
           avatar: 1,
+          lastLoginAt: 1,
           followed_by_viewer: {
             $cond: {
               if: {

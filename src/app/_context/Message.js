@@ -10,7 +10,6 @@ import toast from "react-hot-toast";
 const MessageContext = createContext(undefined);
 
 function MessageContextProvider({ children }) {
-  const path = usePathname();
   const { userDetails } = useContext(UserContext);
   const [conversationId, setConversationId] = useState("new");
   const [conversations, setConversations] = useState([]);
@@ -44,32 +43,19 @@ function MessageContextProvider({ children }) {
         ));
       });
 
-      socket.emit(
-        "get_conversations",
-        { userId: userDetails._id },
-        (conversations) => {
-          console.log("conversations ===>", conversations);
-          setConversationsLoading(true);
-          setConversations([...conversations]);
-          setConversationsLoading(false);
-        }
-      );
-
-      const handleMessage = (data) => {
+      const handleMessage = (data, type) => {
         if (!data.conversationId) return;
 
         conversationId === "new" && setConversationId(data.conversationId);
 
-        setMessageData((prevState) => {
-          const updatedMessages = {
-            ...prevState,
-            [data.conversationId]: [
-              ...(prevState?.[data?.conversationId] || []),
-              data,
-            ],
-          };
-          return updatedMessages;
-        });
+        // Update message data
+        setMessageData((prevState) => ({
+          ...prevState,
+          [data.conversationId]: [
+            ...(prevState?.[data?.conversationId] || []),
+            data,
+          ],
+        }));
 
         setConversations((prevConversations) => {
           let updatedConversations = [...prevConversations];
@@ -82,6 +68,12 @@ function MessageContextProvider({ children }) {
               ...updatedConversations[findConversationIndex],
               lastMessage: data.text,
               lastMessageCreatedAt: new Date(),
+              unreadCount:
+                type === "receive"
+                  ? (updatedConversations[findConversationIndex]?.unreadCount ||
+                      0) + 1
+                  : updatedConversations[findConversationIndex]?.unreadCount ||
+                    0,
             };
             const currentConversation = updatedConversations.splice(
               findConversationIndex,
@@ -102,12 +94,13 @@ function MessageContextProvider({ children }) {
         });
       };
 
-      socket.on("send_new_message", handleMessage);
-      socket.on("receive_new_message", handleMessage);
+      socket.on("send_new_message", (data) => handleMessage(data, "send"));
+      socket.on("receive_new_message", (data) =>
+        handleMessage(data, "receive")
+      );
 
       return () => {
         socket.off("new_friend_request");
-        socket.off("get_conversations");
         socket.off("send_new_message");
         socket.off("receive_new_message");
       };
@@ -122,6 +115,7 @@ function MessageContextProvider({ children }) {
         conversations,
         setConversations,
         conversationsLoading,
+        setConversationsLoading,
         messageData,
         setMessageData,
         socket,

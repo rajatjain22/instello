@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { FaPhoneAlt } from "react-icons/fa";
 import {
   IoAddCircleOutline,
@@ -15,6 +15,9 @@ import {
 import { BsInfoCircle } from "react-icons/bs";
 import { UserContext } from "@/app/_context/User";
 import { MessageContext } from "@/app/_context/Message";
+import UnreadMessage from "./UnreadMessage";
+import { formatTimestampOnDays } from "@/helpers/all";
+import DocumentModel from "./DocumentModel";
 
 export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
@@ -23,12 +26,14 @@ export default function Messages({ userId }) {
 
   const [msgData, setMsgData] = useState({
     user: {},
+    lastReadMessage: null,
     message: "",
     pageLoading: true,
   });
 
   const {
     conversations,
+    setConversations,
     conversationId,
     setConversationId,
     messageData,
@@ -58,9 +63,14 @@ export default function Messages({ userId }) {
           conversationResponse.json(),
         ]);
 
-        setMsgData((prevData) => ({ ...prevData, user: userData.data }));
-
         setConversationId(conversationData?.id ? conversationData.id : "new");
+
+        setMsgData((prevData) => ({
+          ...prevData,
+          user: userData.data,
+          lastReadMessage:
+            conversationData?.conversation?.lastReadMessage ?? null,
+        }));
 
         if (
           conversationData?.id &&
@@ -68,7 +78,10 @@ export default function Messages({ userId }) {
         ) {
           socket?.emit(
             "get_messages",
-            { conversationId: conversationData?.id },
+            {
+              conversationId: conversationData?.id,
+              loggedUser: userDetails?._id,
+            },
             (messages) => {
               setMessageData((prevState) => ({
                 ...prevState,
@@ -77,9 +90,38 @@ export default function Messages({ userId }) {
                   ...messages,
                 ],
               }));
+              setConversations((prevState) => {
+                const newData = [...prevState];
+                const index = newData.findIndex(
+                  (item) => item.id === conversationData?.id
+                );
+                if (index !== -1) {
+                  newData[index] = { ...newData[index], unreadCount: 0 };
+                }
+                return newData;
+              });
             }
           );
         }
+
+        socket?.emit(
+          "read_mssages",
+          {
+            conversationId: conversationData?.id,
+            loggedUser: userDetails?._id,
+          },
+          () => {
+            const conversationIndex = conversations.findIndex(
+              (e) => e.user_id === userId
+            );
+
+            if (conversationIndex !== -1) {
+              const updatedConversations = [...conversations];
+              updatedConversations[conversationIndex].unreadCount = 0;
+              setConversations(updatedConversations);
+            }
+          }
+        );
       } catch (error) {
         console.error("Error while fetching user data:", error.message);
       } finally {
@@ -87,29 +129,34 @@ export default function Messages({ userId }) {
       }
     };
 
-    if (userId && socket) {
+    if (userId && userDetails && socket) {
       fetchData();
     }
-  }, [userId, socket]);
+  }, [userId, userDetails, socket]);
 
-  // useEffect(() => {
-    
-  //   console.log(conversations);
+  useEffect(() => {
+    socket?.emit(
+      "read_mssages",
+      {
+        conversationId: conversationId,
+        loggedUser: userDetails?._id,
+      },
+      () => {
+        const conversationIndex = conversations.findIndex(
+          (e) => e.user_id === userId
+        );
 
-  //   socket?.emit(
-  //     "read_message",
-  //     {
-  //       conversationId: conversationData?.id,
-  //       senderId: userDetails?._id,
-  //       receiverId: userData.data._id,
-  //     },
-  //     () => {
-  //       console.log(conversationData?.id);
-  //     }
-  //   );
-  // }, [socket, ])
+        if (conversationIndex !== -1) {
+          const updatedConversations = [...conversations];
+          updatedConversations[conversationIndex].unreadCount = 0;
+          setConversations(updatedConversations);
+        }
+      }
+    );
+  }, [messageData]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (e) => {
+    e.preventDefault();
     socket.emit("send_message", {
       conversationId: conversationId ?? "new",
       senderId: userDetails?._id,
@@ -117,9 +164,8 @@ export default function Messages({ userId }) {
       avatar: msgData?.user?.avatar,
       username: msgData?.user?.username,
       type: "text",
-      text: msgData.message,
+      text: e?.target?.innerText ?? msgData.message,
     });
-    console.log(conversationId);
     setMsgData((presVal) => ({ ...presVal, message: "" }));
   };
 
@@ -128,20 +174,20 @@ export default function Messages({ userId }) {
   }
 
   return (
-    <div className='flex-1 '>
+    <div className="flex-1 ">
       {/* <!-- chat heading --> */}
-      <div className='flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700'>
-        <div className='flex items-center sm:gap-4 gap-2'>
+      <div className="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700">
+        <div className="flex items-center sm:gap-4 gap-2">
           {/* <!-- toggle for mobile --> */}
-          <Link href='/messages' className='md:hidden'>
-            <IoChevronBackOutline className='text-2xl -ml-4 md' />
+          <Link href="/messages" className="md:hidden">
+            <IoChevronBackOutline className="text-2xl -ml-4 md" />
           </Link>
 
-          <div className='relative w-8 h-8 cursor-pointer max-md:hidden'>
+          <div className="relative w-8 h-8 cursor-pointer max-md:hidden">
             <Image
               src={msgData?.user?.avatar}
-              alt='profile'
-              className='rounded-full shadow'
+              alt="profile"
+              className="rounded-full shadow"
               fill={true}
             />
             <div
@@ -150,101 +196,111 @@ export default function Messages({ userId }) {
               } rounded-full absolute right-0 bottom-0 m-px`}
             ></div>
           </div>
-          <div className='cursor-pointer'>
-            <div className='text-base font-bold'>{msgData?.user?.fullName}</div>
+          <div className="cursor-pointer">
+            <div className="text-base font-bold">{msgData?.user?.fullName}</div>
             <div
               className={`text-xs ${
                 msgData.user.status ? "text-green-500" : "text-gray-500"
               } font-semibold`}
             >
-              {msgData.user.status ? "Online" : "Offline"}
+              {msgData.user.status
+                ? "Online"
+                : formatTimestampOnDays(msgData.user.lastLoginAt)}
             </div>
           </div>
         </div>
 
-        <div className='flex items-center gap-4'>
-          <button type='button' className='button__ico'>
-            <FaPhoneAlt className='text-2xl' />
+        <div className="flex items-center gap-4">
+          <button type="button" className="button__ico">
+            <FaPhoneAlt className="text-2xl" />
           </button>
           <button
-            type='button'
-            className='hover:bg-slate-100 p-1.5 rounded-full'
+            type="button"
+            className="hover:bg-slate-100 p-1.5 rounded-full"
           >
-            <IoVideocamOutline className='text-2xl' />
+            <IoVideocamOutline className="text-2xl" />
           </button>
           <button
-            type='button'
-            className='hover:bg-slate-100 p-1.5 rounded-full'
+            type="button"
+            className="hover:bg-slate-100 p-1.5 rounded-full"
           >
-            <BsInfoCircle className='text-2xl' />
+            <BsInfoCircle className="text-2xl" />
           </button>
         </div>
       </div>
 
       {/* <!-- chats bubble --> */}
-      <div className='w-full p-5 overflow-y-auto sm:h-[calc(100vh-137px)] h-[calc(100vh-127px)]'>
-        <div className='py-5 text-center text-sm lg:pt-8'>
-          <div className='relative w-24 h-24 rounded-full mx-auto mb-3'>
+      <div className="w-full p-5 overflow-y-auto sm:h-[calc(100vh-137px)] h-[calc(100vh-127px)]">
+        <div className="py-5 text-center text-sm lg:pt-8">
+          <div className="relative w-24 h-24 rounded-full mx-auto mb-3">
             <Image
               src={msgData?.user?.avatar}
-              alt='profile'
-              className='rounded-full shadow'
+              alt="profile"
+              className="rounded-full shadow"
               fill={true}
             />
           </div>
-          <div className='mt-8'>
-            <div className='md:text-xl text-base font-medium text-black dark:text-white'>
+          <div className="mt-8">
+            <div className="md:text-xl text-base font-medium text-black dark:text-white">
               {msgData?.user?.fullName}
             </div>
-            <div className='text-gray-500 text-sm dark:text-white/80'>
+            <div className="text-gray-500 text-sm dark:text-white/80">
               @{msgData?.user?.username}
             </div>
           </div>
-          <div className='mt-3.5'>
+          <div className="mt-3.5">
             <Link
               href={`/profile/${userId}`}
-              className='inline-block rounded-lg px-4 py-1.5 text-sm font-semibold bg-secondery'
+              className="inline-block rounded-lg px-4 py-1.5 text-sm font-semibold bg-secondery"
             >
               View profile
             </Link>
           </div>
         </div>
 
-        <div className='text-sm font-medium space-y-6'>
+        <div className="text-sm font-medium space-y-6">
           {messageData?.[conversationId]?.map((e, i) => (
-            <div key={i}>
-              {e.senderId === userDetails?._id ? (
-                // {/* <!-- sent --> */}
-                <div className='flex gap-2 flex-row-reverse items-end'>
-                  <div className='relative w-5 h-5'>
-                    <Image
-                      src={userDetails?.avatar}
-                      alt='profile'
-                      className='rounded-full shadow'
-                      fill={true}
-                    />
+            <Fragment key={e._id || `msg-${i}`}>
+              <div>
+                {e.senderId === userDetails?._id ? (
+                  // {/* <!-- sent --> */}
+                  <div className={`flex gap-2 flex-row-reverse items-end`}>
+                    <div className="relative w-5 h-5">
+                      <Image
+                        src={userDetails?.avatar}
+                        alt="profile"
+                        className="rounded-full shadow"
+                        fill={true}
+                      />
+                    </div>
+                    <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow">
+                      {e.text}
+                    </div>
                   </div>
-                  <div className='px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow'>
-                    {e.text}
-                  </div>
-                </div>
-              ) : (
-                // {/* <!-- received --> */}
-                <div className='flex gap-3'>
-                  <div className='relative w-9 h-9'>
-                    <Image
-                      src={msgData?.user?.avatar}
-                      alt='profile'
-                      className='rounded-full shadow'
-                      fill={true}
-                    />
-                  </div>
-                  <div className='px-4 py-2 rounded-[20px] max-w-sm bg-secondery'>
-                    {e.text}
-                  </div>
-                </div>
-              )}
-            </div>
+                ) : (
+                  // {/* <!-- received --> */}
+                  <>
+                    <div className={`flex gap-2`}>
+                      <div className="relative w-9 h-9">
+                        <Image
+                          src={msgData?.user?.avatar}
+                          alt="profile"
+                          className="rounded-full shadow"
+                          fill={true}
+                        />
+                      </div>
+                      <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery">
+                        {e.text}
+                      </div>
+                    </div>
+                  </>
+                )}
+                {messageData?.[conversationId].length > i + 1 &&
+                  e._id === msgData?.lastReadMessage &&
+                  messageData?.[conversationId]?.[i + 1]?.senderId !==
+                    userDetails?._id && <UnreadMessage />}
+              </div>
+            </Fragment>
           ))}
           {/* <!-- time --> */}
           {/* <div className="flex justify-center ">
@@ -282,41 +338,47 @@ export default function Messages({ userId }) {
       </div>
 
       {/* <!-- sending message area --> */}
-      <div className='flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden'>
+      <div className="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden">
         <div
-          id='message__wrap'
-          className='flex items-center gap-2 h-full dark:text-white -mt-1.5'
+          id="message__wrap"
+          className="flex items-center gap-2 h-full dark:text-white -mt-1.5"
         >
-          <button type='button' className='shrink-0'>
-            <IoAddCircleOutline className='text-3xl flex md' />
+          <button type="button" className="shrink-0">
+            <IoAddCircleOutline className="text-3xl flex md" />
           </button>
-          <button type='button'>
-            <IoHappyOutline className='text-3xl flex md' />
+          <button type="button">
+            <IoHappyOutline className="text-3xl flex md" />
           </button>
         </div>
-        <div className='relative flex-1'>
-          <textarea
-            placeholder='Write your message'
-            rows='1'
-            className='w-full resize-none bg-secondery rounded-full px-4 p-2'
+        <form onSubmit={handleSendMessage} className="relative flex-1">
+          <input
+            placeholder="Write your message"
+            className="w-full resize-none bg-secondery rounded-full px-4 p-2"
             onChange={(e) =>
               setMsgData((presVal) => ({ ...presVal, message: e.target.value }))
             }
             value={msgData.message}
-          ></textarea>
+          ></input>
 
           <button
-            type='button'
-            className='shrink-0 p-2 absolute right-0.5 top-0'
-            onClick={handleSendMessage}
+            type="submit"
+            className="shrink-0 p-2 absolute right-0.5 top-0"
           >
-            <IoSendOutline className='text-xl flex md' />
+            <IoSendOutline className="text-xl flex md" />
           </button>
-        </div>
+        </form>
 
-        <button type='button' className='flex h-full dark:text-white'>
-          <IoHeartOutline className='text-3xl flex -mt-3 md' />
-        </button>
+        {/* <button type="button" className="flex h-full dark:text-white" onClick={handleSendMessage}>
+        &#128077;
+          <IoHeartOutline className="text-3xl flex -mt-3 md" />
+        </button> */}
+        <button
+  type="button"
+  className="flex h-full dark:text-white text-2xl" // Use text size classes
+  onClick={handleSendMessage}
+>
+  &#128077;
+</button>
       </div>
     </div>
   );

@@ -71,11 +71,43 @@ const formatTimestamp = (timestamp) => {
   return messageTime.toLocaleDateString("en-US", optionsWithYear);
 };
 
+const formatTimestampOnDays = (timestamp) => {
+  const now = new Date();
+  const lastOnline = new Date(timestamp);
+  const timeDifferenceInSeconds = Math.floor((now - lastOnline) / 1000);
+
+  if (timeDifferenceInSeconds < 60) {
+    return "Just now"; // Less than a minute
+  } else if (timeDifferenceInSeconds < 3600) {
+    const minutes = Math.floor(timeDifferenceInSeconds / 60);
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else if (timeDifferenceInSeconds < 86400) {
+    // Less than 1 day
+    const hours = Math.floor(timeDifferenceInSeconds / 3600);
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (timeDifferenceInSeconds < 604800) {
+    // Less than 1 week
+    const days = Math.floor(timeDifferenceInSeconds / 86400);
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else {
+    const weeks = Math.floor(timeDifferenceInSeconds / 604800);
+    const weeksModulo = Math.floor((timeDifferenceInSeconds % 604800) / 86400);
+
+    if (weeks == 1) {
+      return "1 week ago";
+    } else if (weeks > 1) {
+      return `${weeks} weeks ago`;
+    } else {
+      return "7 days ago";
+    }
+  }
+};
+
 //Username Validation
 const onValidUsername = (inputString) => {
   const usernameRegex = /^[a-z_][a-z0-9_.]{1,}$/;
   return usernameRegex.test(inputString);
-}; 
+};
 
 //Email Validation
 const onValidEmail = (inputString) => {
@@ -94,6 +126,7 @@ export {
   capitalizeWords,
   AllWordFirstChar,
   formatTimestamp,
+  formatTimestampOnDays,
   onValidUsername,
   onValidEmail,
   onValidPassword,

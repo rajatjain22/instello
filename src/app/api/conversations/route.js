@@ -18,11 +18,12 @@ export async function GET(request) {
 
     const conversation = await Conversations.findOne({
       participants: { $all: [loggedUserId, userId] },
-    }).select("_id");
+    }).select("_id lastReadMessage");
 
     return NextResponse.json({
       message: "Success",
-      id: conversation?._id,
+      conversation,
+      id: conversation._id,
     });
   } catch (error) {
     console.log(error.message);
