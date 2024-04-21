@@ -176,7 +176,7 @@ export default function Messages({ userId }) {
   return (
     <div className="flex-1 ">
       {/* <!-- chat heading --> */}
-      <div className="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700">
+      <div className="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700 sticky top-0 bg-white">
         <div className="flex items-center sm:gap-4 gap-2">
           {/* <!-- toggle for mobile --> */}
           <Link href="/messages" className="md:hidden">
@@ -230,7 +230,7 @@ export default function Messages({ userId }) {
       </div>
 
       {/* <!-- chats bubble --> */}
-      <div className="w-full p-5 overflow-y-auto sm:h-[calc(100vh-137px)] h-[calc(100vh-127px)]">
+      <div className="w-full p-5">
         <div className="py-5 text-center text-sm lg:pt-8">
           <div className="relative w-24 h-24 rounded-full mx-auto mb-3">
             <Image
@@ -338,7 +338,7 @@ export default function Messages({ userId }) {
       </div>
 
       {/* <!-- sending message area --> */}
-      <div className="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden">
+      <div className="flex items-center md:gap-4 gap-2 md:p-3 p-2 h-14 fixed w-full bottom-0 bg-white shadow-lg">
         <div
           id="message__wrap"
           className="flex items-center gap-2 h-full dark:text-white -mt-1.5"
