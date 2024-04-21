@@ -26,6 +26,7 @@ export async function POST(request) {
         // { email: { $regex: searchValue, $options: "i" } },
         { username: { $regex: searchValue, $options: "i" } },
       ],
+      _id: { $ne: new mongoose.Types.ObjectId(loggedUserId) },
     };
 
     // const users = await Users.find(query).select("_id fullName username");

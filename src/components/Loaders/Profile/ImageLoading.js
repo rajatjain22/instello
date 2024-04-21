@@ -35,7 +35,7 @@ export function ImageLoading3() {
 
 export function ImageLoading4({className}) {
   return (
-    <div aria-label="Loading..." role="status">
+    <div className="flex justify-center" aria-label="Loading..." role="status">
       <svg
         width="24"
         height="24"

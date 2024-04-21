@@ -23,7 +23,7 @@ export async function GET(request) {
     return NextResponse.json({
       message: "Success",
       conversation,
-      id: conversation._id,
+      id: conversation?._id,
     });
   } catch (error) {
     console.log(error.message);

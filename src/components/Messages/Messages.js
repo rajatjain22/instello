@@ -17,7 +17,8 @@ import { UserContext } from "@/app/_context/User";
 import { MessageContext } from "@/app/_context/Message";
 import UnreadMessage from "./UnreadMessage";
 import { formatTimestampOnDays } from "@/helpers/all";
-import DocumentModel from "./DocumentModel";
+import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
+import toast from "react-hot-toast";
 
 export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
@@ -29,6 +30,7 @@ export default function Messages({ userId }) {
     lastReadMessage: null,
     message: "",
     pageLoading: true,
+    msgLoadig: true,
   });
 
   const {
@@ -49,6 +51,7 @@ export default function Messages({ userId }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setMsgData((prevData) => ({ ...prevData, msgLoadig: true }));
         const [userDataResponse, conversationResponse] = await Promise.all([
           fetch(`/api/users/profile/${userId}`),
           fetch(`/api/conversations?q=${userId}`),
@@ -64,13 +67,6 @@ export default function Messages({ userId }) {
         ]);
 
         setConversationId(conversationData?.id ? conversationData.id : "new");
-
-        setMsgData((prevData) => ({
-          ...prevData,
-          user: userData.data,
-          lastReadMessage:
-            conversationData?.conversation?.lastReadMessage ?? null,
-        }));
 
         if (
           conversationData?.id &&
@@ -122,6 +118,14 @@ export default function Messages({ userId }) {
             }
           }
         );
+
+        setMsgData((prevData) => ({
+          ...prevData,
+          user: userData.data,
+          lastReadMessage:
+            conversationData?.conversation?.lastReadMessage ?? null,
+          msgLoadig: false,
+        }));
       } catch (error) {
         console.error("Error while fetching user data:", error.message);
       } finally {
@@ -155,18 +159,57 @@ export default function Messages({ userId }) {
     );
   }, [messageData]);
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
-    socket.emit("send_message", {
+  const handleSendMessage = (e, type = "") => {
+    let message = msgData?.message ?? "";
+
+    // If the `type` is "like", get the message from the event target's inner text
+    if (type === "like") {
+      message = e?.target?.innerText ?? "";
+    }
+
+    // Trim any extra spaces and validate message content
+    const messageText = message.trim();
+
+    if (!messageText) {
+      console.warn("Attempted to send an empty or invalid message.");
+      return;
+    }
+
+    const messagePayload = {
       conversationId: conversationId ?? "new",
       senderId: userDetails?._id,
       receiverId: userId,
       avatar: msgData?.user?.avatar,
       username: msgData?.user?.username,
       type: "text",
-      text: msgData.message,
-    });
-    setMsgData((presVal) => ({ ...presVal, message: "" }));
+      text: messageText,
+    };
+
+    // Send the socket event to emit the message
+    socket?.emit("send_message", messagePayload);
+
+    // Clear the message in `msgData` after sending
+    setMsgData((prevVal) => ({ ...prevVal, message: "" }));
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const handleOnChange = (e) => {
+    setMsgData((presVal) => ({ ...presVal, message: e.target.value }));
+
+    // socket.emit("typing_message", {
+    //   senderId: userDetails._id,
+    //   receiverId: userId,
+    // });
+
+    // socket.on("send_typing_message", (data) => {
+    //   console.log("User is typing:", data);
+    // });
   };
 
   if (msgData.pageLoading) {
@@ -174,7 +217,7 @@ export default function Messages({ userId }) {
   }
 
   return (
-    <div className="flex-1 ">
+    <div className="relative flex-1 overflow-y-scroll h-screen">
       {/* <!-- chat heading --> */}
       <div className="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700 sticky top-0 bg-white">
         <div className="flex items-center sm:gap-4 gap-2">
@@ -257,60 +300,65 @@ export default function Messages({ userId }) {
             </Link>
           </div>
         </div>
-
-        <div className="text-sm font-medium space-y-6">
-          {messageData?.[conversationId]?.map((e, i) => (
-            <Fragment key={e._id || `msg-${i}`}>
-              <div>
-                {e.senderId === userDetails?._id ? (
-                  // {/* <!-- sent --> */}
-                  <div className={`flex gap-2 flex-row-reverse items-end`}>
-                    <div className="relative w-5 h-5">
-                      <Image
-                        src={userDetails?.avatar}
-                        alt="profile"
-                        className="rounded-full shadow"
-                        fill={true}
-                      />
-                    </div>
-                    <div className="px-4 py-2 rounded-[20px] max-w-sm bg-gradient-to-tr from-sky-500 to-blue-500 text-white shadow">
-                      {e.text}
-                    </div>
+        {msgData.msgLoadig ? (
+          <ImageLoading4 className="w-12 h-12" />
+        ) : (
+          <>
+            <div className="font-medium space-y-2 mb-12">
+              {messageData?.[conversationId]?.map((e, i) => (
+                <Fragment key={e._id || `msg-${i}`}>
+                  <div>
+                    {e.senderId === userDetails?._id ? (
+                      // {/* <!-- sent --> */}
+                      <div className={`flex gap-2 flex-row-reverse items-end`}>
+                        <div className="relative w-5 h-5">
+                          <Image
+                            src={userDetails?.avatar}
+                            alt="profile"
+                            className="rounded-full shadow"
+                            fill={true}
+                          />
+                        </div>
+                        <div
+                          className={`px-4 py-2  max-w-sm rounded-[20px] text-white shadow bg-gradient-to-tr from-sky-500 to-blue-500`}
+                        >
+                          {e.text}
+                        </div>
+                      </div>
+                    ) : (
+                      // {/* <!-- received --> */}
+                      <>
+                        <div className={`flex gap-2`}>
+                          <div className="relative w-9 h-9">
+                            <Image
+                              src={msgData?.user?.avatar}
+                              alt="profile"
+                              className="rounded-full shadow"
+                              fill={true}
+                            />
+                          </div>
+                          <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery">
+                            {e.text}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    {messageData?.[conversationId].length > i + 1 &&
+                      e._id === msgData?.lastReadMessage &&
+                      messageData?.[conversationId]?.[i + 1]?.senderId !==
+                        userDetails?._id && <UnreadMessage />}
                   </div>
-                ) : (
-                  // {/* <!-- received --> */}
-                  <>
-                    <div className={`flex gap-2`}>
-                      <div className="relative w-9 h-9">
-                        <Image
-                          src={msgData?.user?.avatar}
-                          alt="profile"
-                          className="rounded-full shadow"
-                          fill={true}
-                        />
-                      </div>
-                      <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery">
-                        {e.text}
-                      </div>
-                    </div>
-                  </>
-                )}
-                {messageData?.[conversationId].length > i + 1 &&
-                  e._id === msgData?.lastReadMessage &&
-                  messageData?.[conversationId]?.[i + 1]?.senderId !==
-                    userDetails?._id && <UnreadMessage />}
-              </div>
-            </Fragment>
-          ))}
-          {/* <!-- time --> */}
-          {/* <div className="flex justify-center ">
+                </Fragment>
+              ))}
+              {/* <!-- time --> */}
+              {/* <div className="flex justify-center ">
             <div className="font-medium text-gray-500 text-sm dark:text-white/70">
               April 8,2023,6:30 AM
             </div>
           </div> */}
 
-          {/* <!-- sent media--> */}
-          {/* <div className="flex gap-2 flex-row-reverse items-end">
+              {/* <!-- sent media--> */}
+              {/* <div className="flex gap-2 flex-row-reverse items-end">
             <div className="relative w-4 h-4">
               <Image
                 src="/people-know/avatar-3.jpg"
@@ -333,12 +381,15 @@ export default function Messages({ userId }) {
               </div>
             </a>
           </div> */}
-        </div>
-        <div ref={bottomScroll}></div>
+            </div>
+            <div ref={bottomScroll}></div>
+          </>
+        )}
       </div>
 
       {/* <!-- sending message area --> */}
-      <div className="flex items-center md:gap-4 gap-2 md:p-3 p-2 h-14 fixed w-full bottom-0 bg-white shadow-lg">
+      {/* <div className=" items-center md:gap-4 gap-2 md:p-3 p-2 h-14 fixed w-full bottom-0 bg-white shadow-lg"> */}
+      <div className="flex justify-between items-center gap-2 h-14 fixed w-[-webkit-fill-available] bottom-0 bg-white z-20 p-2 border-t shadow-lg">
         <div
           id="message__wrap"
           className="flex items-center gap-2 h-full dark:text-white -mt-1.5"
@@ -350,23 +401,23 @@ export default function Messages({ userId }) {
             <IoHappyOutline className="text-3xl flex md" />
           </button>
         </div>
-        <form onSubmit={handleSendMessage} className="relative flex-1">
+        <div className="relative flex-1 ">
           <input
             placeholder="Write your message"
             className="w-full resize-none bg-secondery rounded-full px-4 p-2"
-            onChange={(e) =>
-              setMsgData((presVal) => ({ ...presVal, message: e.target.value }))
-            }
+            onChange={handleOnChange}
             value={msgData.message}
+            onKeyDown={handleKeyDown}
           ></input>
 
           <button
-            type="submit"
+            type="button"
             className="shrink-0 p-2 absolute right-0.5 top-0"
+            onClick={handleSendMessage}
           >
             <IoSendOutline className="text-xl flex md" />
           </button>
-        </form>
+        </div>
 
         {/* <button type="button" className="flex h-full dark:text-white" onClick={handleSendMessage}>
         &#128077;
@@ -375,7 +426,7 @@ export default function Messages({ userId }) {
         <button
           type="button"
           className="flex h-full dark:text-white text-2xl" // Use text size classes
-          onClick={handleSendMessage}
+          onClick={(e) => handleSendMessage(e, "like")}
         >
           &#128077;
         </button>
