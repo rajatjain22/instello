@@ -11,6 +11,7 @@ function UserContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [socket, setSocket] = useState(null);
 
   const isPublicPath =
     path === "/login" || path === "/register" || path === "/forget-password";
@@ -36,6 +37,13 @@ function UserContextProvider({ children }) {
 
         if (userData?.message && postData?.message) {
           setUserDetails({ ...userData.data, posts: postData.data });
+          if (!socketData && userData.data._id) {
+            setSocket(connectSocket(userData.data._id));
+          }
+
+          socketData?.on("getUsers", (users) => {
+            console.log("activeUsers ==> ", users);
+          });
         } else {
           throw new Error("Response did not contain expected data");
         }

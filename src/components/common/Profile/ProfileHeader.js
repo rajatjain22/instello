@@ -11,6 +11,7 @@ import { MessageContext } from "@/app/_context/Message";
 export default function ProfileHeader({ profile, setProfile }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const { socket } = useContext(MessageContext);
+
   const [isOpen, setIsOpen] = useState(false);
   const [modelVal, setModelVal] = useState("");
   const [followBtnLoading, setFollowBtnLoading] = useState(false);

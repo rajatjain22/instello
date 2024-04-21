@@ -24,6 +24,7 @@ export async function GET(request) {
       message: "Success",
       conversation,
       id: conversation._id,
+
     });
   } catch (error) {
     console.log(error.message);

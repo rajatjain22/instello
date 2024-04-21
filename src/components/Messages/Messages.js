@@ -15,6 +15,7 @@ import {
 import { BsInfoCircle } from "react-icons/bs";
 import { UserContext } from "@/app/_context/User";
 import { MessageContext } from "@/app/_context/Message";
+
 import UnreadMessage from "./UnreadMessage";
 import { formatTimestampOnDays } from "@/helpers/all";
 import DocumentModel from "./DocumentModel";
@@ -24,6 +25,8 @@ export default function Messages({ userId }) {
   const { userDetails } = useContext(UserContext);
   const { socket } = useContext(MessageContext);
 
+  const { conversationId, setConversationId, messageData, setMessageData } =
+    useContext(MessageContext);
   const [msgData, setMsgData] = useState({
     user: {},
     lastReadMessage: null,
@@ -169,25 +172,36 @@ export default function Messages({ userId }) {
     setMsgData((presVal) => ({ ...presVal, message: "" }));
   };
 
+  const handleSendMessage = () => {
+    socket.emit("send_message", {
+      conversationId: conversationId ?? "new",
+      senderId: userDetails?._id,
+      receiverId: userId,
+      type: "text",
+      text: msgData.message,
+    });
+    setMsgData((presVal) => ({ ...presVal, message: "" }));
+  };
+
   if (msgData.pageLoading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="flex-1 ">
+    <div className='flex-1 '>
       {/* <!-- chat heading --> */}
-      <div className="flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700">
-        <div className="flex items-center sm:gap-4 gap-2">
+      <div className='flex items-center justify-between gap-2 w- px-6 py-3.5 z-10 border-b dark:border-slate-700'>
+        <div className='flex items-center sm:gap-4 gap-2'>
           {/* <!-- toggle for mobile --> */}
-          <Link href="/messages" className="md:hidden">
-            <IoChevronBackOutline className="text-2xl -ml-4 md" />
+          <Link href='/messages' className='md:hidden'>
+            <IoChevronBackOutline className='text-2xl -ml-4 md' />
           </Link>
 
-          <div className="relative w-8 h-8 cursor-pointer max-md:hidden">
+          <div className='relative w-8 h-8 cursor-pointer max-md:hidden'>
             <Image
               src={msgData?.user?.avatar}
-              alt="profile"
-              className="rounded-full shadow"
+              alt='profile'
+              className='rounded-full shadow'
               fill={true}
             />
             <div
@@ -210,48 +224,48 @@ export default function Messages({ userId }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button type="button" className="button__ico">
-            <FaPhoneAlt className="text-2xl" />
+        <div className='flex items-center gap-4'>
+          <button type='button' className='button__ico'>
+            <FaPhoneAlt className='text-2xl' />
           </button>
           <button
-            type="button"
-            className="hover:bg-slate-100 p-1.5 rounded-full"
+            type='button'
+            className='hover:bg-slate-100 p-1.5 rounded-full'
           >
-            <IoVideocamOutline className="text-2xl" />
+            <IoVideocamOutline className='text-2xl' />
           </button>
           <button
-            type="button"
-            className="hover:bg-slate-100 p-1.5 rounded-full"
+            type='button'
+            className='hover:bg-slate-100 p-1.5 rounded-full'
           >
-            <BsInfoCircle className="text-2xl" />
+            <BsInfoCircle className='text-2xl' />
           </button>
         </div>
       </div>
 
       {/* <!-- chats bubble --> */}
-      <div className="w-full p-5 overflow-y-auto sm:h-[calc(100vh-137px)] h-[calc(100vh-127px)]">
-        <div className="py-5 text-center text-sm lg:pt-8">
-          <div className="relative w-24 h-24 rounded-full mx-auto mb-3">
+      <div className='w-full p-5 overflow-y-auto sm:h-[calc(100vh-137px)] h-[calc(100vh-127px)]'>
+        <div className='py-5 text-center text-sm lg:pt-8'>
+          <div className='relative w-24 h-24 rounded-full mx-auto mb-3'>
             <Image
               src={msgData?.user?.avatar}
-              alt="profile"
-              className="rounded-full shadow"
+              alt='profile'
+              className='rounded-full shadow'
               fill={true}
             />
           </div>
-          <div className="mt-8">
-            <div className="md:text-xl text-base font-medium text-black dark:text-white">
+          <div className='mt-8'>
+            <div className='md:text-xl text-base font-medium text-black dark:text-white'>
               {msgData?.user?.fullName}
             </div>
-            <div className="text-gray-500 text-sm dark:text-white/80">
+            <div className='text-gray-500 text-sm dark:text-white/80'>
               @{msgData?.user?.username}
             </div>
           </div>
-          <div className="mt-3.5">
+          <div className='mt-3.5'>
             <Link
               href={`/profile/${userId}`}
-              className="inline-block rounded-lg px-4 py-1.5 text-sm font-semibold bg-secondery"
+              className='inline-block rounded-lg px-4 py-1.5 text-sm font-semibold bg-secondery'
             >
               View profile
             </Link>
@@ -338,18 +352,19 @@ export default function Messages({ userId }) {
       </div>
 
       {/* <!-- sending message area --> */}
-      <div className="flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden">
+      <div className='flex items-center md:gap-4 gap-2 md:p-3 p-2 overflow-hidden'>
         <div
-          id="message__wrap"
-          className="flex items-center gap-2 h-full dark:text-white -mt-1.5"
+          id='message__wrap'
+          className='flex items-center gap-2 h-full dark:text-white -mt-1.5'
         >
-          <button type="button" className="shrink-0">
-            <IoAddCircleOutline className="text-3xl flex md" />
+          <button type='button' className='shrink-0'>
+            <IoAddCircleOutline className='text-3xl flex md' />
           </button>
-          <button type="button">
-            <IoHappyOutline className="text-3xl flex md" />
+          <button type='button'>
+            <IoHappyOutline className='text-3xl flex md' />
           </button>
         </div>
+
         <form onSubmit={handleSendMessage} className="relative flex-1">
           <input
             placeholder="Write your message"
@@ -364,7 +379,7 @@ export default function Messages({ userId }) {
             type="submit"
             className="shrink-0 p-2 absolute right-0.5 top-0"
           >
-            <IoSendOutline className="text-xl flex md" />
+            <IoSendOutline className='text-xl flex md' />
           </button>
         </form>
 
