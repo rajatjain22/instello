@@ -164,7 +164,7 @@ export default function Messages({ userId }) {
       avatar: msgData?.user?.avatar,
       username: msgData?.user?.username,
       type: "text",
-      text: e?.target?.innerText ?? msgData.message,
+      text: msgData.message,
     });
     setMsgData((presVal) => ({ ...presVal, message: "" }));
   };
@@ -373,12 +373,12 @@ export default function Messages({ userId }) {
           <IoHeartOutline className="text-3xl flex -mt-3 md" />
         </button> */}
         <button
-  type="button"
-  className="flex h-full dark:text-white text-2xl" // Use text size classes
-  onClick={handleSendMessage}
->
-  &#128077;
-</button>
+          type="button"
+          className="flex h-full dark:text-white text-2xl" // Use text size classes
+          onClick={handleSendMessage}
+        >
+          &#128077;
+        </button>
       </div>
     </div>
   );
