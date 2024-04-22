@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import BtnLoading from "../Loaders/Login/BtnLoading";
-import { onValidEmail, onValidPassword, onValidUsername } from "@/helpers/all";
-import { debounce } from "@/helpers/debounce";
-import { FaCheck } from "react-icons/fa";
-import toast from "react-hot-toast";
+import { onValidEmail } from "@/helpers/all";
+
 import UsernameInput from "../common/UsernameInput";
 
 export default function LoginForm({ formType, onSubmit, loading }) {

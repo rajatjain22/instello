@@ -53,3 +53,9 @@ export function ImageLoading4({className}) {
     </div>
   );
 }
+
+export function ImageLoading5({className}) {
+  return (
+    <div className={style["lds-ripple"]}><div></div><div></div></div>
+  );
+}

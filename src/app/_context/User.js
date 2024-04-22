@@ -1,6 +1,5 @@
 "use client";
 
-import { connectSocket, socketData } from "@/helpers/socket";
 import { usePathname } from "next/navigation";
 import React, { createContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -10,12 +9,10 @@ const UserContext = createContext(undefined);
 function UserContextProvider({ children }) {
   const path = usePathname();
   const [userDetails, setUserDetails] = useState(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const isPublicPath =
-    path === "/login" || path === "/register" || path === "/forget-password";
-
-  useEffect(() => {
+  const isPublicPath = ["/login", "/register", "/forget-password"].includes(path);
+  
+    useEffect(() => {
     console.log("User context api start");
 
     const fetchData = async () => {
@@ -47,12 +44,10 @@ function UserContextProvider({ children }) {
     if (!isPublicPath) {
       fetchData();
     }
-  }, [isPublicPath, isLoggedIn]);
+  }, [isPublicPath]);
 
   return (
-    <UserContext.Provider
-      value={{ userDetails, setUserDetails, isLoggedIn, setIsLoggedIn }}
-    >
+     <UserContext.Provider value={{ userDetails, setUserDetails }}>
       {children}
     </UserContext.Provider>
   );

@@ -18,14 +18,14 @@ export default function RootLayout({ children }) {
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         >
+        <PostContextProvider>
           <UserContextProvider>
-            <PostContextProvider>
               <MessageContextProvider>
                 <Provider>{children}</Provider>
                 <Toaster position="top-right" reverseOrder={false} />
               </MessageContextProvider>
-            </PostContextProvider>
           </UserContextProvider>
+        </PostContextProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

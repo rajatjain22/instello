@@ -3,7 +3,7 @@
 import AddPost from "@/components/common/Posts/AddPost";
 import PostContainer from "@/components/layout/PostContainer";
 import PeopleKnow from "@/components/layout/PeopleKnow";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import PostPlaceholder from "@/components/Placeholders/PostPlaceholder";
 
@@ -19,24 +19,32 @@ export default function Home() {
     setHomePostPage,
     homePostHasMore,
     setHomePostHasMore,
+    setHomePostsLoading
   } = useContext(PostContext);
 
-  const getHomePost = () => {
-    fetch(`/api/post/get?page=${homePostPage}`)
-      .then((res) => res.json())
-      .then((res) => {
-        if (res?.message) {
-          setHomePosts((presVal) => [...presVal, ...res.data]);
-          setHomePostPage((presVal) => presVal + 1);
-          setHomePostHasMore(res.hasMore);
-        } else {
-          console.log(res.error);
+   const getHomePost = async () => {
+      try {
+        const res = await fetch("/api/post/get");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch home posts");
         }
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-  };
+
+        const data = await res.json();
+
+        if (data?.message) {
+          setHomePosts(prevPosts => [...prevPosts, ...data.data]);
+          setHomePostPage(prevPage => prevPage + 1);
+          setHomePostHasMore(data.hasMore);
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error("Error while fetching home posts:", error.message);
+      } finally {
+        setHomePostsLoading(false);
+      }
+    };
 
   return (
     <>

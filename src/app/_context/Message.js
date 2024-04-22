@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 const MessageContext = createContext(undefined);
 
 function MessageContextProvider({ children }) {
+  const path = usePathname();
   const { userDetails } = useContext(UserContext);
   const [conversationId, setConversationId] = useState("new");
   const [conversations, setConversations] = useState([]);
@@ -17,23 +18,33 @@ function MessageContextProvider({ children }) {
   const [messageData, setMessageData] = useState(null);
   const [socket, setSocket] = useState(null);
 
+  const isPublicPath = ["/login", "/register", "/forget-password"].includes(path);
+
   useEffect(() => {
-    let socketData = null;
-    if (userDetails?._id) {
-      socketData = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
-        query: `user_id=${userDetails?._id}`,
-      });
+    console.log("Message context running");
 
-      socketData.on("connect", () => {
-        console.log("Socket connected");
-        setSocket(socketData);
-      });
-
-      socketData.on("getUsers", (users) => {
-        console.log("Active users:", users);
-      });
+    if (!userDetails?._id) {
+      return;
     }
+
+    const socketData = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+      query: `user_id=${userDetails?._id}`,
+    });
+
+    socketData.on("connect", () => {
+      console.log("Socket connected");
+      setSocket(socketData);
+    });
+
+    socketData.on("getUsers", (users) => {
+      console.log("Active users:", users);
+    });
+
+    return () => {
+      socketData.disconnect();
+    };
   }, [userDetails]);
+  
 
   useEffect(() => {
     if (socket) {

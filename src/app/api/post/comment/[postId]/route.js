@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/dbconfig/dbconfig";
 import Posts from "@/schemas/PostModel";
 import Comments from "@/schemas/CommetModel";
-import { IoConstructOutline } from "react-icons/io5";
-
 
 dbConnect();
 

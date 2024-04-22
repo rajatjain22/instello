@@ -3,41 +3,45 @@
 import { usePathname } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
-const PostContext = createContext();
+const PostContext = createContext(undefined);
 
 const PostContextProvider = ({ children }) => {
   const path = usePathname();
-  const isPublicPath =
-    path === "/login" || path === "/register" || path === "/forget-password";
+  const isPublicPath = ["/login", "/register", "/forget-password"].includes(path);
 
   const [homePosts, setHomePosts] = useState([]);
   const [homePostsLoading, setHomePostsLoading] = useState(true);
   const [homePostPage, setHomePostPage] = useState(0);
   const [homePostHasMore, setHomePostHasMore] = useState(true);
-
   const [explorePosts, setExplorePosts] = useState([]);
 
-  useEffect(() => {
-    console.log("Post context api start");
-    const getHomePost = () => {
-      fetch("/api/post/get")
-        .then((res) => res.json())
-        .then((res) => {
-          if (res?.message) {
-            setHomePosts(res.data);
-            setHomePostPage((presVal) => presVal + 1);
-            setHomePostHasMore(res.hasMore);
-          } else {
-            console.log(res.error);
-          }
-        })
-        .catch((error) => {
-          console.log(error.message);
-        })
-        .finally(() => {
-          setHomePostsLoading(false);
-        });
+ useEffect(() => {
+    console.log("Post context API start");
+
+    const getHomePost = async () => {
+      try {
+        const res = await fetch("/api/post/get");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch home posts");
+        }
+
+        const data = await res.json();
+
+        if (data?.message) {
+          setHomePosts(prevPosts => [...prevPosts, ...data.data]);
+          setHomePostPage(prevPage => prevPage + 1);
+          setHomePostHasMore(data.hasMore);
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error("Error while fetching home posts:", error.message);
+      } finally {
+        setHomePostsLoading(false);
+      }
     };
+
     if (!isPublicPath) {
       getHomePost();
     }
@@ -54,7 +58,6 @@ const PostContextProvider = ({ children }) => {
         setHomePostPage,
         homePostHasMore,
         setHomePostHasMore,
-
         explorePosts,
         setExplorePosts,
       }}
