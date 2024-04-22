@@ -1,3 +1,4 @@
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { UserContextProvider } from "./_context/User";
@@ -5,6 +6,8 @@ import { PostContextProvider } from "./_context/Post";
 import Provider from "./Provider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { MessageContextProvider } from "./_context/Message";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Home",
@@ -14,18 +17,18 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className="">
-      <body>
+      <body className={inter.className}>
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
         >
-        <PostContextProvider>
-          <UserContextProvider>
+          <PostContextProvider>
+            <UserContextProvider>
               <MessageContextProvider>
                 <Provider>{children}</Provider>
                 <Toaster position="top-right" reverseOrder={false} />
               </MessageContextProvider>
-          </UserContextProvider>
-        </PostContextProvider>
+            </UserContextProvider>
+          </PostContextProvider>
         </GoogleOAuthProvider>
       </body>
     </html>

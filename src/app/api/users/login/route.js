@@ -50,8 +50,6 @@ export async function POST(request) {
       "Set-Cookie": `token=${token}; HttpOnly=true; Max-Age=${expirationTimeInSeconds}; Path=/`,
     };
 
-    console.log(headers)
-
     return NextResponse.json({ message: "Logged in successfully!" }, { headers });
 
   } catch (error) {

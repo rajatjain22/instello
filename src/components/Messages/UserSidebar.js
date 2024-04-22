@@ -5,12 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { IoIosCheckmarkCircleOutline } from "react-icons/io";
-import {
-  IoChevronBackOutline,
-  IoChevronDownOutline,
-  IoSettingsOutline,
-} from "react-icons/io5";
 import SearchForm from "../common/SearchForm";
 import toast from "react-hot-toast";
 import User from "../common/User";
@@ -100,16 +94,16 @@ export default function UserSidebar() {
       }
     };
     fetchData();
-// console.log("userDetails", userDetails);
-//     socket?.emit(
-//       "get_conversations",
-//       { userId: userDetails._id },
-//       (conversatiosn) => {
-//         setConversationsLoading(true);
-//         setConversations([...conversatiosn]);
-//         setConversationsLoading(false);
-//       }
-//     );
+    // console.log("userDetails", userDetails);
+    //     socket?.emit(
+    //       "get_conversations",
+    //       { userId: userDetails._id },
+    //       (conversatiosn) => {
+    //         setConversationsLoading(true);
+    //         setConversations([...conversatiosn]);
+    //         setConversationsLoading(false);
+    //       }
+    //     );
   }, [userDetails]);
 
   return (
@@ -127,7 +121,24 @@ export default function UserSidebar() {
         <div className="flex my-2 items-center justify-between">
           <div className="flex items-center gap-2">
             <Link href="/" className="md:hidden pl-2">
-              <IoChevronBackOutline className="text-2xl -ml-4 md" />
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                className="text-2xl -ml-4 md"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="48"
+                  d="M328 112 184 256l144 144"
+                ></path>
+              </svg>
             </Link>
             <h2 className="text-2xl font-bold text-black ml-1 dark:text-white">
               Chats
@@ -136,21 +147,63 @@ export default function UserSidebar() {
 
           {/* <!-- right action buttons --> */}
           <div className="flex items-center gap-2.5">
-            <button
-              className="group"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              <IoSettingsOutline className="text-2xl flex group-aria-expanded:rotate-180 md" />
+            <button className="group">
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                className="text-2xl flex group-aria-expanded:rotate-180 md"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="32"
+                  d="M262.29 192.31a64 64 0 1 0 57.4 57.4 64.13 64.13 0 0 0-57.4-57.4zM416.39 256a154.34 154.34 0 0 1-1.53 20.79l45.21 35.46a10.81 10.81 0 0 1 2.45 13.75l-42.77 74a10.81 10.81 0 0 1-13.14 4.59l-44.9-18.08a16.11 16.11 0 0 0-15.17 1.75A164.48 164.48 0 0 1 325 400.8a15.94 15.94 0 0 0-8.82 12.14l-6.73 47.89a11.08 11.08 0 0 1-10.68 9.17h-85.54a11.11 11.11 0 0 1-10.69-8.87l-6.72-47.82a16.07 16.07 0 0 0-9-12.22 155.3 155.3 0 0 1-21.46-12.57 16 16 0 0 0-15.11-1.71l-44.89 18.07a10.81 10.81 0 0 1-13.14-4.58l-42.77-74a10.8 10.8 0 0 1 2.45-13.75l38.21-30a16.05 16.05 0 0 0 6-14.08c-.36-4.17-.58-8.33-.58-12.5s.21-8.27.58-12.35a16 16 0 0 0-6.07-13.94l-38.19-30A10.81 10.81 0 0 1 49.48 186l42.77-74a10.81 10.81 0 0 1 13.14-4.59l44.9 18.08a16.11 16.11 0 0 0 15.17-1.75A164.48 164.48 0 0 1 187 111.2a15.94 15.94 0 0 0 8.82-12.14l6.73-47.89A11.08 11.08 0 0 1 213.23 42h85.54a11.11 11.11 0 0 1 10.69 8.87l6.72 47.82a16.07 16.07 0 0 0 9 12.22 155.3 155.3 0 0 1 21.46 12.57 16 16 0 0 0 15.11 1.71l44.89-18.07a10.81 10.81 0 0 1 13.14 4.58l42.77 74a10.8 10.8 0 0 1-2.45 13.75l-38.21 30a16.05 16.05 0 0 0-6.05 14.08c.33 4.14.55 8.3.55 12.47z"
+                ></path>
+              </svg>
             </button>
 
             <button className="">
-              <IoIosCheckmarkCircleOutline className="text-2xl flex md" />
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                className="text-2xl flex md"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M362.6 192.9L345 174.8c-.7-.8-1.8-1.2-2.8-1.2-1.1 0-2.1.4-2.8 1.2l-122 122.9-44.4-44.4c-.8-.8-1.8-1.2-2.8-1.2-1 0-2 .4-2.8 1.2l-17.8 17.8c-1.6 1.6-1.6 4.1 0 5.7l56 56c3.6 3.6 8 5.7 11.7 5.7 5.3 0 9.9-3.9 11.6-5.5h.1l133.7-134.4c1.4-1.7 1.4-4.2-.1-5.7z"></path>
+                <path d="M256 76c48.1 0 93.3 18.7 127.3 52.7S436 207.9 436 256s-18.7 93.3-52.7 127.3S304.1 436 256 436c-48.1 0-93.3-18.7-127.3-52.7S76 304.1 76 256s18.7-93.3 52.7-127.3S207.9 76 256 76m0-28C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48z"></path>
+              </svg>
             </button>
 
             {/* <!-- mobile toggle menu --> */}
             <button type="button" className="md:hidden">
-              <IoChevronDownOutline />
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                strokeWidth="0"
+                viewBox="0 0 512 512"
+                className="text-2xl -ml-4 md"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="48"
+                  d="M328 112 184 256l144 144"
+                ></path>
+              </svg>
             </button>
           </div>
         </div>
@@ -227,7 +280,6 @@ export default function UserSidebar() {
                   <div className="text-xs font-light text-gray-500 dark:text-white/70">
                     {/* {formatTimestamp(val?.lastMessageCreatedAt)} */}
                     {formatTimestampOnDays(val?.lastMessageCreatedAt)}
-
                   </div>
                 </div>
                 <div className="flex items-center justify-between gap-2 mb-1.5">

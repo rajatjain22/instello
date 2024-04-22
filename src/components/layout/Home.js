@@ -19,50 +19,50 @@ export default function Home() {
     setHomePostPage,
     homePostHasMore,
     setHomePostHasMore,
-    setHomePostsLoading
+    setHomePostsLoading,
   } = useContext(PostContext);
 
-   const getHomePost = async () => {
-      try {
-        const res = await fetch("/api/post/get");
+  const getHomePost = async () => {
+    try {
+      const res = await fetch(`/api/post/get?page=${homePostPage}`);
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch home posts");
-        }
-
-        const data = await res.json();
-
-        if (data?.message) {
-          setHomePosts(prevPosts => [...prevPosts, ...data.data]);
-          setHomePostPage(prevPage => prevPage + 1);
-          setHomePostHasMore(data.hasMore);
-        } else {
-          console.error(data.error);
-        }
-      } catch (error) {
-        console.error("Error while fetching home posts:", error.message);
-      } finally {
-        setHomePostsLoading(false);
+      if (!res.ok) {
+        throw new Error("Failed to fetch home posts");
       }
-    };
+
+      const data = await res.json();
+
+      if (data?.message) {
+        setHomePosts((prevPosts) => [...prevPosts, ...data.data]);
+        setHomePostPage((prevPage) => prevPage + 1);
+        setHomePostHasMore(data.hasMore);
+      } else {
+        console.error(data.error);
+      }
+    } catch (error) {
+      console.error("Error while fetching home posts:", error.message);
+    } finally {
+      setHomePostsLoading(false);
+    }
+  };
 
   return (
     <>
       <Story />
-      <div className='flex max-lg:flex-col xl:gap-10 md:gap-3 md:mt-10'>
-        <div className='w-full md:max-w-[475px] mx-auto flex-1 xl:space-y-6 space-y-3'>
+      <div className="flex max-lg:flex-col xl:gap-10 md:gap-3 md:mt-10">
+        <div className="w-full md:max-w-[475px] mx-auto flex-1 xl:space-y-6 space-y-3">
           <AddPost setPosts={setHomePosts} />
           <InfiniteScroll
             dataLength={homePosts.length}
             next={getHomePost}
             hasMore={homePostHasMore}
             loader={<PostPlaceholder />}
-            className='xl:space-y-6 space-y-3'
+            className="xl:space-y-6 space-y-3"
           >
             <PostContainer postLoading={homePostsLoading} posts={homePosts} />
           </InfiniteScroll>
         </div>
-        <div className='w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto gap-5'>
+        <div className="w-full hidden lg:block lg:max-w-[340px] md:max-w-[575px] mx-auto gap-5">
           <PeopleKnow />
         </div>
       </div>

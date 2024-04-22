@@ -18,7 +18,9 @@ function MessageContextProvider({ children }) {
   const [messageData, setMessageData] = useState(null);
   const [socket, setSocket] = useState(null);
 
-  const isPublicPath = ["/login", "/register", "/forget-password"].includes(path);
+  const isPublicPath = ["/login", "/register", "/forget-password"].includes(
+    path
+  );
 
   useEffect(() => {
     console.log("Message context running");
@@ -44,20 +46,26 @@ function MessageContextProvider({ children }) {
       socketData.disconnect();
     };
   }, [userDetails]);
-  
 
   useEffect(() => {
-    if (socket) {
+    if (socket && socket.connected) {
+      console.log("Socket is connected. Setting up event listeners.");
+
       socket.on("new_friend_request", (data) => {
         toast.custom((t) => (
           <CustomToast id={t.id} visible={t.visible} data={data} />
         ));
       });
-
+      
       const handleMessage = (data, type) => {
-        if (!data.conversationId) return;
+       if (!data.conversationId) {
+          console.warn("No conversationId in data");
+          return;
+        }
 
-        conversationId === "new" && setConversationId(data.conversationId);
+        if (conversationId === "new") {
+          setConversationId(data.conversationId);
+        }
 
         // Update message data
         setMessageData((prevState) => ({
@@ -106,15 +114,16 @@ function MessageContextProvider({ children }) {
       };
 
       socket.on("send_new_message", (data) => handleMessage(data, "send"));
-      socket.on("receive_new_message", (data) =>
-        handleMessage(data, "receive")
-      );
+      socket.on("receive_new_message", (data) => handleMessage(data, "receive"));
 
       return () => {
+        console.log("Cleaning up event listeners");
         socket.off("new_friend_request");
         socket.off("send_new_message");
         socket.off("receive_new_message");
       };
+    } else {
+      console.warn("Socket is not connected. Cannot set event listeners.");
     }
   }, [userDetails, conversationId, socket]);
 
