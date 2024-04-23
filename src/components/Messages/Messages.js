@@ -5,12 +5,11 @@ import Link from "next/link";
 import { Fragment, useContext, useEffect, useRef, useState } from "react";
 import { UserContext } from "@/app/_context/User";
 import { MessageContext } from "@/app/_context/Message";
-import UnreadMessage from "./UnreadMessage";
 import { formatTimestampOnDays } from "@/helpers/all";
 import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
 import DocumentModel from "./DocumentModel";
-import ImageSwiper from "./ImageSwiper";
 import ImageSlider from "./ImageSlider";
+import { RenderMessages } from "./MessageType";
 
 export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
@@ -19,9 +18,10 @@ export default function Messages({ userId }) {
   const { socket } = useContext(MessageContext);
   const [filesRef, setFileRef] = useState([]);
 
+  const [unreadMessage, setunreadMessage] = useState(true);
+
   const [msgData, setMsgData] = useState({
     user: {},
-    unreadMessage: false,
     lastReadMessage: null,
     message: "",
     documentSend: false,
@@ -41,10 +41,11 @@ export default function Messages({ userId }) {
 
   useEffect(() => {
     if (bottomScroll.current) {
-      if (document.getElementById("unreadmessageid")) {
+      if (unreadMessage && document.getElementById("unreadmessageid")) {
         document
           .getElementById("unreadmessageid")
           .scrollIntoView({ behavior: "smooth", block: "center" });
+        setunreadMessage(false);
       } else {
         bottomScroll.current.scrollIntoView({
           behavior: "smooth",
@@ -168,7 +169,6 @@ export default function Messages({ userId }) {
   }, [messageData]);
 
   const handleSendMessage = (e, type = "") => {
-    setMsgData((prevState) => ({ ...prevState, unreadMessage: false }));
 
     // Get the message from the event target
     let message = msgData?.message ?? "";
@@ -193,6 +193,7 @@ export default function Messages({ userId }) {
       avatar: msgData?.user?.avatar,
       username: msgData?.user?.username,
       type: "text",
+      file: filesRef,
       text: messageText,
     };
 
@@ -201,6 +202,7 @@ export default function Messages({ userId }) {
 
     // Clear the message in `msgData` after sending
     setMsgData((prevVal) => ({ ...prevVal, message: "" }));
+    setFileRef([]);
   };
 
   const handleKeyDown = (event) => {
@@ -386,51 +388,11 @@ export default function Messages({ userId }) {
         ) : (
           <>
             <div className="font-medium space-y-2 mb-16">
-              {messageData?.[conversationId]?.map((e, i) => (
-                <Fragment key={e._id || `msg-${i}`}>
-                  <div>
-                    {e.senderId === userDetails?._id ? (
-                      // {/* <!-- sent --> */}
-                      <div className={`flex gap-2 flex-row-reverse items-end`}>
-                        <div className="relative w-5 h-5">
-                          <Image
-                            src={userDetails?.avatar}
-                            alt="profile"
-                            className="rounded-full shadow"
-                            fill={true}
-                          />
-                        </div>
-                        <div
-                          className={`px-4 py-2  max-w-sm rounded-[20px] text-white shadow bg-gradient-to-tr from-sky-500 to-blue-500`}
-                        >
-                          {e.text}
-                        </div>
-                      </div>
-                    ) : (
-                      // {/* <!-- received --> */}
-                      <>
-                        <div className={`flex gap-2`}>
-                          <div className="relative w-9 h-9">
-                            <Image
-                              src={msgData?.user?.avatar}
-                              alt="profile"
-                              className="rounded-full shadow"
-                              fill={true}
-                            />
-                          </div>
-                          <div className="px-4 py-2 rounded-[20px] max-w-sm bg-secondery">
-                            {e.text}
-                          </div>
-                        </div>
-                      </>
-                    )}
-                    {messageData?.[conversationId].length > i + 1 &&
-                      e._id === msgData?.lastReadMessage &&
-                      messageData?.[conversationId]?.[i + 1]?.senderId !==
-                        userDetails?._id && <UnreadMessage />}
-                  </div>
-                </Fragment>
-              ))}
+              <RenderMessages
+                messages={messageData?.[conversationId]}
+                userDetails={userDetails}
+                msgData={msgData}
+              />
               {/* <!-- time --> */}
               {/* <div className="flex justify-center ">
             <div className="font-medium text-gray-500 text-sm dark:text-white/70">
@@ -438,7 +400,6 @@ export default function Messages({ userId }) {
             </div>
           </div> */}
 
-              {/* <!-- sent media--> */}
               {/* <div className="flex gap-2 flex-row-reverse items-end">
             <div className="relative w-4 h-4">
               <Image
@@ -470,7 +431,7 @@ export default function Messages({ userId }) {
 
       <input
         disabled={filesRef?.length >= 4}
-        accept="image/*,video/*"
+        accept="image/*"
         ref={inputRef}
         multiple
         onChange={(e) => {
@@ -498,7 +459,6 @@ export default function Messages({ userId }) {
             )}
             {filesRef.length > 0 && (
               <div className="bg-white p-8">
-                {/* <ImageSwiper /> */}
                 <ImageSlider
                   filesRef={filesRef}
                   setFileRef={setFileRef}

@@ -56,9 +56,9 @@ function MessageContextProvider({ children }) {
           <CustomToast id={t.id} visible={t.visible} data={data} />
         ));
       });
-      
+console.log("object")
       const handleMessage = (data, type) => {
-       if (!data.conversationId) {
+        if (!data.conversationId) {
           console.warn("No conversationId in data");
           return;
         }
@@ -114,7 +114,9 @@ function MessageContextProvider({ children }) {
       };
 
       socket.on("send_new_message", (data) => handleMessage(data, "send"));
-      socket.on("receive_new_message", (data) => handleMessage(data, "receive"));
+      socket.on("receive_new_message", (data) =>
+        handleMessage(data, "receive")
+      );
 
       return () => {
         console.log("Cleaning up event listeners");
