@@ -1,4 +1,4 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import verifyOnJWT from "./jwt/verifyOnEdge";
 
 export async function middleware(request) {
@@ -19,20 +19,29 @@ export async function middleware(request) {
     const isAuth = verifyData?.payload;
 
     if (!isAuth) {
-      const response = NextResponse.next();
-      response.cookies.set("token", "", {
-        httpOnly: true,
-        expires: new Date(0),
-      });
-      return response;
-      return response.json(
+      const headers = {
+        "Set-Cookie": `token=; HttpOnly=true; expires=${new Date(
+          0
+        ).toUTCString()}; path=/`,
+      };
+      // Respond with JSON indicating an error message
+      return NextResponse.json(
         { success: false, message: "authentication failed" },
-        { status: 401 }
+        { status: 401, headers }
       );
-      return NextResponse.redirect(new URL("/login", request.nextUrl));
+      // const response = NextResponse.next();
+      // response.cookies.set("token", "", {
+      //   httpOnly: true,
+      //   expires: new Date(0),
+      // });
+      // return response;
+      // return response.json(
+      //   { success: false, message: "authentication failed" },
+      //   { status: 401 }
+      // );
+      // return NextResponse.redirect(new URL("/login", request.nextUrl));
     }
 
-    
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-user-id", isAuth.id);
     const response = NextResponse.next({
@@ -48,7 +57,7 @@ export async function middleware(request) {
       return NextResponse.redirect(new URL("/", request.nextUrl));
     }
 
-    if (!isPublicPath && !token) {
+    if (!isPublicPath && !token && token === "") {
       return NextResponse.redirect(new URL("/login", request.nextUrl));
     }
   }
@@ -64,6 +73,8 @@ export const config = {
     "/register",
     "/forget-password",
     "/explore",
+    "/messages",
+    "/messages/:path*",
     "/profile",
     "/profile/:path*",
     "/api/:path*",

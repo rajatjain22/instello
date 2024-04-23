@@ -9,14 +9,19 @@ import UnreadMessage from "./UnreadMessage";
 import { formatTimestampOnDays } from "@/helpers/all";
 import { ImageLoading4 } from "../Loaders/Profile/ImageLoading";
 import DocumentModel from "./DocumentModel";
+import ImageSwiper from "./ImageSwiper";
+import ImageSlider from "./ImageSlider";
 
 export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
+  const inputRef = useRef(null);
   const { userDetails } = useContext(UserContext);
   const { socket } = useContext(MessageContext);
+  const [filesRef, setFileRef] = useState([]);
 
   const [msgData, setMsgData] = useState({
     user: {},
+    unreadMessage: false,
     lastReadMessage: null,
     message: "",
     documentSend: false,
@@ -36,7 +41,16 @@ export default function Messages({ userId }) {
 
   useEffect(() => {
     if (bottomScroll.current) {
-      bottomScroll.current.scrollIntoView({ behavior: "smooth", block: "end" });
+      if (document.getElementById("unreadmessageid")) {
+        document
+          .getElementById("unreadmessageid")
+          .scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        bottomScroll.current.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+        });
+      }
     }
   }, [messageData, conversationId]);
 
@@ -92,24 +106,24 @@ export default function Messages({ userId }) {
           );
         }
 
-        socket?.emit(
-          "read_mssages",
-          {
-            conversationId: conversationData?.id,
-            loggedUser: userDetails?._id,
-          },
-          () => {
-            const conversationIndex = conversations.findIndex(
-              (e) => e.user_id === userId
-            );
+        // socket?.emit(
+        //   "read_messages",
+        //   {
+        //     conversationId: conversationData?.id,
+        //     loggedUser: userDetails?._id,
+        //   },
+        //   () => {
+        //     const conversationIndex = conversations.findIndex(
+        //       (e) => e.user_id === userId
+        //     );
 
-            if (conversationIndex !== -1) {
-              const updatedConversations = [...conversations];
-              updatedConversations[conversationIndex].unreadCount = 0;
-              setConversations(updatedConversations);
-            }
-          }
-        );
+        //     if (conversationIndex !== -1) {
+        //       const updatedConversations = [...conversations];
+        //       updatedConversations[conversationIndex].unreadCount = 0;
+        //       setConversations(updatedConversations);
+        //     }
+        //   }
+        // );
 
         setMsgData((prevData) => ({
           ...prevData,
@@ -131,27 +145,32 @@ export default function Messages({ userId }) {
   }, [userId, userDetails, socket]);
 
   useEffect(() => {
-    socket?.emit(
-      "read_mssages",
-      {
-        conversationId: conversationId,
-        loggedUser: userDetails?._id,
-      },
-      () => {
-        const conversationIndex = conversations.findIndex(
-          (e) => e.user_id === userId
-        );
+    if (conversationId !== "new") {
+      socket?.emit(
+        "read_messages",
+        {
+          conversationId: conversationId,
+          loggedUser: userDetails?._id,
+        },
+        () => {
+          const conversationIndex = conversations.findIndex(
+            (e) => e.user_id === userId
+          );
 
-        if (conversationIndex !== -1) {
-          const updatedConversations = [...conversations];
-          updatedConversations[conversationIndex].unreadCount = 0;
-          setConversations(updatedConversations);
+          if (conversationIndex !== -1) {
+            const updatedConversations = [...conversations];
+            updatedConversations[conversationIndex].unreadCount = 0;
+            setConversations(updatedConversations);
+          }
         }
-      }
-    );
+      );
+    }
   }, [messageData]);
 
   const handleSendMessage = (e, type = "") => {
+    setMsgData((prevState) => ({ ...prevState, unreadMessage: false }));
+
+    // Get the message from the event target
     let message = msgData?.message ?? "";
 
     // If the `type` is "like", get the message from the event target's inner text
@@ -183,7 +202,7 @@ export default function Messages({ userId }) {
     // Clear the message in `msgData` after sending
     setMsgData((prevVal) => ({ ...prevVal, message: "" }));
   };
-  
+
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -202,6 +221,13 @@ export default function Messages({ userId }) {
     // socket.on("send_typing_message", (data) => {
     //   console.log("User is typing:", data);
     // });
+  };
+
+  const handleDocument = () => {
+    setMsgData((presVal) => ({
+      ...presVal,
+      documentSend: !presVal.documentSend,
+    }));
   };
 
   if (msgData.pageLoading) {
@@ -442,11 +468,46 @@ export default function Messages({ userId }) {
         )}
       </div>
 
+      <input
+        disabled={filesRef?.length >= 4}
+        accept="image/*,video/*"
+        ref={inputRef}
+        multiple
+        onChange={(e) => {
+          setFileRef([...filesRef, ...e.target.files]);
+          setTimeout(() => handleDocument(), 0);
+        }}
+        type="file"
+        name="image"
+        id="uploadImage"
+        className="hidden"
+      />
+
       {/* <!-- sending message area --> */}
       {/* <div className=" items-center md:gap-4 gap-2 md:p-3 p-2 h-14 fixed w-full bottom-0 bg-white shadow-lg"> */}
       <div className="flex justify-between items-center gap-2 h-14 fixed w-[-webkit-fill-available] bottom-0 bg-white z-20 p-2 border-t shadow-lg">
         <div>
-          {msgData.documentSend && <DocumentModel />}
+          <div className="absolute bottom-14 w-[-webkit-fill-available]">
+            {msgData.documentSend && (
+              <DocumentModel
+                filesRef={filesRef}
+                setFileRef={setFileRef}
+                handleDocument={handleDocument}
+                inputRef={inputRef}
+              />
+            )}
+            {filesRef.length > 0 && (
+              <div className="bg-white p-8">
+                {/* <ImageSwiper /> */}
+                <ImageSlider
+                  filesRef={filesRef}
+                  setFileRef={setFileRef}
+                  isFeed={false}
+                />
+              </div>
+            )}
+          </div>
+
           <div
             id="message__wrap"
             className="flex items-center gap-2 h-full dark:text-white -mt-1.5"
@@ -454,13 +515,14 @@ export default function Messages({ userId }) {
             <button
               type="button"
               className="shrink-0"
-              onClick={() =>
+              onClick={() => {
                 setMsgData((prevState) => ({
                   ...prevState,
                   documentSend: !prevState.documentSend,
                   emojiSend: false,
-                }))
-              }
+                }));
+                setFileRef([]);
+              }}
             >
               <svg
                 stroke="currentColor"
