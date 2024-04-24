@@ -33,6 +33,8 @@ export default function Messages({ userId }) {
   const {
     conversations,
     setConversations,
+    notSendMessage,
+    setNotSendMessage,
     conversationId,
     setConversationId,
     messageData,
@@ -169,7 +171,6 @@ export default function Messages({ userId }) {
   }, [messageData]);
 
   const handleSendMessage = (e, type = "") => {
-
     // Get the message from the event target
     let message = msgData?.message ?? "";
 
@@ -197,8 +198,27 @@ export default function Messages({ userId }) {
       text: messageText,
     };
 
+    if (!conversationId) {
+      console.warn("No conversationId in data");
+    }
+
+
+    if (conversationId === "new") {
+      const newId = notSendMessage["new"][`${userId}`]?.length + 1;
+
+      notSendMessage["new"][userId].push({
+        ...messagePayload,
+        newId: newId,
+        send: true,
+      });
+    }
+console.log(notSendMessage)
     // Send the socket event to emit the message
-    socket?.emit("send_message", messagePayload);
+    socket?.emit("send_message", {
+      ...messagePayload,
+      newId: notSendMessage["new"][userId]?.length,
+      send: true,
+    });
 
     // Clear the message in `msgData` after sending
     setMsgData((prevVal) => ({ ...prevVal, message: "" }));
@@ -393,35 +413,20 @@ export default function Messages({ userId }) {
                 userDetails={userDetails}
                 msgData={msgData}
               />
+              <RenderMessages
+                messages={
+                  conversationId !== "new"
+                    ? notSendMessage?.[conversationId]
+                    : notSendMessage?.["new"]?.[userId]
+                }
+                userDetails={userDetails}
+                msgData={msgData}
+              />
               {/* <!-- time --> */}
               {/* <div className="flex justify-center ">
             <div className="font-medium text-gray-500 text-sm dark:text-white/70">
               April 8,2023,6:30 AM
             </div>
-          </div> */}
-
-              {/* <div className="flex gap-2 flex-row-reverse items-end">
-            <div className="relative w-4 h-4">
-              <Image
-                src="/people-know/avatar-3.jpg"
-                alt="profile"
-                className="rounded-full shadow"
-                fill={true}
-              />
-            </div>
-
-            <a className="block rounded-[18px] border overflow-hidden" href="#">
-              <div className="max-w-md">
-                <div className="max-w-full relative w-72 h-52">
-                  <Image
-                    src="/product-3.jpg"
-                    alt="profile"
-                    className="object-cover"
-                    fill={true}
-                  />
-                </div>
-              </div>
-            </a>
           </div> */}
             </div>
             <div ref={bottomScroll}></div>

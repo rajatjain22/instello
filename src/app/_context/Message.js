@@ -12,15 +12,12 @@ const MessageContext = createContext(undefined);
 function MessageContextProvider({ children }) {
   const path = usePathname();
   const { userDetails } = useContext(UserContext);
-  const [conversationId, setConversationId] = useState("new");
+  let [conversationId, setConversationId] = useState("new");
   const [conversations, setConversations] = useState([]);
   const [conversationsLoading, setConversationsLoading] = useState(true);
-  const [messageData, setMessageData] = useState(null);
+  const [messageData, setMessageData] = useState({});
+  const [notSendMessage, setNotSendMessage] = useState({});
   const [socket, setSocket] = useState(null);
-
-  const isPublicPath = ["/login", "/register", "/forget-password"].includes(
-    path
-  );
 
   useEffect(() => {
     console.log("Message context running");
@@ -56,7 +53,7 @@ function MessageContextProvider({ children }) {
           <CustomToast id={t.id} visible={t.visible} data={data} />
         ));
       });
-console.log("object")
+
       const handleMessage = (data, type) => {
         if (!data.conversationId) {
           console.warn("No conversationId in data");
@@ -67,14 +64,29 @@ console.log("object")
           setConversationId(data.conversationId);
         }
 
+        const checkConvoId = notSendMessage.hasOwnProperty(data.conversationId);
+
+        const receiverMessages = checkConvoId
+          ? notSendMessage[data.conversationId]
+          : notSendMessage["new"][data.receiverId];
+
+        notSendMessage[data.receiverId] = receiverMessages.filter(
+          (e) => e.newId !== data.newId
+        );
+
         // Update message data
-        setMessageData((prevState) => ({
-          ...prevState,
-          [data.conversationId]: [
-            ...(prevState?.[data?.conversationId] || []),
-            data,
-          ],
-        }));
+        setMessageData((prevState) => {
+          const conversationId = data.conversationId;
+
+          const prevMessages = prevState[conversationId] || [];
+
+          const updatedMessages = [...prevMessages, data];
+
+          return {
+            ...prevState,
+            [conversationId]: updatedMessages,
+          };
+        });
 
         setConversations((prevConversations) => {
           let updatedConversations = [...prevConversations];
@@ -140,6 +152,8 @@ console.log("object")
         setConversationsLoading,
         messageData,
         setMessageData,
+        notSendMessage,
+        setNotSendMessage,
         socket,
       }}
     >

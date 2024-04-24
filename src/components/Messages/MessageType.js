@@ -26,6 +26,7 @@ function Message({ data, user, isSender }) {
 
   return (
     <div className={`flex gap-2 ${alignment}`}>
+      {data?.send && <span className="text-[8px] text-[gray]">sending...</span>}
       <Avatar src={user?.avatar} size={isSender ? "small" : "large"} />
       <div className={`px-4 py-2 max-w-sm rounded-[20px] shadow ${bgColor}`}>
         <p>{data.text}</p>
@@ -36,13 +37,13 @@ function Message({ data, user, isSender }) {
 }
 
 // Media Message components for image-based messages
-function MediaMessage({ data, user, isSender }) {
+function MediaMessage({ data, user, isSender, send }) {
   const alignment = isSender ? "flex-row-reverse items-end" : "";
   const imageSize = isSender ? "small" : "large";
   return (
     <div className={`flex gap-2 ${alignment}`}>
+      {send && <span className="text-[8px] text-[gray]">sending...</span>}
       <Avatar src={user?.avatar} size={imageSize} />
-
       <a className="block rounded-[18px] border overflow-hidden" href="#">
         <div className="max-w-md">
           <div className="relative w-72 h-52 object-cover">
@@ -75,6 +76,7 @@ const RenderMessages = ({ messages, userDetails, msgData }) => {
                   data={val}
                   user={isSender ? userDetails : msgData?.user}
                   isSender={isSender}
+                  send={e?.send}
                 />
                 {e.file.length === idx + 1 && e.text && (
                   <Message
