@@ -1,6 +1,8 @@
 import { Fragment } from "react";
 import Image from "next/image";
 import UnreadMessage from "./UnreadMessage";
+import Embed from "react-embed";
+import Link from "next/link";
 
 // Common Avatar component to avoid repetition
 function Avatar({ src, size = "small" }) {
@@ -37,26 +39,62 @@ function Message({ data, user, isSender }) {
 }
 
 // Media Message components for image-based messages
-function MediaMessage({ data, user, isSender, send }) {
+function MediaMessage({ data, user, isSender }) {
   const alignment = isSender ? "flex-row-reverse items-end" : "";
   const imageSize = isSender ? "small" : "large";
+
   return (
-    <div className={`flex gap-2 ${alignment}`}>
-      {send && <span className="text-[8px] text-[gray]">sending...</span>}
-      <Avatar src={user?.avatar} size={imageSize} />
-      <a className="block rounded-[18px] border overflow-hidden" href="#">
-        <div className="max-w-md">
-          <div className="relative w-72 h-52 object-cover">
-            <Image
-              src={data}
-              alt="profile"
-              className="object-cover"
-              fill={true}
-            />
+    <>
+      {data.file?.length > 0 &&
+        data.file.map((val, idx) => (
+          <div className={`flex gap-2 ${alignment}`} key={idx}>
+            {data?.send && (
+              <span className="text-[8px] text-[gray]">sending...</span>
+            )}
+            <Avatar src={user?.avatar} size={imageSize} />
+            <a className="block rounded-[18px] border overflow-hidden" href="#">
+              <div className="max-w-md">
+                <div className="relative w-72 h-52 object-cover">
+                  <Image
+                    src={val}
+                    alt="profile"
+                    className="object-cover"
+                    fill={true}
+                  />
+                </div>
+              </div>
+            </a>
           </div>
+        ))}
+      {data?.text && <Message data={data} user={user} isSender={isSender} />}
+    </>
+  );
+}
+
+// Link Message components for image-based messages
+function LinkMessage({ data, user, isSender }) {
+  const alignment = isSender ? "flex-row-reverse items-end" : "";
+  const imageSize = isSender ? "small" : "large";
+
+  return (
+    <>
+      <div className={`flex gap-2 ${alignment}`}>
+        <Avatar src={user?.avatar} size={imageSize} />
+        {data?.send && (
+          <span className="text-[8px] text-[gray]">sending...</span>
+        )}
+        <div className="max-w-md mt-4">
+          <Embed width="300px" isDark url={data.text} />
+          <Link
+            href={data.text}
+            target="_blank"
+            className={`py-2 max-w-sm text-[blue]`}
+          >
+            {data.text}
+          </Link>
         </div>
-      </a>
-    </div>
+      </div>
+    </>
   );
 }
 
@@ -66,30 +104,21 @@ const RenderMessages = ({ messages, userDetails, msgData }) => {
     <>
       {messages?.map((e, index) => {
         const isSender = e.senderId === userDetails?._id;
-        const hasFiles = e?.file?.length > 0;
-
+        const hasFiles = e?.type;
+        console.log(e);
         const renderMessage = () => {
-          if (hasFiles) {
-            return e.file.map((val, idx) => (
-              <Fragment key={idx}>
-                <MediaMessage
-                  data={val}
-                  user={isSender ? userDetails : msgData?.user}
-                  isSender={isSender}
-                  send={e?.send}
-                />
-                {e.file.length === idx + 1 && e.text && (
-                  <Message
-                    data={e}
-                    user={isSender ? userDetails : msgData?.user}
-                    isSender={isSender}
-                  />
-                )}
-              </Fragment>
-            ));
-          } else {
+          if (hasFiles === "text" || hasFiles === "media") {
             return (
-              <Message
+              <MediaMessage
+                data={e}
+                user={isSender ? userDetails : msgData?.user}
+                isSender={isSender}
+              />
+            );
+          }
+          if (hasFiles === "link") {
+            return (
+              <LinkMessage
                 data={e}
                 user={isSender ? userDetails : msgData?.user}
                 isSender={isSender}

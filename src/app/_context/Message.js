@@ -64,16 +64,6 @@ function MessageContextProvider({ children }) {
           setConversationId(data.conversationId);
         }
 
-        const checkConvoId = notSendMessage.hasOwnProperty(data.conversationId);
-
-        const receiverMessages = checkConvoId
-          ? notSendMessage[data.conversationId]
-          : notSendMessage["new"][data.receiverId];
-
-        notSendMessage[data.receiverId] = receiverMessages.filter(
-          (e) => e.newId !== data.newId
-        );
-
         // Update message data
         setMessageData((prevState) => {
           const conversationId = data.conversationId;
@@ -99,6 +89,7 @@ function MessageContextProvider({ children }) {
               ...updatedConversations[findConversationIndex],
               lastMessage: data.text,
               lastMessageCreatedAt: new Date(),
+              lastMessageType: data.type,
               unreadCount:
                 type === "receive"
                   ? (updatedConversations[findConversationIndex]?.unreadCount ||

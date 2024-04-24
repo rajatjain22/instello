@@ -22,7 +22,6 @@ export default function UserSidebar() {
     setConversations,
     conversationsLoading,
     setConversationsLoading,
-    socket,
   } = useContext(MessageContext);
   const { userDetails } = useContext(UserContext);
 
@@ -284,7 +283,9 @@ export default function UserSidebar() {
                 </div>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className=" overflow-hidden text-ellipsis text-sm whitespace-nowrap">
-                    {val?.lastMessage}
+                    {val?.lastMessageType === "text"
+                      ? val?.lastMessage
+                      : val?.lastMessageType}
                   </div>
                   {val.unreadCount > 0 && (
                     <div className="w-5 h-5 border rounded-full bg-[#353535] text-white text-xs text-center flex justify-center items-center">
