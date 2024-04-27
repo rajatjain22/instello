@@ -16,27 +16,29 @@ export default function Messages({ userId }) {
   const bottomScroll = useRef(null);
   const inputRef = useRef(null);
   const { userDetails } = useContext(UserContext);
-  const {
-    socket,
-    allConversations,
-    setAllConversations,
-    messageData,
-    setMessageData,
-    userData,
-    setUserData,
-  } = useContext(MessageContext);
+  const { socket } = useContext(MessageContext);
   const [filesRef, setFileRef] = useState([]);
 
   const [unreadMessage, setunreadMessage] = useState(true);
 
   const [msgData, setMsgData] = useState({
+    user: {},
     lastReadMessage: null,
     message: "",
     documentSend: false,
     emojiSend: false,
-    pageLoading: false,
-    msgLoadig: false,
+    pageLoading: true,
+    msgLoadig: true,
   });
+
+  const {
+    conversations,
+    setConversations,
+    conversationId,
+    setConversationId,
+    messageData,
+    setMessageData,
+  } = useContext(MessageContext);
 
   useEffect(() => {
     if (bottomScroll.current) {
@@ -52,31 +54,84 @@ export default function Messages({ userId }) {
         });
       }
     }
-  }, [messageData]);
+  }, [messageData, conversationId]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setMsgData((prevData) => ({ ...prevData, msgLoadig: true }));
+        const [userDataResponse, conversationResponse] = await Promise.all([
+          fetch(`/api/users/profile/${userId}`),
+          fetch(`/api/conversations?q=${userId}`),
+        ]);
+
+        if (!userDataResponse.ok || !conversationResponse.ok) {
+          throw new Error("Failed to fetch data");
+        }
+
+        const [userData, conversationData] = await Promise.all([
+          userDataResponse.json(),
+          conversationResponse.json(),
+        ]);
+
+        setConversationId(conversationData?.id ? conversationData.id : "new");
+
+        if (
+          conversationData?.id &&
+          (!messageData || !messageData[conversationData.id])
+        ) {
+          socket?.emit(
+            "get_messages",
+            {
+              conversationId: conversationData?.id,
+              loggedUser: userDetails?._id,
+            },
+            (messages) => {
+              setMessageData((prevState) => ({
+                ...prevState,
+                [conversationData?.id]: [
+                  ...(prevState?.[conversationData?.id] || []),
+                  ...messages,
+                ],
+              }));
+              setConversations((prevState) => {
+                const newData = [...prevState];
+                const index = newData.findIndex(
+                  (item) => item.id === conversationData?.id
+                );
+                if (index !== -1) {
+                  newData[index] = { ...newData[index], unreadCount: 0 };
+                }
+                return newData;
+              });
+            }
+          );
+        }
+
+        // socket?.emit(
+        //   "read_messages",
+        //   {
+        //     conversationId: conversationData?.id,
+        //     loggedUser: userDetails?._id,
+        //   },
+        //   () => {
+        //     const conversationIndex = conversations.findIndex(
+        //       (e) => e.user_id === userId
+        //     );
+
+        //     if (conversationIndex !== -1) {
+        //       const updatedConversations = [...conversations];
+        //       updatedConversations[conversationIndex].unreadCount = 0;
+        //       setConversations(updatedConversations);
+        //     }
+        //   }
+        // );
+
         setMsgData((prevData) => ({
           ...prevData,
-          pageLoading: true,
-          msgLoadig: true,
-        }));
-        const res = await fetch(`/api/conversations/messages/${userId}`);
-        const data = await res.json();
-
-        setMessageData((prevState) => ({
-          ...prevState,
-          [userId]: [...(prevState?.[userId] || []), ...data.messages],
-        }));
-        setUserData((prevState) => ({
-          ...prevState,
-          [userId]: data.user,
-        }));
-
-        setMsgData((prevData) => ({
-          ...prevData,
-          lastReadMessage: data?.lastReadMessage ?? null,
+          user: userData.data,
+          lastReadMessage:
+            conversationData?.conversation?.lastReadMessage ?? null,
           msgLoadig: false,
         }));
       } catch (error) {
@@ -86,35 +141,32 @@ export default function Messages({ userId }) {
       }
     };
 
-    if (userId) {
-      if (!messageData[userId]) {
-        fetchData();
-      }
+    if (userId && userDetails && socket) {
+      fetchData();
     }
-  }, [userId]);
+  }, [userId, userDetails, socket]);
 
   useEffect(() => {
-    socket?.emit(
-      "read_messages",
-      {
-        userId,
-        loggedUser: userDetails?._id,
-      },
-      () => {
-        const conversationIndex = allConversations.findIndex(
-          (e) => e.user_id === userId
-        );
+    if (conversationId !== "new") {
+      socket?.emit(
+        "read_messages",
+        {
+          conversationId: conversationId,
+          loggedUser: userDetails?._id,
+        },
+        () => {
+          const conversationIndex = conversations.findIndex(
+            (e) => e.user_id === userId
+          );
 
-        if (conversationIndex !== -1) {
-          const updatedConversations = [...allConversations];
-          updatedConversations[conversationIndex] = {
-            ...updatedConversations[conversationIndex],
-            unreadCount: 0,
-          };
-          setAllConversations(updatedConversations);
+          if (conversationIndex !== -1) {
+            const updatedConversations = [...conversations];
+            updatedConversations[conversationIndex].unreadCount = 0;
+            setConversations(updatedConversations);
+          }
         }
-      }
-    );
+      );
+    }
   }, [messageData]);
 
   const handleSendMessage = (e, type = "") => {
@@ -135,58 +187,15 @@ export default function Messages({ userId }) {
     }
 
     const messagePayload = {
+      conversationId: conversationId ?? "new",
       senderId: userDetails?._id,
       receiverId: userId,
-      avatar: userData?.[userId]?.avatar,
-      username: userData?.[userId]?.username,
+      avatar: msgData?.user?.avatar,
+      username: msgData?.user?.username,
       type: filesRef.length > 0 ? "media" : isURL(message) ? "link" : "text",
       file: filesRef,
       text: messageText,
-      newKey: Date.now(),
-      status: true,
     };
-
-    // Update message data
-    setMessageData((prevState) => ({
-      ...prevState,
-      [userId]: [...prevState[userId], messagePayload],
-    }));
-
-    // setConversations((prevConversations) => {
-    //   let updatedConversations = [...prevConversations];
-    //   const findConversationIndex = updatedConversations.findIndex(
-    //     (e) => e.id === data.conversationId
-    //   );
-
-    //   if (findConversationIndex !== -1) {
-    //     updatedConversations[findConversationIndex] = {
-    //       ...updatedConversations[findConversationIndex],
-    //       lastMessage: data.text,
-    //       lastMessageCreatedAt: new Date(),
-    //       lastMessageType: data.type,
-    //       unreadCount:
-    //         type === "receive"
-    //           ? (updatedConversations[findConversationIndex]?.unreadCount ||
-    //               0) + 1
-    //           : updatedConversations[findConversationIndex]?.unreadCount || 0,
-    //     };
-    //     const currentConversation = updatedConversations.splice(
-    //       findConversationIndex,
-    //       1
-    //     )[0];
-    //     updatedConversations.unshift(currentConversation);
-    //   } else {
-    //     updatedConversations.unshift({
-    //       id: data.conversationId,
-    //       user_id: data.receiverId,
-    //       username: data.username,
-    //       avatar: data.avatar,
-    //       lastMessage: data.text,
-    //       lastMessageCreatedAt: new Date(),
-    //     });
-    //   }
-    //   return updatedConversations;
-    // });
 
     // Send the socket event to emit the message
     socket?.emit("send_message", messagePayload);
@@ -227,8 +236,6 @@ export default function Messages({ userId }) {
     return <div>Loading...</div>;
   }
 
-  console.log(userData?.[userId]);
-
   return (
     <div className="relative flex-1 overflow-y-scroll h-screen">
       {/* <!-- chat heading --> */}
@@ -258,29 +265,27 @@ export default function Messages({ userId }) {
 
           <div className="relative w-8 h-8 cursor-pointer max-md:hidden">
             <Image
-              src={userData?.[userId]?.avatar}
+              src={msgData?.user?.avatar}
               alt="profile"
               className="rounded-full shadow"
               fill={true}
             />
             <div
               className={`w-2 h-2 ${
-                userData?.[userId]?.status && "bg-teal-500"
+                msgData.user.status && "bg-teal-500"
               } rounded-full absolute right-0 bottom-0 m-px`}
             ></div>
           </div>
           <div className="cursor-pointer">
-            <div className="text-base font-bold">
-              {userData?.[userId]?.fullName}
-            </div>
+            <div className="text-base font-bold">{msgData?.user?.fullName}</div>
             <div
               className={`text-xs ${
-                userData?.[userId]?.status ? "text-green-500" : "text-gray-500"
+                msgData.user.status ? "text-green-500" : "text-gray-500"
               } font-semibold`}
             >
-              {userData?.[userId]?.status
+              {msgData.user.status
                 ? "Online"
-                : formatTimestampOnDays(userData?.[userId]?.lastLoginAt)}
+                : formatTimestampOnDays(msgData.user.lastLoginAt)}
             </div>
           </div>
         </div>
@@ -355,7 +360,7 @@ export default function Messages({ userId }) {
         <div className="py-5 text-center text-sm lg:pt-8">
           <div className="relative w-24 h-24 rounded-full mx-auto mb-3">
             <Image
-              src={userData?.[userId]?.avatar}
+              src={msgData?.user?.avatar}
               alt="profile"
               className="rounded-full shadow"
               fill={true}
@@ -363,10 +368,10 @@ export default function Messages({ userId }) {
           </div>
           <div className="mt-8">
             <div className="md:text-xl text-base font-medium text-black dark:text-white">
-              {userData?.[userId]?.fullName}
+              {msgData?.user?.fullName}
             </div>
             <div className="text-gray-500 text-sm dark:text-white/80">
-              @{userData?.[userId]?.username}
+              @{msgData?.user?.username}
             </div>
           </div>
           <div className="mt-3.5">
@@ -384,11 +389,41 @@ export default function Messages({ userId }) {
           <>
             <div className="font-medium space-y-2 mb-16">
               <RenderMessages
-                messages={messageData?.[userId]}
+                messages={messageData?.[conversationId]}
                 userDetails={userDetails}
-                user={userData?.[userId]}
-                lastReadMessage={msgData.lastReadMessage}
+                msgData={msgData}
               />
+
+              {/* <!-- time --> */}
+              {/* <div className="flex justify-center ">
+            <div className="font-medium text-gray-500 text-sm dark:text-white/70">
+              April 8,2023,6:30 AM
+            </div>
+          </div> */}
+
+              {/* <div className="flex gap-2 flex-row-reverse items-end">
+            <div className="relative w-4 h-4">
+              <Image
+                src="/people-know/avatar-3.jpg"
+                alt="profile"
+                className="rounded-full shadow"
+                fill={true}
+              />
+            </div>
+
+            <a className="block rounded-[18px] border overflow-hidden" href="#">
+              <div className="max-w-md">
+                <div className="max-w-full relative w-72 h-52">
+                  <Image
+                    src="/product-3.jpg"
+                    alt="profile"
+                    className="object-cover"
+                    fill={true}
+                  />
+                </div>
+              </div>
+            </a>
+          </div> */}
             </div>
             <div ref={bottomScroll}></div>
           </>

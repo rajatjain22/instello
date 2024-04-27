@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { IoClose } from "react-icons/io5";
 
 export default function ModelBox({ children, isOpen, onClose, className }) {
   const modalRef = useRef();
@@ -23,17 +22,17 @@ export default function ModelBox({ children, isOpen, onClose, className }) {
   return (
     <div>
       {isOpen && (
-        <div className='fixed inset-0 z-10 overflow-y-auto'>
-          <div className='flex items-center justify-center min-h-screen px-4 text-center'>
+        <div className="fixed inset-0 z-10 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 text-center">
             <div
-              className='fixed inset-0 transition-opacity'
-              aria-hidden='true'
+              className="fixed inset-0 transition-opacity"
+              aria-hidden="true"
             >
-              <div className='absolute inset-0 bg-gray-500 opacity-75'></div>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
             <span
-              className='hidden sm:inline-block sm:align-middle sm:h-screen'
-              aria-hidden='true'
+              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              aria-hidden="true"
             >
               &#8203;
             </span>
@@ -43,10 +42,20 @@ export default function ModelBox({ children, isOpen, onClose, className }) {
             >
               {children}
               <div
-                className='absolute top-0 right-0 cursor-pointer text-2xl text-black'
+                className="absolute top-0 right-0 cursor-pointer text-2xl text-black"
                 onClick={onClose}
               >
-                <IoClose />
+                <svg
+                  stroke="currentColor"
+                  fill="currentColor"
+                  strokeWidth="0"
+                  viewBox="0 0 512 512"
+                  height="1em"
+                  width="1em"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="m289.94 256 95-95A24 24 0 0 0 351 127l-95 95-95-95a24 24 0 0 0-34 34l95 95-95 95a24 24 0 1 0 34 34l95-95 95 95a24 24 0 0 0 34-34z"></path>
+                </svg>
               </div>
             </div>
           </div>

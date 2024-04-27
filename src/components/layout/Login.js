@@ -11,7 +11,6 @@ import { PostContext } from "@/app/_context/Post";
 import ForgotPasswordLink from "@/components/Login/ForgotPasswordLink";
 
 export default function Login() {
-  const { setIsLoggedIn } = useContext(UserContext);
   const { setHomePostsLoading } = useContext(PostContext);
 
   const router = useRouter();
@@ -43,7 +42,6 @@ export default function Login() {
       if (!response.ok) throw new Error(resJson.error);
 
       if (formType) {
-        setIsLoggedIn(true);
         router.push("/");
       } else {
         setFormType(true);
@@ -60,7 +58,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col h-screen justify-center items-center">
+    <div className="h-screen place-content-center overflow-y-scroll">
       <div className="max-w-sm mx-auto md:px-10 p-4 w-full">
         <div className="relative w-6 h-16 bg-fuchsia-100 px-3 rounded-2xl p-2.5 my-5 mx-auto">
           {/* Your image component */}

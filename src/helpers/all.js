@@ -122,6 +122,14 @@ const onValidPassword = (inputString) => {
   return re.test(inputString);
 };
 
+function isURL(str) {
+  // Regular expression for matching URLs starting with http:// or https://
+  const urlRegex = /(https?:\/\/[^\s]+)/;
+
+  // Test if the string matches the URL regex
+  return urlRegex.test(str);
+}
+
 export {
   capitalizeWords,
   AllWordFirstChar,
@@ -130,4 +138,5 @@ export {
   onValidUsername,
   onValidEmail,
   onValidPassword,
+  isURL,
 };

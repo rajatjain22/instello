@@ -19,11 +19,7 @@ const FilePreview = ({ i, file, filesRef, setFileRef, isFeed }) => {
   }
 
   return (
-    <div
-      className={`slide bg-white flex-shrink-0  h-[calc(30vw*1.5)] sm:h-[calc(30vw*1.5)] md:h-[calc(16vw*1.5)]  relative ${
-        !isFeed && "w-[36vw] sm:w-[36vw] md:w-[20vw] mx-2"
-      }`}
-    >
+    <div className={`slide bg-white flex-shrink-0 relative w-24 h-24 mx-2`}>
       {isImage && (
         <Image
           src={url}
@@ -67,7 +63,7 @@ const FilePreview = ({ i, file, filesRef, setFileRef, isFeed }) => {
             filesRef.splice(i, 1);
             return setFileRef([...filesRef]);
           }}
-          className="absolute right-3 top-2 px-2 py-2 rounded-full bg-bg-card text-black bg-[#f7f7f7] group cursor-pointer backdrop-blur-[2px]"
+          className="absolute right-0 top-0 px-2 py-2 rounded-full bg-bg-card text-black group cursor-pointer backdrop-blur-[2px]"
         >
           <svg
             stroke="currentColor"

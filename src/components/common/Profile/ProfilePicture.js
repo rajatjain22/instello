@@ -4,7 +4,6 @@ import { UserContext } from "@/app/_context/User";
 import { ImageLoading4 } from "@/components/Loaders/Profile/ImageLoading";
 import Image from "next/image";
 import React, { useContext, useEffect, useState } from "react";
-import { IoCamera } from "react-icons/io5";
 
 export default function ProfilePicture({ profile }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
@@ -70,21 +69,21 @@ export default function ProfilePicture({ profile }) {
       }`}
     >
       <label
-        htmlFor='file'
+        htmlFor="file"
         className={`${profileData._id === userDetails._id && "cursor-pointer"}`}
       >
-        <div className='relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900'>
+        <div className="relative  flex justify-center items-center md:w-40 md:h-40 h-16 w-16 rounded-full overflow-hidden md:border-[6px] border-gray-100 shrink-0 dark:border-slate-900">
           {profileloading ? (
-            <div className='text-sm md:text-2xl text-white'>
-              <ImageLoading4 className='w-20 h-20' />
+            <div className="text-sm md:text-2xl text-white">
+              <ImageLoading4 className="w-20 h-20" />
             </div>
           ) : (
             <Image
-              className='shrink-0 bg-fuchsia-100 rounded-2xl'
+              className="shrink-0 bg-fuchsia-100 rounded-2xl"
               src={profileData.avatar}
-              alt='Picture of the author'
+              alt="Picture of the author"
               fill={true}
-              loading='lazy'
+              loading="lazy"
             />
           )}
         </div>
@@ -92,24 +91,35 @@ export default function ProfilePicture({ profile }) {
       {profileData._id === userDetails._id && (
         <>
           <button
-            type='button'
-            className='absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden'
+            type="button"
+            className="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-white shadow p-1.5 rounded-full md:flex hidden"
           >
-            <IoCamera className='text-2xl' />
+            <svg
+              stroke="currentColor"
+              fill="currentColor"
+              strokeWidth="0"
+              viewBox="0 0 512 512"
+              className="text-2xl"
+              height="1em"
+              width="1em"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle cx="256" cy="272" r="64"></circle>
+              <path d="M432 144h-59c-3 0-6.72-1.94-9.62-5l-25.94-40.94a15.52 15.52 0 0 0-1.37-1.85C327.11 85.76 315 80 302 80h-92c-13 0-25.11 5.76-34.07 16.21a15.52 15.52 0 0 0-1.37 1.85l-25.94 41c-2.22 2.42-5.34 5-8.62 5v-8a16 16 0 0 0-16-16h-24a16 16 0 0 0-16 16v8h-4a48.05 48.05 0 0 0-48 48V384a48.05 48.05 0 0 0 48 48h352a48.05 48.05 0 0 0 48-48V192a48.05 48.05 0 0 0-48-48zM256 368a96 96 0 1 1 96-96 96.11 96.11 0 0 1-96 96z"></path>
+            </svg>
           </button>
 
           <input
-            id='file'
-            type='file'
-            name='file'
-            className='hidden'
+            id="file"
+            type="file"
+            name="file"
+            className="hidden"
             onChange={handleUpdateProfile}
-            accept='image/*'
+            accept="image/*"
             disabled={profileloading}
           />
         </>
       )}
-
     </div>
   );
 }

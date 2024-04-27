@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 export default function ForgotPasswordLink() {
   const handleForgetPassword = () => {
     fetch("/api/users/forgetPassword", {
