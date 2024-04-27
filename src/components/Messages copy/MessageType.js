@@ -28,9 +28,7 @@ function Message({ data, user, isSender }) {
 
   return (
     <div className={`flex gap-2 ${alignment}`}>
-      {data?.status && (
-        <span className="text-[8px] text-[gray]">sending...</span>
-      )}
+      {data?.send && <span className="text-[8px] text-[gray]">sending...</span>}
       <Avatar src={user?.avatar} size={isSender ? "small" : "large"} />
       <div className={`px-4 py-2 max-w-sm rounded-[20px] shadow ${bgColor}`}>
         <p>{data.text}</p>
@@ -50,7 +48,7 @@ function MediaMessage({ data, user, isSender }) {
       {data.file?.length > 0 &&
         data.file.map((val, idx) => (
           <div className={`flex gap-2 ${alignment}`} key={idx}>
-            {data?.status && (
+            {data?.send && (
               <span className="text-[8px] text-[gray]">sending...</span>
             )}
             <Avatar src={user?.avatar} size={imageSize} />
@@ -82,7 +80,7 @@ function LinkMessage({ data, user, isSender }) {
     <>
       <div className={`flex gap-2 ${alignment}`}>
         <Avatar src={user?.avatar} size={imageSize} />
-        {data?.status && (
+        {data?.send && (
           <span className="text-[8px] text-[gray]">sending...</span>
         )}
         <div className="max-w-md mt-4">
@@ -101,7 +99,7 @@ function LinkMessage({ data, user, isSender }) {
 }
 
 // Main code structure for rendering messages
-const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
+const RenderMessages = ({ messages, userDetails, msgData }) => {
   return (
     <>
       {messages?.map((e, index) => {
@@ -112,7 +110,7 @@ const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
             return (
               <MediaMessage
                 data={e}
-                user={isSender ? userDetails : user}
+                user={isSender ? userDetails : msgData?.user}
                 isSender={isSender}
               />
             );
@@ -121,7 +119,7 @@ const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
             return (
               <LinkMessage
                 data={e}
-                user={isSender ? userDetails : user}
+                user={isSender ? userDetails : msgData?.user}
                 isSender={isSender}
               />
             );
@@ -133,7 +131,7 @@ const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
             {renderMessage()}
             {/* Render UnreadMessage only if the current message is the last read and the next one is not from the sender */}
             {index < messages.length - 1 &&
-              e._id === lastReadMessage &&
+              e._id === msgData?.lastReadMessage &&
               messages[index + 1].senderId !== userDetails?._id && (
                 <UnreadMessage />
               )}

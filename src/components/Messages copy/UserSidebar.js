@@ -17,9 +17,13 @@ import { UserContext } from "@/app/_context/User";
 export default function UserSidebar() {
   const { isMobile, isTablet } = useResponsive();
   const pathname = usePathname();
+  const {
+    conversations,
+    setConversations,
+    conversationsLoading,
+    setConversationsLoading,
+  } = useContext(MessageContext);
   const { userDetails } = useContext(UserContext);
-  const { allConversations, setAllConversations } = useContext(MessageContext);
-  const [allConversationsLoading, setAllConversationsLoading] = useState(false);
 
   const [search, setSearch] = useState({
     text: "",
@@ -70,19 +74,36 @@ export default function UserSidebar() {
   }, [search.text, debouncedSearch]);
 
   useEffect(() => {
-    setAllConversationsLoading(true);
     const fetchData = async () => {
-      try {
-        const res = await fetch("/api/conversations");
-        const data = await res.json();
-        setAllConversations(data.data);
-        setAllConversationsLoading(false);
-      } catch (error) {
-        console.log(error);
+      setConversationsLoading(true);
+      if (userDetails) {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SOCKET_URL}/get_conversations/${userDetails._id}`
+          );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          setConversations([...data]);
+          setConversationsLoading(false);
+        } catch (error) {
+          console.error("Fetch error:", error);
+        }
       }
     };
     fetchData();
-  }, []);
+    // console.log("userDetails", userDetails);
+    //     socket?.emit(
+    //       "get_conversations",
+    //       { userId: userDetails._id },
+    //       (conversatiosn) => {
+    //         setConversationsLoading(true);
+    //         setConversations([...conversatiosn]);
+    //         setConversationsLoading(false);
+    //       }
+    //     );
+  }, [userDetails]);
 
   return (
     <div
@@ -226,14 +247,14 @@ export default function UserSidebar() {
           ) : (
             <>No users</>
           )
-        ) : allConversationsLoading ? (
+        ) : conversationsLoading ? (
           <>
             <UserPlaceholder />
             <UserPlaceholder />
             <UserPlaceholder />
           </>
-        ) : allConversations.length ? (
-          allConversations?.map((val, index) => (
+        ) : conversations.length ? (
+          conversations?.map((val, index) => (
             <Link
               key={index}
               href={`/messages/${val.user_id}`}

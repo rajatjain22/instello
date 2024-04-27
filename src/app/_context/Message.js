@@ -10,13 +10,12 @@ import toast from "react-hot-toast";
 const MessageContext = createContext(undefined);
 
 function MessageContextProvider({ children }) {
-  const path = usePathname();
   const { userDetails } = useContext(UserContext);
-  let [conversationId, setConversationId] = useState("new");
-  const [conversations, setConversations] = useState([]);
-  const [conversationsLoading, setConversationsLoading] = useState(true);
+
+  const [allConversations, setAllConversations] = useState([]);
   const [messageData, setMessageData] = useState({});
-  const [notSendMessage, setNotSendMessage] = useState({});
+  const [userData, setUserData] = useState({});
+
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
@@ -45,107 +44,104 @@ function MessageContextProvider({ children }) {
   }, [userDetails]);
 
   useEffect(() => {
-    if (socket && socket.connected) {
-      console.log("Socket is connected. Setting up event listeners.");
+    const handleNewFriendRequest = (data) => {
+      toast.custom((t) => (
+        <CustomToast id={t.id} visible={t.visible} data={data} />
+      ));
+    };
 
-      socket.on("new_friend_request", (data) => {
-        toast.custom((t) => (
-          <CustomToast id={t.id} visible={t.visible} data={data} />
-        ));
+    const handleSendMessage = (data, type) => {
+      console.log("data", data);
+      const getMessageId = type === "send" ? data.receiverId : data.senderId;
+      setMessageData((prevState) => {
+        const updateState = { ...prevState };
+        const messageArray = updateState[getMessageId] || [];
+
+        const existingMessageIndex = messageArray.findIndex(
+          (e) => e.newKey === data.newKey
+        );
+
+        if (existingMessageIndex !== -1) {
+          // Update existing message
+          messageArray[existingMessageIndex] = {
+            ...messageArray[existingMessageIndex],
+            conversationId: data.conversationId,
+            status: data.status,
+            _id: data._id,
+            file: data.file,
+          };
+        } else {
+          // Add new message
+          messageArray.push(data);
+        }
+        updateState[getMessageId] = messageArray;
+        return updateState;
       });
 
-      const handleMessage = (data, type) => {
-        if (!data.conversationId) {
-          console.warn("No conversationId in data");
-          return;
-        }
+      setAllConversations((prevConversations) => {
+        let updatedConversations = [...prevConversations];
+        const findConversationIndex = updatedConversations.findIndex(
+          (e) => e.id === data.conversationId
+        );
 
-        if (conversationId === "new") {
-          setConversationId(data.conversationId);
-        }
-
-        // Update message data
-        setMessageData((prevState) => {
-          const conversationId = data.conversationId;
-
-          const prevMessages = prevState[conversationId] || [];
-
-          const updatedMessages = [...prevMessages, data];
-
-          return {
-            ...prevState,
-            [conversationId]: updatedMessages,
+        if (findConversationIndex !== -1) {
+          updatedConversations[findConversationIndex] = {
+            ...updatedConversations[findConversationIndex],
+            lastMessage: data.text,
+            lastMessageCreatedAt: new Date(),
+            lastMessageType: data.type,
+            unreadCount:
+              type === "receive"
+                ? (updatedConversations[findConversationIndex]?.unreadCount ||
+                    0) + 1
+                : updatedConversations[findConversationIndex]?.unreadCount || 0,
           };
-        });
+          const currentConversation = updatedConversations.splice(
+            findConversationIndex,
+            1
+          )[0];
+          updatedConversations.unshift(currentConversation);
+        } else {
+          updatedConversations.unshift({
+            id: data.conversationId,
+            user_id: getMessageId,
+            username: data.username,
+            avatar: data.avatar,
+            lastMessage: data.text,
+            lastMessageType: data.type,
+            unreadCount: type === "receive" ? 1 : 0,
+            lastMessageCreatedAt: new Date(),
+          });
+        }
+        return updatedConversations;
+      });
+    };
 
-        setConversations((prevConversations) => {
-          let updatedConversations = [...prevConversations];
-          const findConversationIndex = updatedConversations.findIndex(
-            (e) => e.id === data.conversationId
-          );
+    socket?.on("new_friend_request", handleNewFriendRequest);
+    socket?.on("send_new_message", (data) => handleSendMessage(data, "send"));
+    socket?.on("receive_new_message", (data) =>
+      handleSendMessage(data, "receive")
+    );
 
-          if (findConversationIndex !== -1) {
-            updatedConversations[findConversationIndex] = {
-              ...updatedConversations[findConversationIndex],
-              lastMessage: data.text,
-              lastMessageCreatedAt: new Date(),
-              lastMessageType: data.type,
-              unreadCount:
-                type === "receive"
-                  ? (updatedConversations[findConversationIndex]?.unreadCount ||
-                      0) + 1
-                  : updatedConversations[findConversationIndex]?.unreadCount ||
-                    0,
-            };
-            const currentConversation = updatedConversations.splice(
-              findConversationIndex,
-              1
-            )[0];
-            updatedConversations.unshift(currentConversation);
-          } else {
-            updatedConversations.unshift({
-              id: data.conversationId,
-              user_id: data.receiverId,
-              username: data.username,
-              avatar: data.avatar,
-              lastMessage: data.text,
-              lastMessageCreatedAt: new Date(),
-            });
-          }
-          return updatedConversations;
-        });
-      };
+    return () => {
+      console.log("Cleaning up event listeners");
+      socket?.off("new_friend_request");
+      socket?.off("send_new_message");
+      socket?.off("receive_new_message");
+    };
+  }, [socket]);
 
-      socket.on("send_new_message", (data) => handleMessage(data, "send"));
-      socket.on("receive_new_message", (data) =>
-        handleMessage(data, "receive")
-      );
-
-      return () => {
-        console.log("Cleaning up event listeners");
-        socket.off("new_friend_request");
-        socket.off("send_new_message");
-        socket.off("receive_new_message");
-      };
-    } else {
-      console.warn("Socket is not connected. Cannot set event listeners.");
-    }
-  }, [userDetails, conversationId, socket]);
-
+  console.log("a;;;;,;;dk", allConversations);
   return (
     <MessageContext.Provider
       value={{
-        conversationId,
-        setConversationId,
-        conversations,
-        setConversations,
-        conversationsLoading,
-        setConversationsLoading,
+        socket,
+        allConversations,
+        setAllConversations,
         messageData,
         setMessageData,
-        notSendMessage,
-        setNotSendMessage,
-        socket,
+        userData,
+        setUserData,
       }}
     >
       {children}
