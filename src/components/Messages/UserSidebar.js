@@ -11,7 +11,7 @@ import User from "../common/User";
 import { UserPlaceholder } from "../Placeholders/UserPlaceholder";
 import { MessageContext } from "@/app/_context/Message";
 import { debounce } from "@/helpers/debounce";
-import { formatTimestamp, formatTimestampOnDays } from "@/helpers/all";
+import { formatTimestampOnDays } from "@/helpers/all";
 import { UserContext } from "@/app/_context/User";
 
 export default function UserSidebar() {
@@ -60,7 +60,6 @@ export default function UserSidebar() {
       let abortController = new AbortController();
       const signal = abortController.signal;
       setSearch((presVal) => ({ ...presVal, searchLoading: true }));
-      console.log("object");
       debouncedSearch(search.text, signal);
 
       return () => {
@@ -70,9 +69,9 @@ export default function UserSidebar() {
   }, [search.text, debouncedSearch]);
 
   useEffect(() => {
-    setAllConversationsLoading(true);
     const fetchData = async () => {
       try {
+        setAllConversationsLoading(true);
         const res = await fetch("/api/conversations");
         const data = await res.json();
         setAllConversations(data.data);
@@ -81,7 +80,9 @@ export default function UserSidebar() {
         console.log(error);
       }
     };
-    fetchData();
+    if (allConversations.length === 0) {
+      fetchData();
+    }
   }, []);
 
   return (
@@ -119,7 +120,7 @@ export default function UserSidebar() {
               </svg>
             </Link>
             <h2 className="text-2xl font-bold text-black ml-1 dark:text-white">
-              Chats
+              {userDetails.fullName}
             </h2>
           </div>
 
@@ -159,28 +160,6 @@ export default function UserSidebar() {
               >
                 <path d="M362.6 192.9L345 174.8c-.7-.8-1.8-1.2-2.8-1.2-1.1 0-2.1.4-2.8 1.2l-122 122.9-44.4-44.4c-.8-.8-1.8-1.2-2.8-1.2-1 0-2 .4-2.8 1.2l-17.8 17.8c-1.6 1.6-1.6 4.1 0 5.7l56 56c3.6 3.6 8 5.7 11.7 5.7 5.3 0 9.9-3.9 11.6-5.5h.1l133.7-134.4c1.4-1.7 1.4-4.2-.1-5.7z"></path>
                 <path d="M256 76c48.1 0 93.3 18.7 127.3 52.7S436 207.9 436 256s-18.7 93.3-52.7 127.3S304.1 436 256 436c-48.1 0-93.3-18.7-127.3-52.7S76 304.1 76 256s18.7-93.3 52.7-127.3S207.9 76 256 76m0-28C141.1 48 48 141.1 48 256s93.1 208 208 208 208-93.1 208-208S370.9 48 256 48z"></path>
-              </svg>
-            </button>
-
-            {/* <!-- mobile toggle menu --> */}
-            <button type="button" className="md:hidden">
-              <svg
-                stroke="currentColor"
-                fill="currentColor"
-                strokeWidth="0"
-                viewBox="0 0 512 512"
-                className="text-2xl -ml-4 md"
-                height="1em"
-                width="1em"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="48"
-                  d="M328 112 184 256l144 144"
-                ></path>
               </svg>
             </button>
           </div>
@@ -232,7 +211,7 @@ export default function UserSidebar() {
             <UserPlaceholder />
             <UserPlaceholder />
           </>
-        ) : allConversations.length ? (
+        ) : allConversations?.length ? (
           allConversations?.map((val, index) => (
             <Link
               key={index}
@@ -261,13 +240,15 @@ export default function UserSidebar() {
                   </div>
                 </div>
                 <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <div className=" overflow-hidden text-ellipsis text-sm whitespace-nowrap">
-                    {val?.lastMessageType === "text"
+                  <div className="flex-1 overflow-hidden text-ellipsis text-sm whitespace-nowrap">
+                    {val.typing
+                      ? "typing..."
+                      : val?.lastMessageType === "text"
                       ? val?.lastMessage
                       : val?.lastMessageType}
                   </div>
                   {val.unreadCount > 0 && (
-                    <div className="w-5 h-5 border rounded-full bg-[#353535] text-white text-xs text-center flex justify-center items-center">
+                    <div className="flex-shrink-0 w-6 h-6 border rounded-full bg-[#353535] text-white text-xs text-center flex justify-center items-center">
                       {val.unreadCount}
                     </div>
                   )}

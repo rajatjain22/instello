@@ -9,7 +9,7 @@ import TopBar from "@/components/common/NavBars/TopBar";
 import BottomBar from "@/components/common/NavBars/BottomBar";
 import NotificationModel from "@/components/layout/NotificationModel";
 import SearchModel from "@/components/layout/SearchModel";
-import {ImageLoading5} from "@/components/Loaders/Profile/ImageLoading"
+import { ImageLoading5 } from "@/components/Loaders/Profile/ImageLoading";
 
 export default function Provider({ children }) {
   // const sideNavBarSearchRef = useRef(null);
@@ -17,7 +17,9 @@ export default function Provider({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  const isPublicPath = ["/login", "/register", "/forget-password"].includes(pathname);
+  const isPublicPath = ["/login", "/register", "/forget-password"].includes(
+    pathname
+  );
 
   const [sideref, setSideref] = useState(null);
   const [topref, settopref] = useState(null);

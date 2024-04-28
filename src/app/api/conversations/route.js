@@ -12,45 +12,10 @@ const getUnreadMessageCount = async (conversationId, lastReadMessage) => {
       return await Messages.countDocuments({ conversationId });
     }
 
-    const lastReadMessageObjId = new mongoose.Types.ObjectId(lastReadMessage);
-
-    const result = await Messages.aggregate([
-      {
-        $match: {
-          _id: lastReadMessageObjId,
-        },
-      },
-      {
-        $lookup: {
-          from: "messages",
-          let: { createdAt: "$createdAt" },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ["$conversationId", conversationId] },
-                    { $gt: ["$createdAt", "$$createdAt"] },
-                  ],
-                },
-              },
-            },
-          ],
-          as: "unreadMessages",
-        },
-      },
-      {
-        $project: {
-          unreadMessageCount: { $size: "$unreadMessages" },
-        },
-      },
-    ]);
-
-    if (result.length > 0) {
-      return result[0].unreadMessageCount || 0;
-    } else {
-      return 0;
-    }
+    return await Messages.countDocuments({
+      conversationId,
+      createdAt: { $gt: lastReadMessage.createdAt },
+    });
   } catch (error) {
     console.error("Error in getUnreadMessageCount:", error);
     throw error;
@@ -83,6 +48,11 @@ export async function GET(request) {
           (elm) => elm._id.toString() !== loggedUserId
         );
 
+        const unreadCount =
+          loggedUserId === el?.lastMessage?.senderId?.toString()
+            ? 0
+            : await getUnreadMessageCount(el._id, el?.lastReadMessage);
+
         return {
           id: el._id,
           user_id: user?._id,
@@ -92,13 +62,7 @@ export async function GET(request) {
           status: user?.status,
           lastMessageType: el?.lastMessage?.type,
           lastMessageCreatedAt: el?.lastMessage?.createdAt ?? "",
-          unreadCount:
-            loggedUserId === el?.lastMessage?.senderId.toString()
-              ? 0
-              : await getUnreadMessageCount(
-                  el._id,
-                  el?.lastReadMessage?._id ?? null
-                ),
+          unreadCount,
         };
       })
     );

@@ -7,7 +7,7 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import Image from "next/image";
 
-export default function PostSwiper({ posts }) {
+export default function PostSwiper({ posts, model = false }) {
   return (
     <Swiper
       pagination={{
@@ -15,7 +15,9 @@ export default function PostSwiper({ posts }) {
       }}
       navigation={true}
       modules={[Pagination, Navigation]}
-      className="mySwiper w-full h-full bg-[#f3f3f3] rounded-3xl"
+      className={`mySwiper w-full h-full ${
+        !model && "bg-[#f3f3f3] rounded-3xl"
+      }`}
     >
       {posts.map((post, i) => {
         const isImage = /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(post);

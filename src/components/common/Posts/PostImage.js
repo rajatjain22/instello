@@ -62,13 +62,6 @@ export default function PostImage({ user, post }) {
     }));
   };
 
-  const handleCloseViewModel = () => {
-    setPostAction((presVal) => ({
-      ...presVal,
-      viewModel: false,
-    }));
-  };
-
   const handleCommentModel = () => {
     setPostAction((presVal) => ({
       ...presVal,

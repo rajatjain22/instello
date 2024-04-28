@@ -206,7 +206,6 @@ function OptionsModel({ buttonRef, onClose, postId, userId }) {
             <hr />
             <Link
               href="#"
-              onClick={hanleOpenConfirmModel}
               className="text-red-400 hover:!bg-red-50 dark:hover:!bg-red-500/50"
             >
               {/* <IoStopCircleOutline className="text-xl shrink-0 md" /> */}
