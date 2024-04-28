@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import FilePreview from "./FilePreview";
-import ModelPost from "./ModelPost";
+import ImageModel from "../ImageModel";
 
 export default function PostList({ posts }) {
   const [model, setModel] = useState({
@@ -60,7 +60,11 @@ export default function PostList({ posts }) {
               );
             })}
           </div>
-          <ModelPost model={model} onClose={onClose} />
+          <ImageModel
+            isOpen={model.open}
+            data={model?.post?.post ?? []}
+            onClose={onClose}
+          />
         </div>
       ) : (
         <div className="flex items-center justify-center h-48 py-3">

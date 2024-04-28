@@ -1,12 +1,15 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import Image from "next/image";
 import UnreadMessage from "./UnreadMessage";
 import Embed from "react-embed";
 import Link from "next/link";
+import ImageModel from "../common/ImageModel";
+import { TypingLoader, TypingLoader2 } from "../Loaders/Message/TypingLoader";
 
 // Common Avatar component to avoid repetition
 function Avatar({ src, size = "small" }) {
-  const avatarSize = size === "small" ? "w-5 h-5" : "w-9 h-9";
+  const avatarSize = "w-5 h-5";
+  // const avatarSize = size === "small" ? "w-5 h-5" : "w-9 h-9";
   return (
     <div className={`relative ${avatarSize}`}>
       <Image
@@ -21,7 +24,7 @@ function Avatar({ src, size = "small" }) {
 
 // Message components for text messages
 function Message({ data, user, isSender }) {
-  const alignment = isSender ? "flex-row-reverse items-end" : "";
+  const alignment = isSender ? "flex-row-reverse items-end ml-9" : "mr-9";
   const bgColor = isSender
     ? "bg-gradient-to-tr from-sky-500 to-blue-500 text-white"
     : "bg-secondery";
@@ -33,8 +36,7 @@ function Message({ data, user, isSender }) {
       )}
       <Avatar src={user?.avatar} size={isSender ? "small" : "large"} />
       <div className={`px-4 py-2 max-w-sm rounded-[20px] shadow ${bgColor}`}>
-        <p>{data.text}</p>
-        {/* <span className="text-xs text-gray-400">12:30pm</span> */}
+        <p className="break-all">{data.text}</p>
       </div>
     </div>
   );
@@ -42,32 +44,37 @@ function Message({ data, user, isSender }) {
 
 // Media Message components for image-based messages
 function MediaMessage({ data, user, isSender }) {
-  const alignment = isSender ? "flex-row-reverse items-end" : "";
+  const alignment = isSender ? "flex-row-reverse items-end ml-9" : "mr-9";
   const imageSize = isSender ? "small" : "large";
-
   return (
     <>
-      {data.file?.length > 0 &&
-        data.file.map((val, idx) => (
-          <div className={`flex gap-2 ${alignment}`} key={idx}>
-            {data?.status && (
-              <span className="text-[8px] text-[gray]">sending...</span>
-            )}
-            <Avatar src={user?.avatar} size={imageSize} />
-            <a className="block rounded-[18px] border overflow-hidden" href="#">
-              <div className="max-w-md">
-                <div className="relative w-72 h-52 object-cover">
-                  <Image
-                    src={val}
-                    alt="profile"
-                    className="object-cover"
-                    fill={true}
-                  />
+      {data.file.length > 0 &&
+        data.file.map((val, idx) => {
+          const url = data?._id ? val : URL.createObjectURL(val);
+          return (
+            <div className={`flex gap-2 ${alignment}`} key={idx}>
+              {data?.status && (
+                <span className="text-[8px] text-[gray]">sending...</span>
+              )}
+              <Avatar src={user?.avatar} size={imageSize} />
+              <a
+                className="block rounded-[18px] border overflow-hidden"
+                href="#"
+              >
+                <div className="max-w-md">
+                  <div className="relative w-72 h-52 object-cover">
+                    <Image
+                      src={url}
+                      alt="profile"
+                      className="object-cover"
+                      fill={true}
+                    />
+                  </div>
                 </div>
-              </div>
-            </a>
-          </div>
-        ))}
+              </a>
+            </div>
+          );
+        })}
       {data?.text && <Message data={data} user={user} isSender={isSender} />}
     </>
   );
@@ -75,7 +82,7 @@ function MediaMessage({ data, user, isSender }) {
 
 // Link Message components for image-based messages
 function LinkMessage({ data, user, isSender }) {
-  const alignment = isSender ? "flex-row-reverse items-end" : "";
+  const alignment = isSender ? "flex-row-reverse items-end ml-9" : "mr-9";
   const imageSize = isSender ? "small" : "large";
 
   return (
@@ -90,7 +97,7 @@ function LinkMessage({ data, user, isSender }) {
           <Link
             href={data.text}
             target="_blank"
-            className={`py-2 max-w-sm text-[blue]`}
+            className={`py-2 max-w-sm text-[blue] break-all`}
           >
             {data.text}
           </Link>
@@ -101,7 +108,19 @@ function LinkMessage({ data, user, isSender }) {
 }
 
 // Main code structure for rendering messages
-const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
+const RenderMessages = ({
+  messages,
+  userDetails,
+  user,
+  lastReadMessage,
+  isTyping,
+}) => {
+  const [model, setModel] = useState(false);
+  const [fileData, setFileData] = useState([]);
+  const handleModel = (show, file = []) => {
+    setModel(show);
+    setFileData(file);
+  };
   return (
     <>
       {messages?.map((e, index) => {
@@ -110,11 +129,21 @@ const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
         const renderMessage = () => {
           if (hasFiles === "text" || hasFiles === "media") {
             return (
-              <MediaMessage
-                data={e}
-                user={isSender ? userDetails : user}
-                isSender={isSender}
-              />
+              <>
+                <div
+                  onClick={() =>
+                    hasFiles === "media" &&
+                    !e.status &&
+                    handleModel(true, e.file)
+                  }
+                >
+                  <MediaMessage
+                    data={e}
+                    user={isSender ? userDetails : user}
+                    isSender={isSender}
+                  />
+                </div>
+              </>
             );
           }
           if (hasFiles === "link") {
@@ -140,6 +169,17 @@ const RenderMessages = ({ messages, userDetails, user, lastReadMessage }) => {
           </Fragment>
         );
       })}
+      {isTyping?.typing && (
+        <div className="flex items-center gap-2">
+          <Avatar src={user?.avatar} size={"large"} />
+          <TypingLoader2 />
+        </div>
+      )}
+      <ImageModel
+        isOpen={model}
+        data={fileData}
+        onClose={() => handleModel(false)}
+      />
     </>
   );
 };

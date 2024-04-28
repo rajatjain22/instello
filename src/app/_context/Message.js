@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { UserContext } from "./User";
 import { io } from "socket.io-client";
@@ -44,15 +43,25 @@ function MessageContextProvider({ children }) {
   }, [userDetails]);
 
   useEffect(() => {
+    if (!socket) return;
+
     const handleNewFriendRequest = (data) => {
       toast.custom((t) => (
         <CustomToast id={t.id} visible={t.visible} data={data} />
       ));
+      if (Notification.permission === "granted") {
+        new Notification(data.username, {
+          body: data.message,
+          icon: data.avatar,
+        });
+      } else {
+        console.warn("Notification permission not granted");
+      }
     };
 
     const handleSendMessage = (data, type) => {
-      console.log("data", data);
       const getMessageId = type === "send" ? data.receiverId : data.senderId;
+      console.log(data);
       setMessageData((prevState) => {
         const updateState = { ...prevState };
         const messageArray = updateState[getMessageId] || [];
@@ -117,21 +126,69 @@ function MessageContextProvider({ children }) {
       });
     };
 
+    const handleUserTyping = (userId, typing) => {
+      const indexConvo = allConversations.findIndex(
+        (e) => e.user_id === userId
+      );
+      if (indexConvo >= 0) {
+        setAllConversations((prevState) => {
+          const newConversations = [...prevState];
+
+          newConversations[indexConvo] = {
+            ...newConversations[indexConvo],
+            typing,
+          };
+
+          return newConversations;
+        });
+      }
+    };
+
+    const handleUserOnline = (userId, status) => {
+      const getConvoIndex = allConversations.findIndex(
+        (e) => e.user_id === userId
+      );
+
+      if (userData.hasOwnProperty(userId)) {
+        userData[userId].status = status;
+        userData[userId].lastLoginAt = new Date();
+      }
+
+      if (getConvoIndex > 0) {
+        setAllConversations((prevStatus) => {
+          const oldState = [...prevStatus];
+          oldState[getConvoIndex] = {
+            ...oldState[getConvoIndex],
+            status,
+          };
+          return oldState;
+        });
+      }
+    };
+
+    socket?.on("userOnline", ({ userId }) => handleUserOnline(userId, true));
+    socket?.on("userOffline", ({ userId }) => handleUserOnline(userId, false));
     socket?.on("new_friend_request", handleNewFriendRequest);
     socket?.on("send_new_message", (data) => handleSendMessage(data, "send"));
     socket?.on("receive_new_message", (data) =>
       handleSendMessage(data, "receive")
     );
+    socket?.on("user_typing", ({ senderId }) =>
+      handleUserTyping(senderId, true)
+    );
+    socket?.on("user_stop_typing", ({ senderId }) =>
+      handleUserTyping(senderId, false)
+    );
 
     return () => {
-      console.log("Cleaning up event listeners");
       socket?.off("new_friend_request");
       socket?.off("send_new_message");
       socket?.off("receive_new_message");
+      socket?.off("user_typing", handleUserTyping);
+      socket?.off("user_stop_typing", handleUserTyping);
     };
-  }, [socket]);
+  }, [socket, allConversations]);
 
-  console.log("a;;;;,;;dk", allConversations);
   return (
     <MessageContext.Provider
       value={{
