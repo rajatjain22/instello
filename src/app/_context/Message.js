@@ -61,7 +61,6 @@ function MessageContextProvider({ children }) {
 
     const handleSendMessage = (data, type) => {
       const getMessageId = type === "send" ? data.receiverId : data.senderId;
-      console.log(data);
       setMessageData((prevState) => {
         const updateState = { ...prevState };
         const messageArray = updateState[getMessageId] || [];
@@ -145,23 +144,30 @@ function MessageContextProvider({ children }) {
     };
 
     const handleUserOnline = (userId, status) => {
-      const getConvoIndex = allConversations.findIndex(
-        (e) => e.user_id === userId
+      const conversationIndex = allConversations.findIndex(
+        (conversation) => conversation.user_id === userId
       );
 
       if (userData.hasOwnProperty(userId)) {
-        userData[userId].status = status;
-        userData[userId].lastLoginAt = new Date();
+        userData[userId] = {
+          ...userData[userId],
+          status,
+          lastLoginAt: new Date(),
+        };
       }
 
-      if (getConvoIndex > 0) {
-        setAllConversations((prevStatus) => {
-          const oldState = [...prevStatus];
-          oldState[getConvoIndex] = {
-            ...oldState[getConvoIndex],
+      if (conversationIndex >= 0) {
+        setAllConversations((prevConversations) => {
+          const updatedConversations = [...prevConversations];
+
+          const currentConversation = updatedConversations[conversationIndex];
+
+          updatedConversations[conversationIndex] = {
+            ...currentConversation,
             status,
           };
-          return oldState;
+
+          return updatedConversations;
         });
       }
     };

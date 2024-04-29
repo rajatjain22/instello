@@ -121,6 +121,16 @@ export default function Messages({ userId }) {
         }
       }
     );
+
+    socket?.on("seen_message", (data) => {
+      console.log("seen  messagde ===>", data);
+      if (data) {
+        setMsgData((presVal) => ({
+          ...presVal,
+          lastReadMessage: data.lastReadMessage,
+        }));
+      }
+    });
   }, [messageData]);
 
   const handleSendMessage = (e, type = "") => {
