@@ -337,7 +337,7 @@ export default function ProfileSetting({ userId }) {
               </form>
             </Tab>
             {/* <!-- tab password--> */}
-            <Tab label="Password">
+            <Tab label="Change Password">
               <form onSubmit={handleChangePasswordSubmit}>
                 <div className="space-y-6">
                   <div className="md:flex items-center gap-16 justify-between max-md:space-y-3">
