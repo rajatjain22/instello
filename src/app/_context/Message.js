@@ -12,17 +12,30 @@ function MessageContextProvider({ children }) {
   const { userDetails } = useContext(UserContext);
 
   const [allConversations, setAllConversations] = useState([]);
+  const [allConversationsLoading, setAllConversationsLoading] = useState(false);
   const [messageData, setMessageData] = useState({});
   const [userData, setUserData] = useState({});
 
   const [socket, setSocket] = useState(null);
 
-  useEffect(() => {
-    console.log("Message context running");
+  const fetchData = async () => {
+    try {
+      setAllConversationsLoading(true);
+      const res = await fetch("/api/conversations");
+      const data = await res.json();
+      setAllConversations(data.data);
+      setAllConversationsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  useEffect(() => {
     if (!userDetails?._id) {
       return;
     }
+
+    console.log("Message context running");
 
     const socketData = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
       query: `user_id=${userDetails?._id}`,
@@ -36,6 +49,8 @@ function MessageContextProvider({ children }) {
     socketData.on("getUsers", (users) => {
       console.log("Active users:", users);
     });
+
+    fetchData();
 
     return () => {
       socketData.disconnect();

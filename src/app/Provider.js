@@ -10,10 +10,16 @@ import BottomBar from "@/components/common/NavBars/BottomBar";
 import NotificationModel from "@/components/layout/NotificationModel";
 import SearchModel from "@/components/layout/SearchModel";
 import { ImageLoading5 } from "@/components/Loaders/Profile/ImageLoading";
+import { MessageContext } from "./_context/Message";
+import { PostContext } from "./_context/Post";
 
 export default function Provider({ children }) {
   // const sideNavBarSearchRef = useRef(null);
   const { userDetails, setUserDetails } = useContext(UserContext);
+  const { setAllConversations, setUserData, setSocket } =
+  useContext(MessageContext);
+const { setHomePosts } = useContext(PostContext);
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -51,8 +57,11 @@ export default function Provider({ children }) {
       .then((res) => res.json())
       .then((res) => {
         if (res?.message) {
-          router.push("/login");
           setUserDetails(null);
+          setAllConversations(null);
+          setUserData(null);
+          setSocket(null);
+          router.push("/login");
           toast.success("Logout Successfull");
         } else {
           throw new Error("Logout Failed");
