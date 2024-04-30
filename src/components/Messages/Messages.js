@@ -108,7 +108,7 @@ export default function Messages({ userId }) {
         userId,
         loggedUser: userDetails?._id,
       },
-      () => {
+      (data) => {
         const conversationIndex = allConversations.findIndex(
           (e) => e.user_id === userId
         );
@@ -119,8 +119,24 @@ export default function Messages({ userId }) {
             unreadCount: 0,
           };
         }
+
+        if (data) {
+          setMsgData((presVal) => ({
+            ...presVal,
+            lastReadMessage: data.lastReadMessage,
+          }));
+        }
       }
     );
+
+    socket?.on("seen_message", (data) => {
+      if (data) {
+        setMsgData((presVal) => ({
+          ...presVal,
+          lastReadMessage: data.lastReadMessage,
+        }));
+      }
+    });
   }, [messageData]);
 
   const handleSendMessage = (e, type = "") => {

@@ -7,6 +7,7 @@ import { NextResponse } from "next/server";
 import uploadImage from "@/cloudnary/uploadImage";
 import Posts from "@/schemas/PostModel";
 import mongoose from "mongoose";
+import bcryptjs from "bcryptjs";
 
 const app = express();
 app.use(fileUpload());
@@ -86,9 +87,35 @@ export async function PUT(request, { params }) {
     const bio = form.get("bio");
     const isPrivate = form.get("isPrivate");
 
+    const currentPassword = form.get("currentPassword");
+    const newPassword = form.get("newPassword");
+    const confirmPassword = form.get("confirmPassword");
+
+    if (currentPassword && newPassword && confirmPassword) {
+      if (newPassword !== confirmPassword) {
+        return NextResponse.json(
+          { error: "password not matched" },
+          { status: 404 }
+        );
+      }
+    }
+
     const user = await Users.findById(userId).select(
-      "-password -createdAt -__v -lastLoginAt"
+      "-createdAt -__v -lastLoginAt"
     );
+
+    if (currentPassword && newPassword && confirmPassword) {
+      const isMatch = await bcryptjs.compare(currentPassword, user.password);
+
+      if (!isMatch) {
+        return NextResponse.json(
+          { error: "Current password is wrong" },
+          { status: 401 }
+        );
+      }
+      const hashedPassword = await bcryptjs.hash(newPassword, 10);
+      user.password = hashedPassword;
+    }
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

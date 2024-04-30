@@ -1,10 +1,11 @@
-import { Fragment, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import UnreadMessage from "./UnreadMessage";
 import Embed from "react-embed";
 import Link from "next/link";
 import ImageModel from "../common/ImageModel";
 import { TypingLoader, TypingLoader2 } from "../Loaders/Message/TypingLoader";
+import { MessageContext } from "@/app/_context/Message";
 
 // Common Avatar component to avoid repetition
 function Avatar({ src, size = "small" }) {
@@ -121,6 +122,7 @@ const RenderMessages = ({
     setModel(show);
     setFileData(file);
   };
+
   return (
     <>
       {messages?.map((e, index) => {
@@ -160,6 +162,12 @@ const RenderMessages = ({
         return (
           <Fragment key={index}>
             {renderMessage()}
+            {e._id === lastReadMessage && e?.senderId === userDetails?._id && (
+              <span className="flex flex-row-reverse text-xs text-gray-500">
+                seen
+              </span>
+            )}
+
             {/* Render UnreadMessage only if the current message is the last read and the next one is not from the sender */}
             {index < messages.length - 1 &&
               e._id === lastReadMessage &&

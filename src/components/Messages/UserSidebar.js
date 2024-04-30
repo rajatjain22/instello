@@ -18,8 +18,8 @@ export default function UserSidebar() {
   const { isMobile, isTablet } = useResponsive();
   const pathname = usePathname();
   const { userDetails } = useContext(UserContext);
-  const { allConversations, setAllConversations } = useContext(MessageContext);
-  const [allConversationsLoading, setAllConversationsLoading] = useState(false);
+  const { allConversations, allConversationsLoading } =
+    useContext(MessageContext);
 
   const [search, setSearch] = useState({
     text: "",
@@ -67,23 +67,6 @@ export default function UserSidebar() {
       };
     }
   }, [search.text, debouncedSearch]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setAllConversationsLoading(true);
-        const res = await fetch("/api/conversations");
-        const data = await res.json();
-        setAllConversations(data.data);
-        setAllConversationsLoading(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    if (allConversations.length === 0) {
-      fetchData();
-    }
-  }, []);
 
   return (
     <div

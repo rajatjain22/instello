@@ -12,17 +12,30 @@ function MessageContextProvider({ children }) {
   const { userDetails } = useContext(UserContext);
 
   const [allConversations, setAllConversations] = useState([]);
+  const [allConversationsLoading, setAllConversationsLoading] = useState(false);
   const [messageData, setMessageData] = useState({});
   const [userData, setUserData] = useState({});
 
   const [socket, setSocket] = useState(null);
 
-  useEffect(() => {
-    console.log("Message context running");
+  const fetchData = async () => {
+    try {
+      setAllConversationsLoading(true);
+      const res = await fetch("/api/conversations");
+      const data = await res.json();
+      setAllConversations(data.data);
+      setAllConversationsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
+  useEffect(() => {
     if (!userDetails?._id) {
       return;
     }
+
+    console.log("Message context running");
 
     const socketData = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
       query: `user_id=${userDetails?._id}`,
@@ -36,6 +49,8 @@ function MessageContextProvider({ children }) {
     socketData.on("getUsers", (users) => {
       console.log("Active users:", users);
     });
+
+    fetchData();
 
     return () => {
       socketData.disconnect();
@@ -61,7 +76,6 @@ function MessageContextProvider({ children }) {
 
     const handleSendMessage = (data, type) => {
       const getMessageId = type === "send" ? data.receiverId : data.senderId;
-      console.log(data);
       setMessageData((prevState) => {
         const updateState = { ...prevState };
         const messageArray = updateState[getMessageId] || [];
@@ -124,6 +138,17 @@ function MessageContextProvider({ children }) {
         }
         return updatedConversations;
       });
+
+      if (type === "receive") {
+        if (Notification.permission === "granted") {
+          new Notification(data.username, {
+            body: data.type === "media" ? "Media" : data.text,
+            icon: data.avatar,
+          });
+        } else {
+          console.warn("Notification permission not granted");
+        }
+      }
     };
 
     const handleUserTyping = (userId, typing) => {
@@ -145,23 +170,30 @@ function MessageContextProvider({ children }) {
     };
 
     const handleUserOnline = (userId, status) => {
-      const getConvoIndex = allConversations.findIndex(
-        (e) => e.user_id === userId
+      const conversationIndex = allConversations.findIndex(
+        (conversation) => conversation.user_id === userId
       );
 
       if (userData.hasOwnProperty(userId)) {
-        userData[userId].status = status;
-        userData[userId].lastLoginAt = new Date();
+        userData[userId] = {
+          ...userData[userId],
+          status,
+          lastLoginAt: new Date(),
+        };
       }
 
-      if (getConvoIndex > 0) {
-        setAllConversations((prevStatus) => {
-          const oldState = [...prevStatus];
-          oldState[getConvoIndex] = {
-            ...oldState[getConvoIndex],
+      if (conversationIndex >= 0) {
+        setAllConversations((prevConversations) => {
+          const updatedConversations = [...prevConversations];
+
+          const currentConversation = updatedConversations[conversationIndex];
+
+          updatedConversations[conversationIndex] = {
+            ...currentConversation,
             status,
           };
-          return oldState;
+
+          return updatedConversations;
         });
       }
     };
@@ -193,8 +225,10 @@ function MessageContextProvider({ children }) {
     <MessageContext.Provider
       value={{
         socket,
+        setSocket,
         allConversations,
         setAllConversations,
+        allConversationsLoading,
         messageData,
         setMessageData,
         userData,
