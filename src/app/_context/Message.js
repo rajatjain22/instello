@@ -138,6 +138,17 @@ function MessageContextProvider({ children }) {
         }
         return updatedConversations;
       });
+
+      if (type === "receive") {
+        if (Notification.permission === "granted") {
+          new Notification(data.username, {
+            body: data.type === "media" ? "Media" : data.text,
+            icon: data.avatar,
+          });
+        } else {
+          console.warn("Notification permission not granted");
+        }
+      }
     };
 
     const handleUserTyping = (userId, typing) => {
@@ -214,8 +225,10 @@ function MessageContextProvider({ children }) {
     <MessageContext.Provider
       value={{
         socket,
+        setSocket,
         allConversations,
         setAllConversations,
+        allConversationsLoading,
         messageData,
         setMessageData,
         userData,

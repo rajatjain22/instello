@@ -18,7 +18,6 @@ export default function Provider({ children }) {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const { setAllConversations, setUserData, setSocket } =
   useContext(MessageContext);
-const { setHomePosts } = useContext(PostContext);
 
   const pathname = usePathname();
   const router = useRouter();
@@ -57,9 +56,9 @@ const { setHomePosts } = useContext(PostContext);
       .then((res) => res.json())
       .then((res) => {
         if (res?.message) {
-          setUserDetails(null);
-          setAllConversations(null);
-          setUserData(null);
+          setUserDetails({});
+          setAllConversations([]);
+          setUserData({});
           setSocket(null);
           router.push("/login");
           toast.success("Logout Successfull");

@@ -162,18 +162,11 @@ const RenderMessages = ({
         return (
           <Fragment key={index}>
             {renderMessage()}
-{console.log(e._id, lastReadMessage ,
-              e?.senderId === userDetails?._id &&
-              index + 1 <= messages.length &&
-              messages[index + 1]?.senderId === userDetails?._id , index+1, messages.length, index + 1 <= messages.length)}
-            {e._id === lastReadMessage &&
-              e?.senderId === userDetails?._id &&
-              index + 1 <= messages.length &&
-              messages[index + 1]?.senderId === userDetails?._id && (
-                <span className="flex flex-row-reverse text-xs text-gray-500">
-                  seen
-                </span>
-              )}
+            {e._id === lastReadMessage && e?.senderId === userDetails?._id && (
+              <span className="flex flex-row-reverse text-xs text-gray-500">
+                seen
+              </span>
+            )}
 
             {/* Render UnreadMessage only if the current message is the last read and the next one is not from the sender */}
             {index < messages.length - 1 &&
