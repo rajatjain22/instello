@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
 
 const Tabs = ({ children }) => {
-  if (!Array.isArray(children) || children.length === 0) {
-    console.error("Tabs component must have at least one Tab child");
-    return null;
-  }
-
-  const [activeTab, setActiveTab] = useState(children[0].props.label);
+  const [activeTab, setActiveTab] = useState(children?.[0]?.props?.label);
 
   const handleClick = (newActiveTab) => {
     setActiveTab(newActiveTab);
