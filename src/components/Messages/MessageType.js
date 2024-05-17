@@ -6,6 +6,7 @@ import Link from "next/link";
 import ImageModel from "../common/ImageModel";
 import { TypingLoader, TypingLoader2 } from "../Loaders/Message/TypingLoader";
 import { MessageContext } from "@/app/_context/Message";
+import ReplyComponent from "./ReplyComponent";
 
 // Common Avatar component to avoid repetition
 function Avatar({ src, size = "small" }) {
@@ -25,6 +26,7 @@ function Avatar({ src, size = "small" }) {
 
 // Message components for text messages
 function Message({ data, user, isSender }) {
+  const [showReplyButton, setShowReplyButton] = useState(false);
   const alignment = isSender ? "flex-row-reverse items-end ml-9" : "mr-9";
   const bgColor = isSender
     ? "bg-gradient-to-tr from-sky-500 to-blue-500 text-white"
@@ -36,15 +38,27 @@ function Message({ data, user, isSender }) {
         <span className="text-[8px] text-[gray]">sending...</span>
       )}
       <Avatar src={user?.avatar} size={isSender ? "small" : "large"} />
-      <div className={`px-4 py-2 max-w-sm rounded-[20px] shadow ${bgColor}`}>
-        <p className="break-all">{data.text}</p>
+      <div
+        className={`relative group`}
+        onMouseEnter={() => setShowReplyButton(true)}
+        onMouseLeave={() => setShowReplyButton(false)}
+      >
+        <div
+          className={`px-4 py-2 max-w-sm rounded-[20px] shadow break-words ${bgColor}`}
+        >
+          <p className="break-all">{data.text}</p>
+        </div>
+        <ReplyComponent
+          className={isSender ? "-left-6" : "-right-24"}
+          data={data}
+        />
       </div>
     </div>
   );
 }
 
 // Media Message components for image-based messages
-function MediaMessage({ data, user, isSender }) {
+function MediaMessage({ data, user, isSender, handleModel }) {
   const alignment = isSender ? "flex-row-reverse items-end ml-9" : "mr-9";
   const imageSize = isSender ? "small" : "large";
   return (
@@ -58,12 +72,12 @@ function MediaMessage({ data, user, isSender }) {
                 <span className="text-[8px] text-[gray]">sending...</span>
               )}
               <Avatar src={user?.avatar} size={imageSize} />
-              <a
-                className="block rounded-[18px] border overflow-hidden"
-                href="#"
-              >
-                <div className="max-w-md">
-                  <div className="relative w-72 h-52 object-cover">
+              <a className=" block" href="#">
+                <div className="max-w-md relative group">
+                  <div
+                    className="relative w-72 h-52 object-cover rounded-[18px] border overflow-hidden"
+                    onClick={() => !data.status && handleModel(true, data.file)}
+                  >
                     <Image
                       src={url}
                       alt="profile"
@@ -71,6 +85,12 @@ function MediaMessage({ data, user, isSender }) {
                       fill={true}
                     />
                   </div>
+                  <ReplyComponent
+                    className={
+                      isSender ? "!-top-2 -left-8" : "!-top-2 -right-24"
+                    }
+                    data={data}
+                  />
                 </div>
               </a>
             </div>
@@ -132,19 +152,20 @@ const RenderMessages = ({
           if (hasFiles === "text" || hasFiles === "media") {
             return (
               <>
-                <div
+                {/* <div
                   onClick={() =>
                     hasFiles === "media" &&
                     !e.status &&
                     handleModel(true, e.file)
                   }
-                >
-                  <MediaMessage
-                    data={e}
-                    user={isSender ? userDetails : user}
-                    isSender={isSender}
-                  />
-                </div>
+                > */}
+                <MediaMessage
+                  data={e}
+                  user={isSender ? userDetails : user}
+                  isSender={isSender}
+                  handleModel={handleModel}
+                />
+                {/* </div> */}
               </>
             );
           }

@@ -185,3 +185,8 @@ body {
   --tw-bg-opacity: 1;
   background-color: rgb(var(--color-secondery) / var(--tw-bg-opacity));
 }
+
+.clip-bottom {
+  clip-path: polygon(0 40%, 100% 100%, 100% 0);
+  /* clip-path: polygon(50% 0, 100% 100%, 0 100%); */
+}
