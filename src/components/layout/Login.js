@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { useContext, useState } from "react";
 import toast from "react-hot-toast";
 import { UserContext } from "@/app/_context/User";
@@ -60,8 +60,12 @@ export default function Login() {
   return (
     <div className="h-screen place-content-center overflow-y-scroll">
       <div className="max-w-sm mx-auto md:px-10 p-4 w-full">
-        <div className="relative w-6 h-16 bg-fuchsia-100 px-3 rounded-2xl p-2.5 my-5 mx-auto">
-          {/* Your image component */}
+        <div className="relative h-16 px-3 rounded-2xl p-2.5 my-5 mx-auto">
+        <Image
+            src="/logo.svg"
+            alt="profile"
+            fill={true}
+          />
         </div>
         <LoginForm
           formType={formType}
